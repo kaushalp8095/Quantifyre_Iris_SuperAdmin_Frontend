@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantifyre Iris - Report Details</title>
+
+    <link rel="stylesheet" href="Css/admin_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="Js/admin-auth-guard.js"></script>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="close-sidebar-btn" id="closeSidebarBtn"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo-section">
+                <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
+            </div>
+            <div class="user-mini-profile">
+                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <p></p>
+            </div>
+            <nav>
+                <ul>
+                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
+                    <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
+                    <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
+                    
+                    <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
+                    <li class="active"><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
+                    <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
+                    <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
+                    <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
+                    
+                    <div class="mobile-only-menu">
+                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                            Setting</a></li>
+                        <div class="dropdown-divider"
+                            style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
+                        <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                    class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                    </div>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="top-bar">
+                <div class="menu-toggle" id="sidebarToggle"><img src="Images/Slide.ico"></div>
+                <div class="top-profile-actions" style="position: relative;">
+
+                    <div class="notification-wrapper" style="position: relative;">
+                        <div class="icon-btn notification" onclick="toggleNotification(event)">
+                            <img src="Images/Notifications.ico">
+                            <span class="notif-count">3</span>
+                        </div>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <h4>Notifications</h4><span class="mark-read">Mark all read</span>
+                            </div>
+                            <ul class="notif-list">
+                                <li class="notif-item unread">
+                                    <div class="n-icon success"><i class="fa-solid fa-check"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>Campaign Approved</strong></p><span>"Summer Sale" is live.</span>
+                                    </div>
+                                    <span class="n-time">2m</span>
+                                </li>
+                                <li class="notif-item unread">
+                                    <div class="n-icon info"><i class="fa-solid fa-user-plus"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>New Lead</strong></p><span>John Doe from Ahmedabad.</span>
+                                    </div>
+                                    <span class="n-time">1h</span>
+                                </li>
+                                <li class="notif-item">
+                                    <div class="n-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>Budget Alert</strong></p><span>90% budget used.</span>
+                                    </div>
+                                    <span class="n-time">1d</span>
+                                </li>
+                            </ul>
+                            <div class="notif-footer"><a href="#">View All Notifications</a></div>
+                        </div>
+                    </div>
+                    <div class="profile-info" onclick="toggleProfileDropdown(event)"
+                        style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar-small">
+                            <img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <div class="text-info">
+                            <h4></h4>
+                            <p>Admin</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-down" id="profileChevron" style="transition: 0.3s;"></i>
+                    </div>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header-info">
+                            <p class="d-name"></p><span class="d-email"></span>
+                        </div>
+                        <ul class="dropdown-list">
+                            <li><a href="AdminSystemSetting.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+                            <div class="dropdown-divider"></div>
+                            <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                        class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="rd-header-flex">
+                <div class="rd-title-group">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="icon-square">
+                            <img src="Images/Report&Analytics50x50.ico"  alt="">
+                        </div>
+                        <div>
+                            <h1>Report Details: Campaign Summary Q2</h1>
+                            <div class="rd-meta-info">
+                                <span>Generated on: Nov 25, 2025</span>
+                                <div class="rd-meta-divider"></div>
+                                <span>By: Super Admin</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rd-action-buttons">
+                    <a href="AdminReports.html" class="rd-btn rd-btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+                    <button class="btn-create"><i class="fa-solid fa-download"></i> Download PDF</button>
+                    <button class="btn-create"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                </div>
+            </div>
+
+            <section class="rd-stats-section">
+                <div class="rd-stats-overview-box">
+                    
+                    <div class="rd-stat-card">
+                        <div class="rd-icon-box rd-icon-blue">
+                           <img src="Images/TotalBill50x50.ico" alt="">
+                        </div>
+                        <div>
+                            <h2 class="rd-stat-value">₹3,47,000</h2>
+                            <p class="rd-stat-label">Total Spend</p>
+                        </div>
+                    </div>
+
+                    <div class="rd-stat-card">
+                        <div class="rd-icon-box rd-icon-green">
+                           <img src="Images/Conversions50x50.ico" alt="">
+                        </div>
+                        <div>
+                            <h2 class="rd-stat-value">2,450</h2>
+                            <p class="rd-stat-label">Conversions</p>
+                        </div>
+                    </div>
+
+                    <div class="rd-stat-card">
+                        <div class="rd-icon-box rd-icon-teal">
+                            <img src="Images/PendingReport50x50.ico" alt="">
+                        </div>
+                        <div>
+                            <h2 class="rd-stat-value">₹24,500</h2>
+                            <p class="rd-stat-label">Avg. CPA</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="rd-chart-section">
+                <div class="rd-chart-header">
+                    <h3>Campaign Performance Trend</h3>
+                    <div class="rd-toggles">
+                        <div class="rd-toggle-item">
+                            <div class="rd-dot rd-dot-dark"></div> Spend
+                        </div>
+                        <div class="rd-toggle-item">
+                            <div class="rd-dot rd-dot-green"></div> Conversions
+                        </div>
+                    </div>
+                </div>
+                <div class="rd-chart-container">
+                    <canvas id="campaignTrendChart"></canvas>
+                </div>
+            </section>
+
+            <section class="rd-table-section">
+                <h3 class="rd-table-title">Campaign Breakdown</h3>
+                <div class="rd-table-wrapper">
+                    <table class="rd-table">
+                        <thead>
+                            <tr>
+                                <th>Campaign Name</th>
+                                <th>Impressions</th>
+                                <th>Clicks</th>
+                                <th>CTR</th>
+                                <th>Spend</th>
+                                <th>Conversions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Agency A Q2</td>
+                                <td>2,400</td>
+                                <td>1,870</td>
+                                <td>34.6%</td>
+                                <td>₹52,000</td>
+                                <td>1,870</td>
+                            </tr>
+                            <tr>
+                                <td>Client A Campaign</td>
+                                <td>1,300</td>
+                                <td>970</td>
+                                <td>23.7%</td>
+                                <td>₹30,000</td>
+                                <td>970</td>
+                            </tr>
+                            <tr>
+                                <td>Summer Promo</td>
+                                <td>3,200</td>
+                                <td>2,450</td>
+                                <td>67.3%</td>
+                                <td>₹24,600</td>
+                                <td>2,450</td>
+                            </tr>
+                            <tr>
+                                <td>Agency B Q1</td>
+                                <td>850</td>
+                                <td>670</td>
+                                <td>45.9%</td>
+                                <td>₹23,650</td>
+                                <td>670</td>
+                            </tr>
+                            <tr>
+                                <td>Winter Sale</td>
+                                <td>1,200</td>
+                                <td>890</td>
+                                <td>55.2%</td>
+                                <td>₹15,400</td>
+                                <td>890</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-icon-box2"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+            <h2>Ready to Leave?</h2>
+            <p>Are you sure you want to logout?</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-modal btn-modal-delete" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="Js/jquery-3.7.1.min.js"></script>
+    <script src="Js/all.js"></script>
+    
+    <script>
+        // Chart Configuration
+        const ctx = document.getElementById('campaignTrendChart').getContext('2d');
+        
+        const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientFill.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
+        gradientFill.addColorStop(1, 'rgba(0, 255, 157, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => i + 1), 
+                datasets: [{
+                    label: 'Conversions',
+                    data: [10, 25, 35, 40, 42, 45, 50, 55, 60, 65, 70, 80, 95, 100, 110, 130, 135, 140, 145, 150, 165, 175, 180, 190, 200, 210, 215, 220, 235, 250],
+                    borderColor: '#00ff9d',
+                    backgroundColor: gradientFill,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Spend',
+                    data: [5, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100, 110, 120, 125, 130, 135, 140, 145, 150, 160, 170, 180, 190],
+                    borderColor: '#005f40',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(9, 35, 30, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#ccc',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#5a6a6e', font: { size: 10 }, maxTicksLimit: 15 }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#5a6a6e', font: { size: 10 } },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

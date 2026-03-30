@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantifyre Iris - Agencies Management</title>
+
+    <link rel="stylesheet" href="Css/admin_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="Js/admin-auth-guard.js"></script>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <aside class="sidebar">
+            <div class="close-sidebar-btn" id="closeSidebarBtn"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo-section">
+                <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
+            </div>
+            <div class="user-mini-profile">
+                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <p></p>
+            </div>
+            <nav>
+                <ul>
+                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li class="active"><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
+                    <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
+                    <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
+                    
+                    <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
+                    <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
+                    <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
+                    <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
+                    <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
+                    
+                    <div class="mobile-only-menu">
+                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                            Setting</a></li>
+                        <div class="dropdown-divider"
+                            style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
+                        <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                    class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                    </div>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="top-bar">
+                <div class="menu-toggle" id="sidebarToggle"><img src="Images/Slide.ico"></div>
+                <div class="top-profile-actions" style="position: relative;">
+
+                    <div class="notification-wrapper" style="position: relative;">
+                        <div class="icon-btn notification" onclick="toggleNotification(event)">
+                            <img src="Images/Notifications.ico">
+                            <span class="notif-count">3</span>
+                        </div>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <h4>Notifications</h4><span class="mark-read">Mark all read</span>
+                            </div>
+                            <ul class="notif-list">
+                                <li class="notif-item unread">
+                                    <div class="n-icon success"><i class="fa-solid fa-check"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>Campaign Approved</strong></p><span>"Summer Sale" is live.</span>
+                                    </div>
+                                    <span class="n-time">2m</span>
+                                </li>
+                                <li class="notif-item unread">
+                                    <div class="n-icon info"><i class="fa-solid fa-user-plus"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>New Lead</strong></p><span>John Doe from Ahmedabad.</span>
+                                    </div>
+                                    <span class="n-time">1h</span>
+                                </li>
+                                <li class="notif-item">
+                                    <div class="n-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>Budget Alert</strong></p><span>90% budget used.</span>
+                                    </div>
+                                    <span class="n-time">1d</span>
+                                </li>
+                            </ul>
+                            <div class="notif-footer"><a href="#">View All Notifications</a></div>
+                        </div>
+                    </div>
+                    <div class="profile-info" onclick="toggleProfileDropdown(event)"
+                        style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar-small">
+                            <img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <div class="text-info">
+                            <h4></h4>
+                            <p>Admin</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-down" id="profileChevron" style="transition: 0.3s;"></i>
+                    </div>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header-info">
+                            <p class="d-name"></p><span class="d-email"></span>
+                        </div>
+                        <ul class="dropdown-list">
+                            <li><a href="AdminSystemSetting.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+                            <div class="dropdown-divider"></div>
+                            <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                        class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-header" style="justify-content: space-between; display: flex;">
+                <div class="title-text">
+                    <div class="icon-square">
+                        <img src="Images/agency50x50.ico" alt="">
+                    </div>
+                    <div>
+                        <h1>Agencies</h1>
+                        <p>Manage agencies, monitor performance</p>
+                    </div>
+                </div>
+                <a href="AdminAddAgency.html" class="btn-create">
+                    Add New Agency
+                </a>
+            </div>
+
+            <section class="agency-stats-grid">
+                <div class="agency-stat-card">
+                    <div class="card-header">
+                        <div class="icon-box icon-cyan"><img src="Images/agency50x50.ico" alt=""></div>
+                        <span class="percent up" style="color: #00ff9d;"><i class="fa-solid fa-arrow-up"></i> 67%</span>
+                    </div>
+                    <h2 id="kpi-total-agencies">0</h2>
+                    <p>Total Agencies</p>
+                </div>
+                <div class="agency-stat-card">
+                    <div class="card-header">
+                        <div class="icon-box icon-blue"><img src="Images/agency50x50.ico" alt=""></div>
+                        <span class="percent up" style="color: #00ff9d;"><i class="fa-solid fa-arrow-up"></i> 20%</span>
+                    </div>
+                    <h2 id="kpi-active-agencies">0</h2>
+                    <p>Active Agencies</p>
+                </div>
+                <div class="agency-stat-card">
+                    <div class="card-header">
+                        <div class="icon-box icon-green"><img src="Images/Campaign50x50.ico" alt=""></div>
+                        <span class="percent up" style="color: #00ff9d;"><i class="fa-solid fa-arrow-up"></i> 56%</span>
+                    </div>
+                    <h2 id="kpi-total-campaigns">0</h2>
+                    <p>Campaign Running</p>
+                </div>
+                <div class="agency-stat-card">
+                    <div class="card-header">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #107c41, #3fab3f);">
+                            <img src="Images/Revenue50x50.ico" alt="">
+                        </div>
+                        <span class="percent up" style="color: #00ff9d;"><i class="fa-solid fa-arrow-up"></i> 34%</span>
+                    </div>
+                    <h2 id="kpi-total-revenue">₹0</h2>
+                    <p>Revenue Generated</p>
+                </div>
+            </section>
+
+            <section class="glass-card section-gap">
+                <div class="table-header-flex">
+                    <h3 class="card-heading" style="padding:0; margin:0;">Agencies List</h3>
+                </div>
+
+                <div class="table-responsive agency-table-container">
+                    <table class="simple-table" id="agencyTable">
+                        <thead>
+                            <tr>
+                                <th>Agency Name</th>
+                                <th>Contact Info</th>
+                                <th>Clients</th>
+                                <th>Campaigns</th>
+                                <th>Revenue</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agencyDataBody">
+                            <tr>
+                                <td colspan="9" style="text-align:center; padding: 50px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Agencies...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="pagination-wrapper" id="pagination-agency">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="pagination-info">
+                        Showing <span id="start-row">0</span> to <span id="end-row">0</span> of
+                        <span id="total-rows">0</span> entries
+                    </div>
+
+                    <div class="custom-dropdown" id="rowsPerPageDropdown" style="width: 60px;min-width: 60px;">
+                        <div class="dropdown-selected" style="height: 32px; padding: 5px 10px; font-size: 0.8rem;"
+                            onclick="toggleDropdown('rowsPerPageDropdown')">
+                            <span class="selected-text">4</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+                        </div>
+                        <ul class="dropdown-options" style="bottom: 100%; top: auto; margin-bottom: 5px;">
+                            <li class="dropdown-item" onclick="changeRowsPerPage(4)">4</li>
+                            <li class="dropdown-item" onclick="changeRowsPerPage(10)">10</li>
+                            <li class="dropdown-item" onclick="changeRowsPerPage(25)">25</li>
+                            <li class="dropdown-item" onclick="changeRowsPerPage(50)">50</li>
+                            <li class="dropdown-item" onclick="changeRowsPerPage(100)">100</li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="pagination-controls">
+                    <button class="page-btn prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="page-numbers"></div>
+                    <button class="page-btn next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Delete & Suspend Model Logic -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon-box1 icon-delete">
+                <i class="fa-regular fa-trash-can"></i>
+            </div>
+            <h2>Delete Agency?</h2>
+            <p>Are you sure you want to delete this agency? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="btn-modal btn-delete-confirm" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
+    <!-- Logut Model Logic -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-icon-box2">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
+            <h2>Ready to Leave?</h2>
+            <p>Are you sure you want to logout? You will need to login again to access your dashboard.</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-modal btn-modal-delete" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="Js/jquery-3.7.1.min.js"></script>
+    <script src="Js/all.js"></script>
+    <script>
+        // ==========================================
+        // 1. CUSTOM DROPDOWN TOGGLE LOGIC
+        // ==========================================
+        function toggleDropdown(id) {
+            event.stopPropagation();
+            $('.custom-dropdown').not('#' + id).removeClass('active');
+            $('#' + id).toggleClass('active');
+        }
+
+        // Bahar click karne par dropdown band ho jaye
+        $(document).click(function (e) {
+            if (!$(e.target).closest('.custom-dropdown').length) {
+                $('.custom-dropdown').removeClass('active');
+            }
+        });
+
+        // ==========================================
+        // 2. CHANGE ROWS PER PAGE LOGIC
+        // ==========================================
+        function changeRowsPerPage(rows) {
+            // A. Dropdown ka text update karein
+            $('#rowsPerPageDropdown .selected-text').text(rows);
+            
+            // B. Dropdown ko band karein
+            $('#rowsPerPageDropdown').removeClass('active');
+            
+            // C. Table ko naye rows ke hisaab se wapas render karein
+            setupTablePagination('agencyTable', 'pagination-agency', rows);
+        }
+
+        // ==========================================
+        // 3. PAGINATION LOGIC (Updated for IDs)
+        // ==========================================
+        function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
+            const table = document.getElementById(tableId);
+            const wrapper = document.getElementById(paginationWrapperId);
+
+            if (!table || !wrapper) return;
+
+            const tbody = table.querySelector('tbody');
+            // Sirf un rows ko gino jo loading/error wali na hon
+            const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => !row.querySelector('td[colspan]'));
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            let currentPage = 1;
+
+            const pageNumbersContainer = wrapper.querySelector('.page-numbers');
+            const prevBtn = wrapper.querySelector('.prev-btn');
+            const nextBtn = wrapper.querySelector('.next-btn');
+            
+            // Aapke HTML me ab id="start-row" hai, isliye getElementById use kiya
+            const startRowSpan = document.getElementById('start-row');
+            const endRowSpan = document.getElementById('end-row');
+            const totalRowsSpan = document.getElementById('total-rows');
+
+            function render() {
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                // Table rows ko hide/show karna
+                rows.forEach((row, index) => {
+                    row.style.display = (index >= start && index < end) ? '' : 'none';
+                });
+
+                // Info text (Showing 1 to 4 of 10 entries) update karna
+                if (startRowSpan && endRowSpan && totalRowsSpan) {
+                    startRowSpan.innerText = totalRows === 0 ? 0 : start + 1;
+                    endRowSpan.innerText = end > totalRows ? totalRows : end;
+                    totalRowsSpan.innerText = totalRows;
+                }
+
+                // Page numbers render karna
+                pageNumbersContainer.innerHTML = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                    btn.innerText = i;
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        currentPage = i;
+                        render();
+                    };
+                    pageNumbersContainer.appendChild(btn);
+                }
+
+                // Prev/Next buttons enable/disable karna
+                if(prevBtn) prevBtn.disabled = (currentPage === 1 || totalPages === 0);
+                if(nextBtn) nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
+            }
+
+            if(prevBtn) {
+                prevBtn.onclick = (e) => {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        currentPage--;
+                        render();
+                    }
+                };
+            }
+
+            if(nextBtn) {
+                nextBtn.onclick = (e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        render();
+                    }
+                };
+            }
+
+            // Pehli baar render function call karo
+            render();
+        }
+
+        // ==========================================
+        // 4. DATA FETCH API LOGIC
+        // ==========================================
+        async function loadAgencies() {
+            const tbody = document.getElementById('agencyDataBody');
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/agencies/list');
+
+                if (!response.ok) throw new Error("Backend connection failed!");
+
+                const data = await response.json();
+                tbody.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 30px;">No Agencies Found in Database.</td></tr>';
+                    // Update KPI as 0
+                    document.getElementById('kpi-total-agencies').innerText = 0;
+                    document.getElementById('kpi-active-agencies').innerText = 0;
+                    document.getElementById('kpi-total-campaigns').innerText = 0;
+                    document.getElementById('kpi-total-revenue').innerText = "₹0";
+                    return;
+                }
+
+                let totalAgenciesCount = data.length;
+                let activeAgenciesCount = 0;
+                let totalCampaignsCount = 0;
+                let totalRevenueSum = 0;
+
+                data.forEach(agency => {
+                    const id = agency.id;
+                    const aName = agency.agencyname || agency.agencyName || 'N/A';
+                    const oName = agency.ownername || agency.ownerName || 'N/A';
+                    const email = agency.email || 'N/A';
+                    const phone = agency.phonenumber || agency.phoneNumber || 'N/A';
+                    const clients = agency.totalclients || agency.totalClients || 0;
+                    const campaigns = agency.totalcampaigns || agency.totalCampaigns || 0;
+                    const status = agency.status || 'Active';
+
+                    let rawRevenue = agency.totalRevenue || agency.total_revenue || agency.totalrevenue || agency.revenue || 0;
+                    let parsedRevenue = parseFloat(rawRevenue);
+                    const revenue = isNaN(parsedRevenue) ? 0 : parsedRevenue; 
+
+                    if (status.toLowerCase() === 'active') {
+                        activeAgenciesCount++;
+                    }
+                    totalCampaignsCount += parseInt(campaigns);
+                    totalRevenueSum += revenue;
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <strong>${aName}</strong><br>
+                                <span style="font-size:0.75rem; color:#8b9c9c;">${oName}</span>
+                            </td>
+                            <td>
+                                <span>${email}</span><br>
+                                <span style="font-size:0.75rem; color:#8b9c9c;">${phone}</span>
+                            </td>
+                            <td>${clients}</td>
+                            <td>${campaigns}</td>
+                            <td>₹${revenue.toLocaleString('en-IN')}</td>
+                            <td><span class="status-pill ${status.toLowerCase() === 'active' ? 'st-active' : 'st-inactive'}">${status}</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <a href="AdminAgencyDetails.html?id=${id}" class="action-btn view"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="AdminEditAgency.html?id=${id}" class="action-btn edit"><i class="fa-solid fa-pen"></i></a>
+                                    <div class="action-btn delete" onclick="openDeleteModal(${id})"><i class="fa-regular fa-trash-can"></i></div>
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+
+                // Update KPI Cards safely
+                const elTotal = document.getElementById('kpi-total-agencies');
+                const elActive = document.getElementById('kpi-active-agencies');
+                const elCamp = document.getElementById('kpi-total-campaigns');
+                const elRev = document.getElementById('kpi-total-revenue');
+
+                if(elTotal) elTotal.innerText = totalAgenciesCount;
+                if(elActive) elActive.innerText = activeAgenciesCount;
+                if(elCamp) elCamp.innerText = totalCampaignsCount;
+                if(elRev) elRev.innerText = "₹" + totalRevenueSum.toLocaleString('en-IN');
+
+                // Data load hone ke baad jo dropdown me likha hai utni rows ke sath set karein
+                const currentSelectedRows = parseInt($('#rowsPerPageDropdown .selected-text').text()) || 4;
+                setupTablePagination('agencyTable', 'pagination-agency', currentSelectedRows);
+
+            } catch (error) {
+                console.error("Error loading agencies:", error);
+                tbody.innerHTML = `<tr><td colspan="9" style="color:red; text-align:center; padding: 30px;">Error: ${error.message}. Make sure Backend is running on 8080.</td></tr>`;
+            }
+        }
+
+        // Page load hote hi API call karna
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAgencies();
+        });
+
+        // ==========================================
+        // 5. DELETE AGENCY & CUSTOM ALERT LOGIC
+        // ==========================================
+        let agencyIdToDelete = null;
+
+        // Modal Open karna aur ID set karna
+        function openDeleteModal(id) {
+            agencyIdToDelete = id;
+            $('#deleteModal').addClass('active');
+        }
+
+        // Modal Close karna
+        function closeModal(modalId) {
+            $('#' + modalId).removeClass('active');
+            agencyIdToDelete = null; // ID reset karein
+        }
+
+        // --- Custom Alert Functions ---
+        function showCustomAlert(title, message, type, redirectUrl = null) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+
+            if (type === 'success') {
+                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+            } else {
+                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+            }
+
+            $('#customAlertOverlay').addClass('active');
+
+            $('.btn-alert-ok').off('click').on('click', function () {
+                closeCustomAlert();
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+
+        function closeCustomAlert() {
+            $('#customAlertOverlay').removeClass('active');
+        }
+
+        // Delete Confirm hone par API call karna
+        function confirmDelete() {
+            if (!agencyIdToDelete) return;
+
+            const btn = $('.btn-delete-confirm');
+            btn.text('Deleting...').prop('disabled', true);
+
+            $.ajax({
+                url: `http://localhost:8080/api/admin/agencies/delete/${agencyIdToDelete}`,
+                type: 'DELETE',
+                success: function (response) {
+                    closeModal('deleteModal'); // Delete box band karo
+                    
+                    // Normal alert() ki jagah Custom Alert show karein
+                    showCustomAlert("Deleted", response.message || "Agency Deleted Successfully!", "success");
+                    
+                    // Table ko refresh karein bina page reload kiye
+                    loadAgencies(); 
+                },
+                error: function (xhr) {
+                    closeModal('deleteModal'); // Delete box band karo
+                    
+                    // Error Custom Alert
+                    showCustomAlert("Error", "Error deleting agency: " + (xhr.responseText || "Server Error"), "error");
+                },
+                complete: function () {
+                    // Button ko wapas normal state mein layein
+                    btn.text('Delete').prop('disabled', false);
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantifyre Iris - Add New Agency</title>
+    <link rel="stylesheet" href="Css/admin_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="Css/clientnamedropdown.css">
+    <script src="Js/admin-auth-guard.js"></script>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+         <aside class="sidebar">
+            <div class="close-sidebar-btn" id="closeSidebarBtn"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo-section">
+                <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
+            </div>
+            <div class="user-mini-profile">
+                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <p></p>
+            </div>
+            <nav>
+                <ul>
+                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li class="active"><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
+                    <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
+                    <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
+                    
+                    <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
+                    <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
+                    <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
+                    <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
+                    <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
+                    
+                    <div class="mobile-only-menu">
+                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                            Setting</a></li>
+                        <div class="dropdown-divider"
+                            style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
+                        <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                    class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                    </div>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="menu-toggle" id="sidebarToggle"><img src="Images/Slide.ico"></div>
+                <div class="top-profile-actions" style="position: relative;">
+
+                    <div class="notification-wrapper" style="position: relative;">
+                        <div class="icon-btn notification" onclick="toggleNotification(event)">
+                            <img src="Images/Notifications.ico">
+                            <span class="notif-count">3</span>
+                        </div>
+                        <div class="notif-dropdown" id="notifDropdown">
+                            <div class="notif-header">
+                                <h4>Notifications</h4><span class="mark-read">Mark all read</span>
+                            </div>
+                            <ul class="notif-list">
+                                <li class="notif-item unread">
+                                    <div class="n-icon success"><i class="fa-solid fa-check"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>Campaign Approved</strong></p><span>"Summer Sale" is live.</span>
+                                    </div>
+                                    <span class="n-time">2m</span>
+                                </li>
+                                <li class="notif-item unread">
+                                    <div class="n-icon info"><i class="fa-solid fa-user-plus"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>New Lead</strong></p><span>John Doe from Ahmedabad.</span>
+                                    </div>
+                                    <span class="n-time">1h</span>
+                                </li>
+                                <li class="notif-item">
+                                    <div class="n-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                    <div class="n-text">
+                                        <p><strong>Budget Alert</strong></p><span>90% budget used.</span>
+                                    </div>
+                                    <span class="n-time">1d</span>
+                                </li>
+                            </ul>
+                            <div class="notif-footer"><a href="#">View All Notifications</a></div>
+                        </div>
+                    </div>
+                    <div class="profile-info" onclick="toggleProfileDropdown(event)"
+                        style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar-small">
+                            <img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <div class="text-info">
+                            <h4></h4>
+                            <p>Admin</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-down" id="profileChevron" style="transition: 0.3s;"></i>
+                    </div>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header-info">
+                            <p class="d-name"></p><span class="d-email"></span>
+                        </div>
+                        <ul class="dropdown-list">
+                            <li><a href="AdminSystemSetting.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+                            <div class="dropdown-divider"></div>
+                            <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                        class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-header">
+                <div class="title-text">
+                    <div class="icon-square"><img src="Images/agency50x50.ico" alt=""></div>
+                    <div>
+                        <h1>Add New Agency</h1>
+                        <p>Add a new agency and set up its account details</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card form-container">
+                <form id="addAgencyForm" action="#" method="POST">
+
+                    <div class="agency-form-grid">
+
+                        <div class="form-group">
+                            <label>Agency Name</label>
+                            <input type="text" id="agencyName" class="form-input" placeholder="Enter your agency name">
+                            <span class="error-msg" id="agencyNameError">* Agency name is required</span>
+                        </div>
+
+                        <div class="form-group logo-span-box">
+                            <label>Agency Logo</label>
+                            <div class="upload-zone" id="logoZone">
+                                <input type="file" id="agencyLogo" class="drop-zone-input" accept="image/*">
+                                <div class="upload-content">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <p>Choose a file or drag & drop it here</p>
+                                </div>
+                            </div>
+                            <span class="error-msg" id="logoError">* Please upload a logo</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Owner Name</label>
+                            <input type="text" id="ownerName" class="form-input" placeholder="Enter your owner name">
+                            <span class="error-msg" id="ownerNameError">* Owner name is required</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="agencyEmail" class="form-input"
+                                placeholder="Enter your Email Address">
+                            <span class="error-msg" id="emailError">* Valid email is required</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Set Password</label>
+                            <div class="password-wrapper" style="position: relative;">
+                                <input type="password" id="agencyPass" class="form-input"
+                                    placeholder="Set your password" style="padding-right: 40px;">
+                                <i class="fa-regular fa-eye" id="togglePassword"
+                                    style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666;"></i>
+                            </div>
+                            <span class="error-msg" id="passError">* Password must be at least 6 characters</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" id="agencyPhone" class="form-input"
+                                placeholder="Enter your Phone Number">
+                            <span class="error-msg" id="phoneError">* Valid phone number is required</span>
+                        </div>
+
+                        <div class="dropdown-row-split">
+                            <div class="form-group">
+                                <label>Plan</label>
+                                <div class="custom-dropdown" id="planDropdown">
+                                    <div class="dropdown-selected" onclick="toggleDropdown('planDropdown')">
+                                        <span class="selected-text">Basic(Default)</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                    <ul class="dropdown-options">
+                                        <li class="dropdown-item active"
+                                            onclick="selectItem('planDropdown', 'Basic(Default)')">Basic(Default)</li>
+                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Pro')">Pro</li>
+                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Enterprise')">
+                                            Enterprise</li>
+                                    </ul>
+                                    <input type="hidden" name="plan" id="planInput" value="Basic(Default)">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Status</label>
+                                <div class="custom-dropdown" id="statusDropdown">
+                                    <div class="dropdown-selected" onclick="toggleDropdown('statusDropdown')">
+                                        <span class="selected-text">Pending(Default)</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                    <ul class="dropdown-options">
+                                        <li class="dropdown-item"
+                                            onclick="selectItem('statusDropdown', 'Pending(Default)')">Pending(Default)
+                                        </li>
+                                        <li class="dropdown-item" onclick="selectItem('statusDropdown', 'Active')">
+                                            Active</li>
+                                        <li class="dropdown-item" onclick="selectItem('statusDropdown', 'Disabled')">
+                                            Disabled</li>
+                                    </ul>
+                                    <input type="hidden" name="status" id="statusInput" value="Pending(Default)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-divider1"></div>
+
+                        <div class="form-section-title" style="width: 100%; margin-bottom: 20px;">
+                            <div><i class="fa-solid fa-location-dot"></i> Address & Location</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Street Address Line 1</label>
+                            <input type="text" id="address1" class="form-input address-group"
+                                placeholder="Enter your address">
+                            <span class="error-msg" id="address1Error">* Address line 1 is required</span>
+                        </div>
+
+                        <div class="dropdown-row-split">
+                            <div class="form-group">
+                                <label>Country</label>
+                                <div class="filter-item filter-wide">
+                                    <select id="countrySearchSelect" class="search-input-field">
+                                        <option></option>
+                                    </select>
+                                    <span id="countryError" class="error-msg">* Select Country</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <div class="filter-item filter-wide">
+                                    <select id="stateSearchSelect" class="search-input-field">
+                                        <option></option>
+                                    </select>
+                                    <span id="stateError" class="error-msg">* Select State</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Street Address Line 2</label>
+                            <input type="text" id="address2" class="form-input address-group"
+                                placeholder="Enter your address">
+                            <span class="error-msg" id="address2Error">* Address line 2 is required</span>
+                        </div>
+
+                        <div class="dropdown-row-split">
+                            <div class="form-group">
+                                <label>City</label>
+                                <div class="filter-item filter-wide">
+                                    <select id="citySearchSelect" class="search-input-field">
+                                        <option></option>
+                                    </select>
+                                    <span id="cityError" class="error-msg">* Select City</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Pin Code</label>
+                                <input type="number" id="pincode" class="form-input address-group"
+                                    placeholder="Enter your pincode" style="height: 40px;">
+                                <span class="error-msg" id="pincodeError">* Pin code is required</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-submit">Create Agency</button>
+                        <button type="button" class="btn btn-cancel" onclick="history.back()">Cancel</button>
+                    </div>
+
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Logut Model Logic -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-icon-box2">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
+            <h2>Ready to Leave?</h2>
+            <p>Are you sure you want to logout? You will need to login again to access your dashboard.</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-modal btn-modal-delete" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="Js/jquery-3.7.1.min.js"></script>
+    <script src="Js/all.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        //--- Custom Dropdown Logic ---//
+
+        function toggleDropdown(id) { // Ise change karke toggleDropdown(e) ya toggleDropdown(id, e) karein
+            $('.custom-dropdown').not('#' + id).removeClass('active');
+            $('#' + id).toggleClass('active');
+            if (window.event) window.event.stopPropagation(); // Safe way
+        }
+
+        function selectItem(dropdownId, text) {
+            let dropdown = $('#' + dropdownId);
+            dropdown.find('.selected-text').text(text);
+            // Hidden input update logic
+            if (dropdownId === 'planDropdown') $('#planInput').val(text);
+            if (dropdownId === 'statusDropdown') $('#statusInput').val(text);
+            dropdown.removeClass('active');
+        }
+
+        $(document).on('change', '.drop-zone-input', function () {
+            const file = this.files[0];
+            const uploadZone = $(this).closest('.upload-zone');
+            const uploadContent = uploadZone.find('.upload-content');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    uploadZone.find('.preview-img').remove();
+                    uploadContent.hide();
+                    uploadZone.append(`<img src="${e.target.result}" class="preview-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 8px; z-index: 5; padding: 5px; pointer-events: none; ">`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Outside click se dropdown band karne ka logic
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.custom-dropdown').length) {
+                $('.custom-dropdown').removeClass('active');
+            }
+        });
+
+        function toggleDropdown(id) {
+            $('.custom-dropdown').not('#' + id).removeClass('active');
+            $('#' + id).toggleClass('active');
+            event.stopPropagation();
+        }
+
+        $(document).ready(function () {
+            // 1. Stats Load Karein
+            $.get('http://localhost:8080/api/admin/agencies/stats', function (data) {
+                $('.agency-stat-card h2').eq(0).text(data.total_agencies);
+                $('.agency-stat-card h2').eq(1).text(data.active_agencies);
+                $('.agency-stat-card h2').eq(2).text(data.total_campaigns);
+                $('.agency-stat-card h2').eq(3).text('₹' + data.total_revenue);
+            });
+
+            // 2. Table Load Karein
+            $.ajax({
+                url: 'http://localhost:8080/api/admin/agencies/all-dynamic',
+                type: 'GET',
+                success: function (data) {
+                    let rows = '';
+                    data.forEach(item => {
+                        let logo = 'Images/agency50x50.ico'; // Default
+                        if (item.agency_logo) {
+                            if (item.agency_logo.startsWith('http')) {
+                                // Nayi Supabase Image
+                                logo = item.agency_logo;
+                            } else {
+                                // Purani Local Image (agar pehle se DB me ho)
+                                logo = `uploads/logos/${item.agency_logo}`;
+                            }
+                        }
+                        rows += `
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="${logo}" width="35" height="35" style="border-radius:4px; object-fit:cover;">
+                            <strong>${item.agency_name}</strong>
+                        </div>
+                    </td>
+                    <td>${item.owner_name}</td>
+                    <td>${item.email}</td>
+                    <td>${item.phone_number}</td>
+                    <td>${item.total_clients || 0}</td>
+                    <td>${item.total_campaigns || 0}</td>
+                    <td>₹0</td> 
+                    <td><span class="status-pill ${item.status === 'Active' ? 'st-active' : 'st-disabled'}">${item.status}</span></td>
+                    <td>
+                        <div class="action-icons">
+                            <a href="AdminAgencyDetails.html?id=${item.id}" class="action-btn view"><i class="fa-regular fa-eye"></i></a>
+                            <a href="AdminEditAgency.html?id=${item.id}" class="action-btn edit"><i class="fa-solid fa-pen"></i></a>
+                            <div class="action-btn delete" onclick="openDeleteModal(${item.id})"><i class="fa-regular fa-trash-can"></i></div>
+                        </div>
+                    </td>
+                </tr>`;
+                    });
+                    $('#agencyTable tbody').html(rows);
+                    // Pagination call karein
+                    setupTablePagination('agencyTable', 'pagination-agency', 4);
+                }
+            });
+        });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            const countrySelect = $('#countrySearchSelect');
+            const stateSelect = $('#stateSearchSelect');
+            const citySelect = $('#citySearchSelect');
+
+            // Select2 base options
+            const select2Config = {
+                width: '100%',
+                dropdownParent: $('.dashboard-container'),
+                allowClear: true
+            };
+
+            // Initialize all as Select2
+            countrySelect.select2({ ...select2Config, placeholder: "Searching Countries..." });
+            stateSelect.select2({ ...select2Config, placeholder: "Select Country First" });
+            citySelect.select2({ ...select2Config, placeholder: "Select State First" });
+
+            // 1. Fetch All Countries
+            fetch("https://countriesnow.space/api/v0.1/countries/positions")
+                .then(response => response.json())
+                .then(res => {
+                    const countryOptions = res.data.map(c => ({ id: c.name, text: c.name }));
+                    countrySelect.select2({ ...select2Config, placeholder: "Select Country", data: countryOptions });
+                })
+                .catch(err => console.error("Country API Error:", err));
+
+            // 2. Fetch States when Country changes
+            countrySelect.on('change', function () {
+                const countryName = $(this).val();
+
+                // Reset State and City
+                stateSelect.empty().append('<option></option>').trigger('change');
+                citySelect.empty().append('<option></option>').trigger('change');
+
+                if (!countryName) return;
+
+                stateSelect.select2({ ...select2Config, placeholder: "Loading States..." });
+
+                fetch("https://countriesnow.space/api/v0.1/countries/states", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ country: countryName })
+                })
+                    .then(response => response.json())
+                    .then(res => {
+                        const states = res.data.states.map(s => ({ id: s.name, text: s.name }));
+                        stateSelect.select2({ ...select2Config, placeholder: "Select State", data: states });
+                    })
+                    .catch(err => stateSelect.select2({ ...select2Config, placeholder: "No States Found" }));
+            });
+
+            // 3. Fetch Cities when State changes
+            stateSelect.on('change', function () {
+                const countryName = countrySelect.val();
+                const stateName = $(this).val();
+
+                // Reset City
+                citySelect.empty().append('<option></option>').trigger('change');
+
+                if (!stateName) return;
+
+                citySelect.select2({ ...select2Config, placeholder: "Loading Cities..." });
+
+                fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ country: countryName, state: stateName })
+                })
+                    .then(response => response.json())
+                    .then(res => {
+                        const cities = res.data.map(city => ({ id: city, text: city }));
+                        citySelect.select2({ ...select2Config, placeholder: "Select City", data: cities });
+                    })
+                    .catch(err => citySelect.select2({ ...select2Config, placeholder: "No Cities Found" }));
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            // Show/Hide Password Toggle Logic
+            $('#togglePassword').on('click', function () {
+                const passwordInput = $('#agencyPass');
+                const icon = $(this);
+
+                // Toggle the type attribute
+                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+                passwordInput.attr('type', type);
+
+                // Toggle the eye / eye-slash icon
+                icon.toggleClass('fa-eye fa-eye-slash');
+            });
+
+            $('.error-msg').hide();
+
+            // 1. Submit Logic
+            $('.btn-submit').on('click', function (e) {
+                e.preventDefault();
+                let isValid = true;
+                $('.error-msg').hide();
+                $('.form-input').css('border-color', '');
+
+                // Validations
+                if ($('#agencyName').val().trim() === "") { $('#agencyNameError').fadeIn(); $('#agencyName').css('border-color', '#ff4d4d'); isValid = false; }
+                if ($('#logoZone').find('.preview-img').length === 0) { $('#logoError').fadeIn(); $('#logoZone').css('border-color', '#ff4d4d'); isValid = false; }
+                if ($('#ownerName').val().trim() === "") { $('#ownerNameError').fadeIn(); $('#ownerName').css('border-color', '#ff4d4d'); isValid = false; }
+
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test($('#agencyEmail').val())) { $('#emailError').fadeIn(); $('#agencyEmail').css('border-color', '#ff4d4d'); isValid = false; }
+
+                if ($('#agencyPass').val().length < 6) { $('#passError').fadeIn(); $('#agencyPass').css('border-color', '#ff4d4d'); isValid = false; }
+                if ($('#agencyPhone').val().trim().length < 10) { $('#phoneError').fadeIn(); $('#agencyPhone').css('border-color', '#ff4d4d'); isValid = false; }
+
+                if ($('#address1').val().trim() === "") { $('#address1Error').fadeIn(); $('#address1').css('border-color', '#ff4d4d'); isValid = false; }
+                if ($('#address2').val().trim() === "") { $('#address2Error').fadeIn(); $('#address2').css('border-color', '#ff4d4d'); isValid = false; }
+                if (!$('#countrySearchSelect').val()) { $('#countryError').fadeIn(); isValid = false; }
+                if (!$('#stateSearchSelect').val()) { $('#stateError').fadeIn(); isValid = false; }
+                if (!$('#citySearchSelect').val()) { $('#cityError').fadeIn(); isValid = false; }
+                if ($('#pincode').val().trim() === "") { $('#pincodeError').fadeIn(); $('#pincode').css('border-color', '#ff4d4d'); isValid = false; }
+                if (isValid) {
+                    let formData = new FormData();
+
+                    // Saari fields ko ek object mein bharo
+                    let agencyData = {
+                        agencyName: $('#agencyName').val(),
+                        ownerName: $('#ownerName').val(),
+                        email: $('#agencyEmail').val(),
+                        password: $('#agencyPass').val(),
+                        phoneNumber: $('#agencyPhone').val(),
+                        plan: $('#planInput').val(),
+                        status: $('#statusInput').val(),
+                        country: $('#countrySearchSelect').val(),
+                        state: $('#stateSearchSelect').val(),
+                        city: $('#citySearchSelect').val(),
+                        pincode: $('#pincode').val(),
+                        // Address merging yahan frontend par hi kar sakte hain ya backend model setters mein
+                        address: $('#address1').val() + ($('#address2').val() ? ", " + $('#address2').val() : "")
+                    };
+
+                    // Sirf 2 cheezein bhej rahe hain (Parts count limit kabhi cross nahi hogi)
+                    formData.append("agencyData", JSON.stringify(agencyData));
+
+                    let logoFile = $('#agencyLogo')[0].files[0];
+                    if (logoFile) {
+                        formData.append("agencyLogo", logoFile);
+                    }
+
+                    $.ajax({
+                        url: 'http://localhost:8080/api/admin/agencies/add',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            alert(response.message || response);
+                            window.location.href = "AdminAgencies.html";
+                        },
+                        error: function (xhr) {
+                            alert("Galti: " + (xhr.responseText || "Server Error"));
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
