@@ -109,17 +109,33 @@ function closeLogoutModal() {
     }
 }
 
-function confirmLogout() {
-    // 1. LocalStorage se saara admin ka data delete karein (Taki wapas na khule)
-    localStorage.removeItem("isAdminLoggedIn");
-    localStorage.removeItem("adminName");
-    localStorage.removeItem("adminLogo");
-    localStorage.clear(); // Safe side ke liye sab clear kar do
+// ==========================================
+        // 🔴 NAYA LOGOUT LOGIC (API CALL KE SATH)
+        // ==========================================
+        function confirmLogout() {
+            const btn = $('.btn-modal-delete1, .btn-modal-delete'); 
+            btn.text('Logging out...').prop('disabled', true);
 
-    document.cookie = "admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-    window.location.replace("SuperAdminLogin.html");
-}
+            // Backend API ko call karo cookie expire karne ke liye
+            $.ajax({
+                url: "http://localhost:8080/api/admin/logout",
+                type: "POST",
+                xhrFields: {
+                    withCredentials: true // 🔴 Ye line sabse zaroori hai cookie delete karne ke liye
+                },
+                success: function () {
+                    // Backend se cookie delete hone ke baad, Frontend ka kachra saaf karo
+                    localStorage.clear();
+                    window.location.replace("SuperAdminLogin.html");
+                },
+                error: function () {
+                    // Agar server se koi error bhi aaye, tab bhi user ko bahar nikal do (Safe Side)
+                    console.error("Logout API failed, but clearing local session.");
+                    localStorage.clear();
+                    window.location.replace("SuperAdminLogin.html");
+                }
+            });
+        }
 
 document.addEventListener('click', function (event) {
     const modal = document.getElementById('logoutModal');

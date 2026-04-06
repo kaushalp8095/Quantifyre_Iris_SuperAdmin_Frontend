@@ -4,17 +4,20 @@
     // 1. Storage se data uthao
     const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
     const adminName = localStorage.getItem("adminName");
+    const loginTime = localStorage.getItem("loginTime"); // Login ke time jo time save kiya tha
 
-    // 2. Cookie check function (Security ke liye)
-    function getCookie(name) {
-        let nameEQ = name + "=";
-        let ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    // 🔴 2. Session Expiry Logic (1 Day = 24 Hours)
+    const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000; // 24 Ghante milliseconds mein
+    let isSessionExpired = false;
+
+    if (loginTime) {
+        const currentTime = new Date().getTime();
+        const timeDifference = currentTime - parseInt(loginTime);
+        
+        // Agar 24 ghante se zyada ho gaya, toh session expire maan lo
+        if (timeDifference > ONE_DAY_IN_MS) {
+            isSessionExpired = true; 
         }
-        return null;
     }
 
     // Login Page ka exact name check karne ke liye helper
@@ -22,26 +25,26 @@
 
     // --- LOGIC 1: AGAR USER LOGIN PAGE PAR HAI ---
     if (isLoginPage) {
-        // Agar pehle se login hai, toh dashboard bhej do
-        if (isLoggedIn === "true" && adminName) {
-            console.log("Super Admin already logged in. Redirecting...");
+        // Agar pehle se login hai aur session expire NAHI hua hai
+        if (isLoggedIn === "true" && adminName && !isSessionExpired) {
             window.location.replace("AdminDashboard.html");
             return;
         }
-        return; // Login page par hi rehne do
+        
+        // Agar session expire ho gaya hai toh purana kachra saaf karo, par login page par hi raho
+        if(isSessionExpired) {
+            localStorage.clear();
+        }
+        return; 
     }
 
     // --- LOGIC 2: AGAR KISI SECURE PAGE PAR HAI ---
-    // Yahan hum check karenge ki data missing toh nahi hai
-    if (!isLoggedIn || isLoggedIn !== "true" || !adminName) {
-        console.warn("Access Denied: No Active Session.");
+    // Agar login data nahi hai, ya phir 24 ghante pure ho chuke hain (isSessionExpired)
+    if (!isLoggedIn || isLoggedIn !== "true" || !adminName || isSessionExpired) {
+        console.warn("Access Denied: Session Expired or No Active Session.");
         
         // Saara kachra saaf karein
-        localStorage.clear(); // Saare admin related keys uda dega
-        
-        // Cookie expire karein
-        document.cookie = "isAdminLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.clear(); 
         
         // Redirect to Login
         window.location.replace("SuperAdminLogin.html");

@@ -98,7 +98,7 @@
                 $btn.text("Verifying...").prop("disabled", true);
 
                 $.ajax({
-                    url: 'http://localhost:8080/api/admin/login',
+                    url: 'http://127.0.0.1:8080/api/admin/login',
                     type: 'POST',
                     contentType: 'application/json',
                     xhrFields: {
@@ -115,6 +115,8 @@
                             localStorage.setItem('adminName', response.name);
                             localStorage.setItem('adminLogo', response.profileLogo);
                             localStorage.setItem("adminEmail", response.email);
+
+                            localStorage.setItem('loginTime', new Date().getTime());
 
                             $btn.text("Login Successful!");
 
