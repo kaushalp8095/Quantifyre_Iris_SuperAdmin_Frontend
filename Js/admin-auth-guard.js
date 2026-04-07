@@ -1,6 +1,6 @@
 (function () {
     const path = window.location.pathname;
-    
+
     // 1. Storage se data uthao
     const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
     const adminName = localStorage.getItem("adminName");
@@ -13,10 +13,10 @@
     if (loginTime) {
         const currentTime = new Date().getTime();
         const timeDifference = currentTime - parseInt(loginTime);
-        
+
         // Agar 24 ghante se zyada ho gaya, toh session expire maan lo
         if (timeDifference > ONE_DAY_IN_MS) {
-            isSessionExpired = true; 
+            isSessionExpired = true;
         }
     }
 
@@ -30,23 +30,58 @@
             window.location.replace("AdminDashboard.html");
             return;
         }
-        
+
         // Agar session expire ho gaya hai toh purana kachra saaf karo, par login page par hi raho
-        if(isSessionExpired) {
+        if (isSessionExpired) {
             localStorage.clear();
         }
-        return; 
+        return;
     }
 
     // --- LOGIC 2: AGAR KISI SECURE PAGE PAR HAI ---
     // Agar login data nahi hai, ya phir 24 ghante pure ho chuke hain (isSessionExpired)
     if (!isLoggedIn || isLoggedIn !== "true" || !adminName || isSessionExpired) {
         console.warn("Access Denied: Session Expired or No Active Session.");
-        
+
         // Saara kachra saaf karein
-        localStorage.clear(); 
-        
+        localStorage.clear();
+
         // Redirect to Login
         window.location.replace("SuperAdminLogin.html");
     }
 })();
+
+async function validateServerConnection() {
+    try {
+        // 1. LocalStorage se dynamic Admin ID uthao
+        const adminId = localStorage.getItem("adminId");
+        
+        // Agar ID nahi milti (jo honi chahiye), toh default 1 par fallback karein ya logout kar dein
+        if (!adminId) throw new Error("No Admin ID found");
+
+        // 2. Fetch call mein dynamic ID use karein (` ` backticks ke saath)
+        const response = await fetch(`http://localhost:8080/api/admin/settings/profile/${adminId}`, {
+            method: 'GET',
+            // 2 second se zyada wait nahi karenge
+            signal: AbortSignal.timeout(2000) 
+        });
+
+        if (!response.ok) {
+            throw new Error("Server response not OK");
+        }
+        
+        console.log("Connection Verified: Backend is UP");
+
+    } catch (error) {
+        console.error("Server is unreachable or session invalid. Redirecting...");
+        
+        // 🔴 Agar Eclipse band hai ya ID galat hai, toh turant logout
+        localStorage.clear();
+        window.location.replace("SuperAdminLogin.html");
+    }
+}
+
+// Ise page load hote hi turant chalao
+if (localStorage.getItem("isAdminLoggedIn") === "true") {
+    validateServerConnection();
+}
