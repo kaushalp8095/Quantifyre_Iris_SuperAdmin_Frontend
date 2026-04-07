@@ -1,6 +1,6 @@
 (function () {
     const path = window.location.pathname;
-
+    
     // 1. Storage se data uthao
     const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
     const adminName = localStorage.getItem("adminName");
@@ -13,10 +13,10 @@
     if (loginTime) {
         const currentTime = new Date().getTime();
         const timeDifference = currentTime - parseInt(loginTime);
-
+        
         // Agar 24 ghante se zyada ho gaya, toh session expire maan lo
         if (timeDifference > ONE_DAY_IN_MS) {
-            isSessionExpired = true;
+            isSessionExpired = true; 
         }
     }
 
@@ -30,22 +30,22 @@
             window.location.replace("AdminDashboard.html");
             return;
         }
-
+        
         // Agar session expire ho gaya hai toh purana kachra saaf karo, par login page par hi raho
-        if (isSessionExpired) {
+        if(isSessionExpired) {
             localStorage.clear();
         }
-        return;
+        return; 
     }
 
     // --- LOGIC 2: AGAR KISI SECURE PAGE PAR HAI ---
     // Agar login data nahi hai, ya phir 24 ghante pure ho chuke hain (isSessionExpired)
     if (!isLoggedIn || isLoggedIn !== "true" || !adminName || isSessionExpired) {
         console.warn("Access Denied: Session Expired or No Active Session.");
-
+        
         // Saara kachra saaf karein
-        localStorage.clear();
-
+        localStorage.clear(); 
+        
         // Redirect to Login
         window.location.replace("SuperAdminLogin.html");
     }
@@ -53,29 +53,19 @@
 
 async function validateServerConnection() {
     try {
-        // 1. LocalStorage se dynamic Admin ID uthao
-        const adminId = localStorage.getItem("adminId");
-        
-        // Agar ID nahi milti (jo honi chahiye), toh default 1 par fallback karein ya logout kar dein
-        if (!adminId) throw new Error("No Admin ID found");
-
-        // 2. Fetch call mein dynamic ID use karein (` ` backticks ke saath)
-        const response = await fetch(`http://localhost:8080/api/admin/settings/profile/${adminId}`, {
+        // Ek simple GET call backend ko (Jaise profile ya health check)
+        const response = await fetch("http://localhost:8080/api/admin/settings/profile/1", {
             method: 'GET',
-            // 2 second se zyada wait nahi karenge
+            // Timeout set karein taaki user ko zyada wait na karna pade
             signal: AbortSignal.timeout(2000) 
         });
 
         if (!response.ok) {
-            throw new Error("Server response not OK");
+            throw new Error("Server down");
         }
-        
-        console.log("Connection Verified: Backend is UP");
-
     } catch (error) {
-        console.error("Server is unreachable or session invalid. Redirecting...");
-        
-        // 🔴 Agar Eclipse band hai ya ID galat hai, toh turant logout
+        console.error("Server is unreachable. Redirecting to login...");
+        // 🔴 Agar server (Eclipse) band hai toh sab saaf karke bhaga do
         localStorage.clear();
         window.location.replace("SuperAdminLogin.html");
     }

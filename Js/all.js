@@ -1,3 +1,20 @@
+// Isse apni "all.js" ya main script file mein paste karein
+$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
+    // Agar Backend (Eclipse) band hai toh status 0 aata hai
+    if (jqXHR.status === 0) {
+        console.error("Backend Server is Offline!");
+        
+        window.location.replace("SuperAdminLogin.html");
+    }
+
+    // Agar session sach mein expire ho gaya (401 Unauthorized)
+    if (jqXHR.status === 401) {
+        localStorage.clear(); // Yahan clear karna zaroori hai
+        window.location.replace("SuperAdminLogin.html");
+    }
+});
+
+
 // Sidebar Profile & Notifications Dropdown Logic //    
 $(document).ready(function () {
     const $sidebar = $('.sidebar');
