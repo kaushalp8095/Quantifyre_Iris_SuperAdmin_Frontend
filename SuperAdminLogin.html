@@ -41,14 +41,28 @@
         </form>
     </div>
 
-   <script src="Js/jquery-3.7.1.min.js"></script>
+    <script src="Js/jquery-3.7.1.min.js"></script>
     <script>
 
-        if (localStorage.getItem('isAdminLoggedIn') === 'true') {
-            window.location.replace("AdminDashboard.html");
-        }
 
         $(document).ready(function () {
+
+            const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn');
+            const adminId = localStorage.getItem('adminId');
+
+            // 🔴 REDIRECT CHECK (Only if Server is UP)
+            if (isAdminLoggedIn === 'true' && adminId) {
+                // Dashboard bhejne se pehle check karo server chalu hai ya nahi
+                fetch(`http://localhost:8080/api/admin/settings/profile/${adminId}`)
+                    .then(res => {
+                        if (res.ok) window.location.replace("AdminDashboard.html");
+                    })
+                    .catch(() => {
+                        console.warn("Server Down: Staying on Login page to prevent loop.");
+                        // Agar server down hai toh hum yahi rukenge, redirect nahi karenge
+                    });
+            }
+
 
             // Password Eye Toggle
             $('#toggleAdminEye').click(function () {
@@ -70,7 +84,7 @@
                 var emailField = $("#admin_email");
                 var passwordField = $("#admin_password");
                 var errorBox = $("#loginError");
-                
+
                 var email = emailField.val().trim();
                 var password = passwordField.val().trim();
                 var $btn = $(this);
@@ -102,7 +116,7 @@
                     type: 'POST',
                     contentType: 'application/json',
                     xhrFields: {
-                        withCredentials: true 
+                        withCredentials: true
                     },
                     data: JSON.stringify({
                         email: email,
@@ -130,10 +144,10 @@
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             errorMessage = xhr.responseJSON.message;
                         }
-                        
+
                         // Show error below form only
                         errorBox.text(errorMessage).show();
-                        
+
                         $btn.text("Login").prop("disabled", false);
                     }
                 });

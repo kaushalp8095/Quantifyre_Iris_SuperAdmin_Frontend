@@ -1,15 +1,15 @@
 // Isse apni "all.js" ya main script file mein paste karein
-$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
-    // Agar Backend (Eclipse) band hai toh status 0 aata hai
+$(document).ajaxError(function(event, jqXHR) {
+    // Status 0 matlab Eclipse band hai
     if (jqXHR.status === 0) {
-        console.error("Backend Server is Offline!");
-        
+        console.error("Backend Offline!");
+        // 🔴 Ek flag set karein taaki auth-guard ko pata chale ki server band hai
+        sessionStorage.setItem("eclipse_is_down", "true");
         window.location.replace("SuperAdminLogin.html");
     }
 
-    // Agar session sach mein expire ho gaya (401 Unauthorized)
     if (jqXHR.status === 401) {
-        localStorage.clear(); // Yahan clear karna zaroori hai
+        localStorage.clear();
         window.location.replace("SuperAdminLogin.html");
     }
 });
