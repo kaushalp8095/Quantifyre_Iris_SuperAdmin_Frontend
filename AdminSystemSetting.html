@@ -9,20 +9,92 @@
     <link rel="stylesheet" href="Css/admin_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-       /* --- ADMIN PROFILE UPDATED CSS --- */
+        /* --- ADMIN PROFILE UPDATED CSS --- */
 
-.profile-layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 30px; align-items: start; }
-.profile-contact-list { padding: 0 20px 0px 20px; text-align: left; }
-.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-.form-input { width: 100%; background: rgba(0, 0, 0, 0.25) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #fff; padding: 8px 12px !important; border-radius: 8px; font-size: 0.9rem; outline: none; transition: 0.3s; height: auto; }
-.form-input:focus { border-color: #00ff9d !important; background: rgba(0, 255, 157, 0.05) !important; }
-.form-header-row { border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; }
-.form-section-title { color: #00ff9d !important; font-size: 0.85rem !important; font-weight: 600 !important; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.form-container { background: rgba(11, 22, 21, 0.4) !important; padding: 30px !important; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); }
-.form-actions-bottom { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; padding-top: 20px; }
+        .profile-layout-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
 
-/*  Responsive Fix for Tablet/Mobile */
-@media (max-width: 991px) { .profile-layout-grid { grid-template-columns: 1fr; } .form-grid-2 { grid-template-columns: 1fr; } }
+        .profile-contact-list {
+            padding: 0 20px 0px 20px;
+            text-align: left;
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.25) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #fff;
+            padding: 8px 12px !important;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.3s;
+            height: auto;
+        }
+
+        .form-input:focus {
+            border-color: #00ff9d !important;
+            background: rgba(0, 255, 157, 0.05) !important;
+        }
+
+        .form-header-row {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+        }
+
+        .form-section-title {
+            color: #00ff9d !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .form-container {
+            background: rgba(11, 22, 21, 0.4) !important;
+            padding: 30px !important;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .form-actions-bottom {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        /*  Responsive Fix for Tablet/Mobile */
+        @media (max-width: 991px) {
+            .profile-layout-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
@@ -34,7 +106,8 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
@@ -43,7 +116,7 @@
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
@@ -166,7 +239,7 @@
 
                                     <div class="profile-identity">
                                         <h2></h2>
-                                        
+
                                         <span class="status-badge"><i class="fa-solid fa-circle-check"></i>
                                             Active</span>
                                     </div>
@@ -190,7 +263,7 @@
                                             </div>
                                         </div>
 
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -209,26 +282,22 @@
                                         <div class="form-grid-2">
                                             <div class="form-group">
                                                 <label>First Name</label>
-                                                <input type="text" class="form-input personal-group" value=""
-                                                    readonly>
+                                                <input type="text" class="form-input personal-group" value="" readonly>
                                             </div>
                                             <div class="form-group">
                                                 <label>Last Name</label>
-                                                <input type="text" class="form-input personal-group" value=""
-                                                    readonly>
+                                                <input type="text" class="form-input personal-group" value="" readonly>
                                             </div>
                                         </div>
 
                                         <div class="form-grid-2">
                                             <div class="form-group">
                                                 <label>Email Address</label>
-                                                <input type="email" class="form-input personal-group"
-                                                    value="" readonly>
+                                                <input type="email" class="form-input personal-group" value="" readonly>
                                             </div>
                                             <div class="form-group">
                                                 <label>Phone Number</label>
-                                                <input type="tel" class="form-input personal-group"
-                                                    value="" readonly>
+                                                <input type="tel" class="form-input personal-group" value="" readonly>
                                             </div>
                                         </div>
 
@@ -269,10 +338,10 @@
                             <div class="sys-box" style="text-align: center;">
                                 <!-- <span class="sys-box-title" style="text-align: left;">Two-Factor Authentication
                                     (2FA)</span> -->
-                                    
+
                                 <div class="sys-box" style="display: flex; flex-direction: column; gap: 20px;">
-                                   
-                                     <button class="sys-btn-primary" id="tfaSubmitBtn"
+
+                                    <button class="sys-btn-primary" id="tfaSubmitBtn"
                                         style="display:none; background: #00ff9d; color: #000;">Send OTP</button>
 
                                     <div class="sys-box"
@@ -290,14 +359,14 @@
                                             </div>
                                             <div style="flex-shrink: 0;">
                                                 <label class="sys-switch">
-                                                    <input type="checkbox" checked>
+                                                    <input type="checkbox" id="loginAlertToggle" checked>
                                                     <span class="sys-slider"></span>
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
 
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -313,19 +382,8 @@
                                             <th>Time</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Chrome On Windows</td>
-                                            <td>Ahmedabad, Gujarat</td>
-                                            <td>168.110.231.1</td>
-                                            <td>12-Nov-2025 02:30:50</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Safari on iPhone 15 Pro</td>
-                                            <td>Mehsana, Gujarat</td>
-                                            <td>172.16.254.1</td>
-                                            <td>30-Nov-2025 01:20:12</td>
-                                        </tr>
+                                    <tbody id="loginActivityBody">
+
                                     </tbody>
                                 </table>
                             </div>
@@ -445,9 +503,9 @@
                                             class="sys-slider"></span></label>
                                 </div>
                             </div>
-                           
+
                         </div>
-                       
+
                     </div>
                 </div>
             </div>
@@ -471,22 +529,30 @@
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
-   <script>
+    <script>
     // ==========================================
-    // 1. UI & TAB FUNCTIONALITY
+    // 1. GLOBAL VARIABLES & INITIAL DATA
     // ==========================================
-    let selectedProfileFile = null; 
+    let selectedProfileFile = null;
     let initialProfileData = {
         firstName: "",
         lastName: "",
         phoneNumber: ""
     };
 
+    // ==========================================
+    // 2. GLOBAL FUNCTIONS (Tab & Pass Toggle)
+    // ==========================================
     function openSysTab(evt, tabName) {
         $(".sys-tab-content").hide();
         $(".sys-tab-btn").removeClass("active");
         $("#" + tabName).fadeIn();
         $(evt.currentTarget).addClass("active");
+
+        // Security tab khulne par history load karein
+        if (tabName === 'security') {
+            fetchAdminSecurityHistory();
+        }
     }
 
     function togglePass(icon) {
@@ -501,310 +567,208 @@
     }
 
     // ==========================================
-    // 2. DROPDOWN LOGIC
-    // ==========================================
-    function toggleDropdown(id, event) {
-        if(event) event.stopPropagation();
-        $('.report-dropdown').not('#' + id).removeClass('active');
-        $('#' + id).toggleClass('active');
-    }
-
-    function selectItem(dropdownId, text) {
-        let dropdown = $('#' + dropdownId);
-        dropdown.find('.selected-text').text(text).css('color', '#fff');
-        dropdown.removeClass('active');
-    }
-
-    function toggleCustomDropdown(id, event) {
-        if(event) event.stopPropagation();
-        const dropdown = document.getElementById(id);
-        $('.custom-dropdown').not('#' + id).removeClass('active');
-        dropdown.classList.toggle('active');
-    }
-
-    function selectOption(dropdownId, value, textId) {
-        document.getElementById(textId).innerText = value;
-        document.getElementById(dropdownId).classList.remove('active');
-    }
-
-    $(document).click(function (e) {
-        if (!$(e.target).closest('.report-dropdown').length) {
-            $('.report-dropdown').removeClass('active');
-        }
-        if (!$(e.target).closest('.custom-dropdown').length) {
-            $('.custom-dropdown').removeClass('active');
-        }
-    });
-
-    // ==========================================
-    // 3. TWO-FACTOR AUTHENTICATION (TFA) LOGIC
-    // ==========================================
-    function toggleTFASettings() {
-        const isChecked = document.getElementById('tfaToggle').checked;
-        const wrapper = $('#tfaMethodsWrapper');
-
-        if (isChecked) {
-            wrapper.show(); 
-        } else {
-            wrapper.hide();
-            $('#tfaInputSection').hide();
-            $('#tfaSubmitBtn').hide();
-            $('.tfa-method-card').css({ 'border-color': 'rgba(255,255,255,0.1)', 'color': '#888' });
-        }
-    }
-
-    function selectTFAMethod(method) {
-        $('.tfa-method-card').css({ 'border-color': 'rgba(255,255,255,0.1)', 'color': '#888', 'background': 'transparent' });
-        $('#tfaInputSection').show();
-        $('#tfaSubmitBtn').show();
-
-        if (method === 'mobile') {
-            $('#tfaMobileCard').css({ 'border-color': '#00ff9d', 'color': '#00ff9d', 'background': 'rgba(0,255,157,0.05)' });
-            $('#tfaInputLabel').text('Enter Mobile Number');
-            $('#tfaUserInput').attr('placeholder', '+91 XXXXX XXXXX').val('');
-        } else {
-            $('#tfaEmailCard').css({ 'border-color': '#00ff9d', 'color': '#00ff9d', 'background': 'rgba(0,255,157,0.05)' });
-            $('#tfaInputLabel').text('Verify Email Address');
-            $('#tfaUserInput').attr('placeholder', 'agency@mail.com').val('agency@quantifyre.com');
-        }
-    }
-
-    // ==========================================
-    // 4. DATA FETCH FUNCTION (🔴 100% Fixed Logo Logic)
+    // 3. DATA FETCH FUNCTIONS
     // ==========================================
     function fetchAdminData() {
         const currentAdminId = localStorage.getItem("adminId");
-
         if (!currentAdminId) {
-            console.error("No Admin ID found!");
             localStorage.clear();
             window.location.replace("SuperAdminLogin.html");
             return;
         }
 
         $.ajax({
-            url: `http://localhost:8080/api/admin/settings/profile/${currentAdminId}`, 
+            url: `http://localhost:8080/api/admin/settings/profile/${currentAdminId}`,
             type: 'GET',
-            cache: false, 
-            success: function(data) {
-                
-                // --- Text Inputs Update ---
-                const fName = data.firstName || '';
-                const lName = data.lastName || '';
-                const emailId = data.email || '';
-                const phoneNo = data.phoneNumber || '';
+            cache: false,
+            success: function (data) {
+                // Inputs Update
+                $('input.personal-group').eq(0).val(data.firstName || '');
+                $('input.personal-group').eq(1).val(data.lastName || '');
+                $('input.personal-group').eq(2).val(data.email || '');
+                $('input.personal-group').eq(3).val(data.phoneNumber || '');
 
-                $('input.personal-group').eq(0).val(fName);
-                $('input.personal-group').eq(1).val(lName);
-                $('input.personal-group').eq(2).val(emailId);
-                $('input.personal-group').eq(3).val(phoneNo);
+                initialProfileData = {
+                    firstName: data.firstName || '',
+                    lastName: data.lastName || '',
+                    phoneNumber: data.phoneNumber || ''
+                };
 
-                initialProfileData.firstName = fName;
-                initialProfileData.lastName = lName;
-                initialProfileData.phoneNumber = phoneNo;
+                const fullName = (data.firstName || '') + " " + (data.lastName || '');
+                $('.profile-identity h2, .user-mini-profile p, .text-info h4, .d-name').text(fullName);
+                $('.pc-text:has(span:contains("Email")) p, .d-email').text(data.email || 'N/A');
+                $('.pc-text:has(span:contains("Phone")) p').text(data.phoneNumber || 'N/A');
 
-                const fullName = fName + " " + lName;
+                // Alert Switch Status Set
+                $('#loginAlertToggle').prop('checked', data.loginAlertsEnabled);
 
-                // --- UI Text Update ---
-                $('.profile-identity h2').text(fullName);
-                $('.pc-text:has(span:contains("Email")) p').text(emailId || 'N/A');
-                $('.pc-text:has(span:contains("Phone")) p').text(phoneNo || 'N/A');
-                
-                $('.user-mini-profile p').text(fullName); 
-                $('.text-info h4').text(fullName);        
-                $('.dropdown-header-info .d-name').text(fullName); 
-                $('.dropdown-header-info .d-email').text(emailId); 
-                
-                // --- LOGO UPDATE ---
-                // Agar pichla icon toot raha tha, toh main logo ko default bana diya
-                const defaultLogo = "Images/quantifirelogo.png"; 
-                
-                if(data.profileLogo && data.profileLogo !== "null" && data.profileLogo !== "") {
-                    $('#profileImagePreview').attr('src', data.profileLogo);
-                    $('.avatar-circle img, .avatar-small img').attr('src', data.profileLogo);
-                    localStorage.setItem("adminLogo", data.profileLogo);
+                // Logo Logic
+                const defaultLogo = "Images/quantifirelogo.png";
+                const logoPath = (data.profileLogo && data.profileLogo !== "null") ? data.profileLogo : defaultLogo;
+                $('#profileImagePreview, .avatar-circle img, .avatar-small img').attr('src', logoPath);
+            }
+        });
+    }
+
+    function fetchAdminSecurityHistory() {
+        const adminId = localStorage.getItem("adminId");
+        const tbody = $('#loginActivityBody');
+        tbody.html('<tr><td colspan="4" style="text-align:center;">Loading activity...</td></tr>');
+
+        $.ajax({
+            url: `http://localhost:8080/api/admin/settings/security/login-activity/${adminId}`,
+            type: 'GET',
+            success: function (data) {
+                let rows = '';
+                if (data && data.length > 0) {
+                    data.forEach(log => {
+                        const loginDate = new Date(log.loginTime).toLocaleString('en-IN', {
+                            day: '2-digit', month: 'short', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                        rows += `<tr>
+                            <td>${log.deviceInfo || 'Unknown'}</td>
+                            <td>${log.location || 'India'}</td>
+                            <td>${log.ipAddress || '0.0.0.0'}</td>
+                            <td>${loginDate}</td>
+                        </tr>`;
+                    });
                 } else {
-                    $('#profileImagePreview').attr('src', defaultLogo);
-                    $('.avatar-circle img, .avatar-small img').attr('src', defaultLogo);
-                    localStorage.removeItem("adminLogo"); 
+                    rows = '<tr><td colspan="4" style="text-align:center;">No recent login activity found.</td></tr>';
                 }
+                tbody.html(rows);
             },
-            error: function() {
-                console.error("Failed to load admin profile data.");
+            error: function () {
+                tbody.html('<tr><td colspan="4" style="text-align:center; color:red;">Failed to load activity.</td></tr>');
             }
         });
     }
 
     // ==========================================
-    // 5. DOCUMENT READY (EVENTS)
+    // 4. DOCUMENT READY (Events)
     // ==========================================
     $(document).ready(function () {
-        
         fetchAdminData();
 
-        // --- Pencil Icon Click Event ---
+        // --- Toggle Login Alerts ---
+        $(document).on('change', '#loginAlertToggle', function () {
+            const adminId = localStorage.getItem("adminId");
+            const isEnabled = $(this).is(':checked');
+
+            $.ajax({
+                url: `http://localhost:8080/api/admin/settings/security/toggle-alerts/${adminId}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ "enabled": isEnabled }),
+                success: function () {
+                    console.log("Alert status updated");
+                },
+                error: function () {
+                    alert("Failed to update alert settings.");
+                }
+            });
+        });
+
+        // --- Edit Toggle (Pencil Icon) ---
         $('.edit-trigger').on('click', function () {
             const targetClass = $(this).data('target');
             const inputs = $('.' + targetClass).not('input[type="email"]');
-
             if (inputs.attr('readonly')) {
-                inputs.removeAttr('readonly');
-                inputs.css({ 'border-color': 'rgba(0, 255, 157, 0.5)', 'background': 'rgba(255, 255, 255, 0.05)' });
-                inputs.first().focus();
+                inputs.removeAttr('readonly').css({ 'border-color': 'rgba(0, 255, 157, 0.5)', 'background': 'rgba(255, 255, 255, 0.05)' }).first().focus();
                 $(this).removeClass('fa-pencil').addClass('fa-check').css('color', '#fff');
             } else {
-                inputs.attr('readonly', true);
-                inputs.css({ 'border-color': '', 'background': '' });
+                inputs.attr('readonly', true).css({ 'border-color': '', 'background': '' });
                 $(this).removeClass('fa-check').addClass('fa-pencil').css('color', '#00ff9d');
             }
         });
 
-        // --- Image Preview Logic ---
+        // --- Image Upload Preview ---
         $('#profileUpload').on('change', function () {
             const file = this.files[0];
             if (!file) return;
-
-            selectedProfileFile = file; 
+            selectedProfileFile = file;
             const reader = new FileReader();
-            reader.onload = function(e) { $('#profileImagePreview').attr('src', e.target.result); }
+            reader.onload = function (e) { $('#profileImagePreview').attr('src', e.target.result); }
             reader.readAsDataURL(file);
         });
 
-        // --- Save Changes (Image + Text) ---
-        $('.btn-submit').on('click', function(e) {
+        // --- Save Profile Changes ---
+        $('.btn-submit').on('click', function (e) {
             e.preventDefault();
-            
-            // 🔴 ALWAYS FETCH FRESH ID HERE
             const currentAdminId = localStorage.getItem("adminId");
-            if(!currentAdminId) return alert("Session expired, please login again.");
-
             const currentFName = $('input.personal-group').eq(0).val().trim();
             const currentLName = $('input.personal-group').eq(1).val().trim();
             const currentPhone = $('input.personal-group').eq(3).val().trim();
 
-            if (
-                currentFName === initialProfileData.firstName &&
-                currentLName === initialProfileData.lastName &&
-                currentPhone === initialProfileData.phoneNumber &&
-                selectedProfileFile === null
-            ) {
-                alert("No changes detected. Nothing to save!");
-                $('input.personal-group').attr('readonly', true).css({'border-color': '', 'background': ''});
-                $('.edit-trigger').removeClass('fa-check').addClass('fa-pencil').css('color', '#00ff9d');
-                return; 
+            if (currentFName === initialProfileData.firstName && currentLName === initialProfileData.lastName && 
+                currentPhone === initialProfileData.phoneNumber && !selectedProfileFile) {
+                alert("No changes detected.");
+                return;
             }
 
             const btn = $(this);
             btn.text("Saving...").prop('disabled', true);
 
-            const payload = {
-                firstName: currentFName,
-                lastName: currentLName,
-                phoneNumber: currentPhone
-            };
-
-            const updateTextDetails = function() {
+            const updateText = () => {
                 $.ajax({
                     url: `http://localhost:8080/api/admin/settings/profile/update/${currentAdminId}`,
                     type: 'PUT',
                     contentType: 'application/json',
-                    data: JSON.stringify(payload),
+                    data: JSON.stringify({ firstName: currentFName, lastName: currentLName, phoneNumber: currentPhone }),
                     success: function (res) {
-                        alert("Profile & Changes Saved Successfully!");
-                        
-                        $('input.personal-group').attr('readonly', true).css({'border-color': '', 'background': ''});
-                        $('.edit-trigger').removeClass('fa-check').addClass('fa-pencil').css('color', '#00ff9d');
-                        
-                        initialProfileData.firstName = res.admin.firstName;
-                        initialProfileData.lastName = res.admin.lastName;
-                        initialProfileData.phoneNumber = res.admin.phoneNumber;
-
-                        const fullName = res.admin.firstName + " " + res.admin.lastName;
-                        
-                        $('.profile-identity h2').text(fullName); 
-                        $('.user-mini-profile p').text(fullName); 
-                        $('.text-info h4').text(fullName);        
-                        $('.dropdown-header-info .d-name').text(fullName); 
-                        
-                        localStorage.setItem("adminName", fullName);
-                        selectedProfileFile = null; 
+                        alert("Profile Updated Successfully!");
+                        fetchAdminData(); // Refresh UI
                     },
-                    error: function () { alert("Failed to update profile text."); },
-                    complete: function () { btn.text("Save Changes").prop('disabled', false); }
+                    complete: function() { btn.text("Save Changes").prop('disabled', false); }
                 });
             };
 
             if (selectedProfileFile) {
                 const formData = new FormData();
                 formData.append("file", selectedProfileFile);
-
                 $.ajax({
                     url: `http://localhost:8080/api/admin/settings/profile/upload-logo/${currentAdminId}`,
                     type: 'POST',
                     data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (res) {
-                        localStorage.setItem("adminLogo", res.logoUrl);
-                        
-                        // 🔴 NAYA FIX: Badi photo ko bhi update karein!
-                        $('#profileImagePreview').attr('src', res.logoUrl);
-                        $('.avatar-circle img, .avatar-small img').attr('src', res.logoUrl);
-                        
-                        updateTextDetails();
-                    },
-                    error: function (xhr) {
-                        alert("Error uploading logo: " + (xhr.responseJSON?.error || "Server Error"));
-                        btn.text("Save Changes").prop('disabled', false);
-                    }
+                    processData: false, contentType: false,
+                    success: function () { updateText(); },
+                    error: function() { alert("Logo upload failed."); btn.prop('disabled', false); }
                 });
             } else {
-                updateTextDetails();
+                updateText();
             }
         });
 
-        // --- Cancel Button Logic ---
-        $('.btn-cancel').on('click', function(e) {
+        // --- Change Password ---
+        $('#security .sys-btn-primary').on('click', function (e) {
+            if ($(this).attr('id') === 'tfaSubmitBtn') return;
             e.preventDefault();
-            window.location.href = "AdminDashboard.html";
-        });
-
-        // --- Change Password Logic ---
-        $('#security .sys-btn-primary').on('click', function(e) {
-            if($(this).attr('id') === 'tfaSubmitBtn') return; 
-
-            e.preventDefault();
-            const currentAdminId = localStorage.getItem("adminId");
-            
+            const adminId = localStorage.getItem("adminId");
             const oldPass = $('#security input').eq(0).val();
             const newPass = $('#security input').eq(1).val();
             const confirmPass = $('#security input').eq(2).val();
 
-            if(!oldPass || !newPass || !confirmPass) return alert("Please fill all password fields.");
-            if(newPass !== confirmPass) return alert("New Password and Confirm Password do not match!");
+            if (!oldPass || !newPass || !confirmPass) return alert("Fill all fields.");
+            if (newPass.length < 8) return alert("Min 8 characters required.");
+            if (newPass !== confirmPass) return alert("Passwords don't match.");
 
-            const btn = $(this);
-            btn.text("Updating...").prop('disabled', true);
-
+            $(this).text("Updating...").prop('disabled', true);
             $.ajax({
-                url: `http://localhost:8080/api/admin/settings/security/change-password/${currentAdminId}`,
+                url: `http://localhost:8080/api/admin/settings/security/change-password/${adminId}`,
                 type: 'PUT',
                 contentType: 'application/json',
                 data: JSON.stringify({ oldPassword: oldPass, newPassword: newPass }),
                 success: function () {
-                    alert("Password Changed Successfully!");
-                    $('#security input').val(''); 
+                    alert("Password Updated! Please login again.");
+                    localStorage.clear();
+                    window.location.replace("SuperAdminLogin.html");
                 },
-                error: function (xhr) {
-                    alert(xhr.responseJSON?.error || "Error changing password");
-                },
-                complete: function () {
-                    btn.text("Update Password").prop('disabled', false);
-                }
+                error: function (xhr) { alert(xhr.responseJSON?.error || "Error"); },
+                complete: () => { $(this).text("Update Password").prop('disabled', false); }
             });
         });
     });
-   </script>
+</script>
 
 </body>
 
