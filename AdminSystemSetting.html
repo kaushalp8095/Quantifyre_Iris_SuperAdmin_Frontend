@@ -683,54 +683,70 @@
             });
         });
 
+        // Notifications Dynemic Data
         $(document).ready(function () {
             const adminId = localStorage.getItem("adminId");
 
-            // --- 1. FETCH: Database se settings lana ---
+            // --- 1. FETCH: Database se data lana aur switches set karna ---
+
             function fetchAdminNotifSettings() {
+                if (!adminId) return;
+
                 $.ajax({
                     url: `http://localhost:8080/api/admin/settings/notifications/${adminId}`,
                     type: 'GET',
                     success: function (settings) {
-                        if (settings) {
-                            // Java Model ki keys (emailNotifNewReg etc.) ko HTML ID se match karo
-                            Object.keys(settings).forEach(key => {
-                                // Agar HTML mein ye ID milti hai, toh status set karo
-                                $(`#${key}`).prop('checked', settings[key]);
-                            });
-                        }
+                        
+                        $('.admin-notif-toggle').each(function () {
+                            const key = $(this).attr('id');
+
+                            const valueToSet = (settings && settings[key] !== undefined) ? settings[key] : true;
+                
+                $(this).prop('checked', valueToSet);
+                        });
                     },
-                    error: function () { console.log("New Admin: Default settings will be used."); }
+                    error: function () {
+                        // API fail ho toh user ko sab ON dikhao
+                        $('.admin-notif-toggle').prop('checked', true);
+                    }
                 });
             }
+
+            // Tab click hone par ya page load par data mangwayein
+            $('button:contains("Notifications")').on('click', function () {
+                fetchAdminNotifSettings();
+            });
+
+            // Pehli baar load karne ke liye
             fetchAdminNotifSettings();
 
-            // --- 2. AUTO-SAVE: Toggle click hote hi save ---
+            // --- 2. AUTO-SAVE: Kisi bhi toggle par change hone par save karna ---
             $(document).on('change', '.admin-notif-toggle', function () {
                 const payload = {};
 
-                // Saare switches ko scan karo aur unki ID ko 'Key' bana do
+                // Saare toggles ka data ek baar mein uthao (Dynamic Loop)
                 $('.admin-notif-toggle').each(function () {
-                    const fieldName = $(this).attr('id');
-                    payload[fieldName] = $(this).is(':checked');
+                    const key = $(this).attr('id');
+                    payload[key] = $(this).is(':checked');
                 });
 
-                console.log("Saving Settings:", payload);
+                console.log("Saving Admin Settings:", payload);
 
                 $.ajax({
                     url: `http://localhost:8080/api/admin/settings/notifications/update/${adminId}`,
-                    type: 'PUT',
+                    type: 'PUT', // Admin mein hum PUT use kar rahe hain
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function () {
-                        console.log("Database Updated Successfully!");
+                        console.log("Admin Settings Saved Successfully!");
                     },
                     error: function () {
-                        alert("Failed to save settings. Please check server.");
+                        console.error("Failed to update Admin notifications.");
                     }
                 });
             });
         });
+
     </script>
 
 </body>
