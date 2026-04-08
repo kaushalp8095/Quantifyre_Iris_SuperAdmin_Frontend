@@ -15,31 +15,32 @@
 
     <div class="dashboard-container">
 
-         <aside class="sidebar">
+        <aside class="sidebar">
             <div class="close-sidebar-btn" id="closeSidebarBtn"><i class="fa-solid fa-xmark"></i></div>
             <div class="logo-section">
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li class="active"><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -165,7 +166,8 @@
                             <label>Set Password</label>
                             <div class="password-wrapper" style="position: relative;">
                                 <input type="password" id="agencyPass" class="form-input"
-                                    placeholder="Set your password" style="padding-right: 40px;" autocomplete="new-password">
+                                    placeholder="Set your password" style="padding-right: 40px;"
+                                    autocomplete="new-password">
                                 <i class="fa-regular fa-eye" id="togglePassword"
                                     style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666;"></i>
                             </div>
@@ -532,10 +534,12 @@
                 if (!$('#stateSearchSelect').val()) { $('#stateError').fadeIn(); isValid = false; }
                 if (!$('#citySearchSelect').val()) { $('#cityError').fadeIn(); isValid = false; }
                 if ($('#pincode').val().trim() === "") { $('#pincodeError').fadeIn(); $('#pincode').css('border-color', '#ff4d4d'); isValid = false; }
+
                 if (isValid) {
+                    // 1. Ek hi baar declare karein
                     let formData = new FormData();
 
-                    // Saari fields ko ek object mein bharo
+                    // 2. Data Object taiyar karein
                     let agencyData = {
                         agencyName: $('#agencyName').val(),
                         ownerName: $('#ownerName').val(),
@@ -548,18 +552,23 @@
                         state: $('#stateSearchSelect').val(),
                         city: $('#citySearchSelect').val(),
                         pincode: $('#pincode').val(),
-                        // Address merging yahan frontend par hi kar sakte hain ya backend model setters mein
                         address: $('#address1').val() + ($('#address2').val() ? ", " + $('#address2').val() : "")
                     };
 
-                    // Sirf 2 cheezein bhej rahe hain (Parts count limit kabhi cross nahi hogi)
+                    // 3. Sab kuch formData mein append karein
                     formData.append("agencyData", JSON.stringify(agencyData));
 
+                    // Admin ID jo login hai (Taki notification sahi admin ko jaye)
+                    const currentLoginAdminId = localStorage.getItem("adminId");
+                    formData.append("adminId", currentLoginAdminId);
+
+                    // Logo File append karein
                     let logoFile = $('#agencyLogo')[0].files[0];
                     if (logoFile) {
                         formData.append("agencyLogo", logoFile);
                     }
 
+                    // 4. AJAX Call
                     $.ajax({
                         url: 'http://localhost:8080/api/admin/agencies/add',
                         type: 'POST',
@@ -567,7 +576,7 @@
                         processData: false,
                         contentType: false,
                         success: function (response) {
-                            alert(response.message || response);
+                            alert(response.message || "Agency Created Successfully!");
                             window.location.href = "AdminAgencies.html";
                         },
                         error: function (xhr) {
