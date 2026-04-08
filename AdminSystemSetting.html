@@ -424,6 +424,17 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
     <script>
@@ -624,8 +635,11 @@
                             $('.pc-text:has(span:contains("Email")) p').text(currentEmail);
                             $('.pc-text:has(span:contains("Phone")) p').text(currentPhone);
 
-                            alert("Profile Updated Successfully!");
+                            showCustomAlert("Success!", "Profile Updated Successfully!", "success");
                             fetchAdminData(); // Refresh UI
+                        },
+                        error: function () {
+                            showCustomAlert("Error", "Failed to update profile details.", "error");
                         },
                         complete: function () { btn.text("Save Changes").prop('disabled', false); }
                     });
@@ -648,7 +662,10 @@
                             updateText();
 
                         },
-                        error: function () { alert("Logo upload failed."); btn.prop('disabled', false); }
+                        error: function () {
+                            showCustomAlert("Upload Failed", "Logo could not be uploaded.", "error");
+                            btn.text("Save Changes").prop('disabled', false);
+                        }
                     });
                 } else {
                     updateText();
@@ -664,10 +681,18 @@
                 const newPass = $('#security input').eq(1).val();
                 const confirmPass = $('#security input').eq(2).val();
 
-                if (!oldPass || !newPass || !confirmPass) return alert("Fill all fields.");
-                if (newPass.length < 8) return alert("Min 8 characters required.");
-                if (newPass !== confirmPass) return alert("Passwords don't match.");
-
+                if (!oldPass || !newPass || !confirmPass) {
+                    showCustomAlert("Empty Fields", "Please fill all password fields.", "error");
+                    return;
+                }
+                if (newPass.length < 8) {
+                    showCustomAlert("Weak Password", "New password must be at least 8 characters.", "error");
+                    return;
+                }
+                if (newPass !== confirmPass) {
+                    showCustomAlert("Mismatch", "New password and Confirm password do not match.", "error");
+                    return;
+                }
                 $(this).text("Updating...").prop('disabled', true);
                 $.ajax({
                     url: `http://localhost:8080/api/admin/settings/security/change-password/${adminId}`,
@@ -675,11 +700,17 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ oldPassword: oldPass, newPassword: newPass }),
                     success: function () {
-                        alert("Password Updated! Please login again.");
-                        localStorage.clear();
-                        window.location.replace("SuperAdminLogin.html");
+                        showCustomAlert("Password Updated!", "Your password has been changed. Please login again.", "success");
+                        $('.btn-alert-ok').off('click').on('click', function () {
+                            $('#customAlertOverlay').removeClass('active');
+                            localStorage.clear();
+                            window.location.replace("SuperAdminLogin.html");
+                        });
                     },
-                    error: function (xhr) { alert(xhr.responseJSON?.error || "Error"); },
+                    error: function (xhr) {
+                        const errMsg = xhr.responseJSON?.error || "Incorrect current password.";
+                        showCustomAlert("Update Failed", errMsg, "error");
+                    },
                     complete: () => { $(this).text("Update Password").prop('disabled', false); }
                 });
             });
@@ -748,6 +779,25 @@
                 });
             });
         });
+
+        function showCustomAlert(title, message, type) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+
+            if (type === 'success') {
+                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+            } else {
+                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+            }
+
+            $('#customAlertOverlay').addClass('active');
+
+            $('.btn-alert-ok').off('click').on('click', function () {
+                $('#customAlertOverlay').removeClass('active');
+            });
+        }
 
     </script>
 
