@@ -21,25 +21,26 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li class="active"><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -64,29 +65,11 @@
                                 <h4>Notifications</h4><span class="mark-read">Mark all read</span>
                             </div>
                             <ul class="notif-list">
-                                <li class="notif-item unread">
-                                    <div class="n-icon success"><i class="fa-solid fa-check"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Campaign Approved</strong></p><span>"Summer Sale" is live.</span>
-                                    </div>
-                                    <span class="n-time">2m</span>
-                                </li>
-                                <li class="notif-item unread">
-                                    <div class="n-icon info"><i class="fa-solid fa-user-plus"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>New Lead</strong></p><span>John Doe from Ahmedabad.</span>
-                                    </div>
-                                    <span class="n-time">1h</span>
-                                </li>
-                                <li class="notif-item">
-                                    <div class="n-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Budget Alert</strong></p><span>90% budget used.</span>
-                                    </div>
-                                    <span class="n-time">1d</span>
-                                </li>
+                                <div style="text-align: center; padding: 15px; color: #8b9c9c;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                                </div>
                             </ul>
-                            <div class="notif-footer"><a href="#">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -221,7 +204,7 @@
             const hiddenInput = dropdown.querySelector('input[type="hidden"]');
 
             selectedText.innerText = value;
-            selectedText.style.color = "#fff"; 
+            selectedText.style.color = "#fff";
 
             hiddenInput.value = value;
 
@@ -229,30 +212,30 @@
         }
 
 
-      $(document).ready(function() {
-    $(document).on('change', '.cnt-drop-input', function () {
-        const file = this.files[0];
-        const uploadZone = $(this).closest('.cnt-upload-zone');
-        const uploadContent = uploadZone.find('.cnt-upload-content');
-        
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            
-            reader.onload = function (e) {
-                uploadZone.find('.preview-img').remove();
-                
-                uploadContent.hide();
-                
-                uploadZone.append(`<img src="${e.target.result}" class="preview-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 8px; z-index: 5; padding: 5px; pointer-events: none; ">`);
-            };
-            
-            reader.readAsDataURL(file);
-        } else {
-            uploadZone.find('.preview-img').remove();
-            uploadContent.show();
-        }
-    });
-});
+        $(document).ready(function () {
+            $(document).on('change', '.cnt-drop-input', function () {
+                const file = this.files[0];
+                const uploadZone = $(this).closest('.cnt-upload-zone');
+                const uploadContent = uploadZone.find('.cnt-upload-content');
+
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        uploadZone.find('.preview-img').remove();
+
+                        uploadContent.hide();
+
+                        uploadZone.append(`<img src="${e.target.result}" class="preview-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 8px; z-index: 5; padding: 5px; pointer-events: none; ">`);
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    uploadZone.find('.preview-img').remove();
+                    uploadContent.show();
+                }
+            });
+        });
     </script>
 </body>
 

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Js/admin-auth-guard.js"></script>
 </head>
+
 <body>
     <div class="dashboard-container">
 
@@ -37,8 +38,9 @@
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                      <div class="mobile-only-menu">
-                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System Setting</a></li>
+                    <div class="mobile-only-menu">
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System Setting</a>
+                        </li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -50,7 +52,7 @@
 
         <main class="main-content">
 
-           <header class="top-bar">
+            <header class="top-bar">
                 <div class="menu-toggle" id="sidebarToggle"><img src="Images/Slide.ico"></div>
                 <div class="top-profile-actions" style="position: relative;">
 
@@ -64,29 +66,11 @@
                                 <h4>Notifications</h4><span class="mark-read">Mark all read</span>
                             </div>
                             <ul class="notif-list">
-                                <li class="notif-item unread">
-                                    <div class="n-icon success"><i class="fa-solid fa-check"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Campaign Approved</strong></p><span>"Summer Sale" is live.</span>
-                                    </div>
-                                    <span class="n-time">2m</span>
-                                </li>
-                                <li class="notif-item unread">
-                                    <div class="n-icon info"><i class="fa-solid fa-user-plus"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>New Lead</strong></p><span>John Doe from Ahmedabad.</span>
-                                    </div>
-                                    <span class="n-time">1h</span>
-                                </li>
-                                <li class="notif-item">
-                                    <div class="n-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Budget Alert</strong></p><span>90% budget used.</span>
-                                    </div>
-                                    <span class="n-time">1d</span>
-                                </li>
+                                <div style="text-align: center; padding: 15px; color: #8b9c9c;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                                </div>
                             </ul>
-                            <div class="notif-footer"><a href="#">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -118,15 +102,18 @@
             <div class="cl-page-header">
                 <div class="cl-title-text">
                     <div class="cl-icon-square"><img src="Images/Customer50x50.ico" alt=""></div>
-                    <div><h1>Add New Client</h1><p>Provide essential details to create a client profile</p></div>
+                    <div>
+                        <h1>Add New Client</h1>
+                        <p>Provide essential details to create a client profile</p>
+                    </div>
                 </div>
             </div>
 
             <div class="cl-glass-card">
                 <form action="#" method="POST">
-                    
+
                     <div class="cl-form-grid">
-                        
+
                         <div class="cl-form-group">
                             <label>Client Name</label>
                             <input type="text" class="cl-form-input" placeholder="Enter your Client name">
@@ -165,9 +152,12 @@
                                     <i class="fa-solid fa-chevron-down"></i>
                                 </div>
                                 <ul class="cl-dd-options">
-                                    <li class="cl-dd-item" onclick="selectClItem('clAgencyDropdown', 'Acme Corp')">Acme Corp</li>
-                                    <li class="cl-dd-item" onclick="selectClItem('clAgencyDropdown', 'Global Tech')">Global Tech</li>
-                                    <li class="cl-dd-item" onclick="selectClItem('clAgencyDropdown', 'Stark Ind')">Stark Ind</li>
+                                    <li class="cl-dd-item" onclick="selectClItem('clAgencyDropdown', 'Acme Corp')">Acme
+                                        Corp</li>
+                                    <li class="cl-dd-item" onclick="selectClItem('clAgencyDropdown', 'Global Tech')">
+                                        Global Tech</li>
+                                    <li class="cl-dd-item" onclick="selectClItem('clAgencyDropdown', 'Stark Ind')">Stark
+                                        Ind</li>
                                 </ul>
                                 <input type="hidden" name="agency">
                             </div>
@@ -195,10 +185,10 @@
                 </form>
             </div>
 
-            </main>
+        </main>
     </div>
 
-     <!-- Logut Model Logic -->
+    <!-- Logut Model Logic -->
     <div class="modal-overlay" id="logoutModal">
         <div class="modal-content">
             <div class="modal-icon-box2">
@@ -241,4 +231,5 @@
         }
     </script>
 </body>
+
 </html>
