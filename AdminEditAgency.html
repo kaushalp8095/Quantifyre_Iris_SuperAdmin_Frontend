@@ -70,7 +70,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -288,6 +289,16 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
@@ -570,12 +581,32 @@
                         processData: false,
                         contentType: false,
                         success: function (response) {
-                            alert("Update Successful: " + (response.message || "Done"));
-                            window.location.href = "AdminAgencies.html";
+                            showCustomAlert(
+                                "Update Successful",
+                                response.message || "Agency details have been updated successfully.",
+                                "success"
+                            );
+
+                            // OK dabane par hi redirect hoga
+                            $('.btn-alert-ok').off('click').on('click', function () {
+                                $('#customAlertOverlay').removeClass('active');
+                                window.location.href = "AdminAgencies.html";
+                            });
                         },
                         error: function (xhr) {
                             $('.btn-submit').prop('disabled', false).text('Update Agency');
-                            alert("Error updating: " + (xhr.responseText || "Server Error"));
+
+                            // ❌ ERROR CUSTOM ALERT (Duplicate Email ya Server Error)
+                            let errorTitle = "Update Failed";
+                            let errorMsg = xhr.responseText || "Something went wrong while updating.";
+
+                            // Agar backend se email registered wala error aaye
+                            if (xhr.responseText && xhr.responseText.includes("Email")) {
+                                errorTitle = "Email Conflict";
+                                errorMsg = "This Email address is already used by another agency.";
+                            }
+
+                            showCustomAlert(errorTitle, errorMsg, "error");
                         }
                     });
 
@@ -600,6 +631,26 @@
                 }
             });
         });
+
+
+        function showCustomAlert(title, message, type) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+
+            if (type === 'success') {
+                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+            } else {
+                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+            }
+
+            $('#customAlertOverlay').addClass('active');
+
+            $('.btn-alert-ok').off('click').on('click', function () {
+                $('#customAlertOverlay').removeClass('active');
+            });
+        }
     </script>
 </body>
 
