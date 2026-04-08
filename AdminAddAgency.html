@@ -64,13 +64,13 @@
                             <div class="notif-header">
                                 <h4>Notifications</h4><span class="mark-read">Mark all read</span>
                             </div>
-                           
+
                             <ul class="notif-list">
                                 <div style="text-align: center; padding: 15px; color: #8b9c9c;">
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            
+
                             <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
                             </div>
                         </div>
@@ -571,11 +571,29 @@
                         processData: false,
                         contentType: false,
                         success: function (response) {
-                            alert(response.message || "Agency Created Successfully!");
-                            window.location.href = "AdminAgencies.html";
+                            showCustomAlert(
+                                "Success!",
+                                response.message || "Agency Created Successfully!",
+                                "success"
+                            );
+
+                            // OK dabane par hi redirect hoga
+                            $('.btn-alert-ok').off('click').on('click', function () {
+                                $('#customAlertOverlay').removeClass('active');
+                                window.location.href = "AdminAgencies.html";
+                            });
                         },
                         error: function (xhr) {
-                            alert("Galti: " + (xhr.responseText || "Server Error"));
+                            $('.btn-submit').text("Create Agency").prop('disabled', false);
+
+                            // ❌ ERROR CUSTOM ALERT (Email duplicate ya server error)
+                            let errorMsg = xhr.responseText || "Something went wrong";
+                            if (xhr.status === 400 || xhr.status === 500) {
+                                // Agar backend se "Ye Email pehle se registered hai" wala message aaye
+                                errorMsg = xhr.responseText.includes("Email") ? "This Email is already registered!" : errorMsg;
+                            }
+
+                            showCustomAlert("Action Failed", errorMsg, "error");
                         }
                     });
                 }
@@ -600,7 +618,7 @@
                 $('#customAlertOverlay').removeClass('active');
             });
         }
-        
+
     </script>
 
 </body>
