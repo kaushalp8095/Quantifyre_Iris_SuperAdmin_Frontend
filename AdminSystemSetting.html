@@ -84,7 +84,8 @@
                                     <span class="n-time">1d</span>
                                 </li>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -612,6 +613,7 @@
                 const currentAdminId = localStorage.getItem("adminId");
                 const currentFName = $('input.personal-group').eq(0).val().trim();
                 const currentLName = $('input.personal-group').eq(1).val().trim();
+                const currentEmail = $('input.personal-group').eq(2).val().trim();
                 const currentPhone = $('input.personal-group').eq(3).val().trim();
 
                 if (currentFName === initialProfileData.firstName && currentLName === initialProfileData.lastName &&
@@ -630,6 +632,16 @@
                         contentType: 'application/json',
                         data: JSON.stringify({ firstName: currentFName, lastName: currentLName, phoneNumber: currentPhone }),
                         success: function (res) {
+                            const newFullName = currentFName + " " + currentLName;
+                            localStorage.setItem("adminName", newFullName);
+                            localStorage.setItem("adminEmail", currentEmail);
+
+                            // 🔴 2. UI INSTANT UPDATE: Setting page ke header/sidebar ko turant badlo
+                            $('.user-mini-profile p, .text-info h4, .d-name').text(newFullName);
+                            $('.d-email').text(currentEmail);
+                            $('.pc-text:has(span:contains("Email")) p').text(currentEmail);
+                            $('.pc-text:has(span:contains("Phone")) p').text(currentPhone);
+
                             alert("Profile Updated Successfully!");
                             fetchAdminData(); // Refresh UI
                         },
@@ -645,7 +657,15 @@
                         type: 'POST',
                         data: formData,
                         processData: false, contentType: false,
-                        success: function () { updateText(); },
+                        success: function () {
+                            if (logoResponse && logoResponse.url) {
+                                localStorage.setItem("adminLogo", logoResponse.url);
+                                // Instant update image on page
+                                $('.avatar-circle img, .avatar-small img, #profileImagePreview').attr('src', logoResponse.url);
+                            }
+                            updateText();
+
+                        },
                         error: function () { alert("Logo upload failed."); btn.prop('disabled', false); }
                     });
                 } else {
@@ -696,13 +716,13 @@
                     url: `http://localhost:8080/api/admin/settings/notifications/${adminId}`,
                     type: 'GET',
                     success: function (settings) {
-                        
+
                         $('.admin-notif-toggle').each(function () {
                             const key = $(this).attr('id');
 
                             const valueToSet = (settings && settings[key] !== undefined) ? settings[key] : true;
-                
-                $(this).prop('checked', valueToSet);
+
+                            $(this).prop('checked', valueToSet);
                         });
                     },
                     error: function () {
