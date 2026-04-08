@@ -601,76 +601,103 @@
             });
 
             // --- Save Profile Changes ---
-            $('.btn-submit').on('click', function (e) {
-                e.preventDefault();
-                const currentAdminId = localStorage.getItem("adminId");
-                const currentFName = $('input.personal-group').eq(0).val().trim();
-                const currentLName = $('input.personal-group').eq(1).val().trim();
-                const currentEmail = $('input.personal-group').eq(2).val().trim();
-                const currentPhone = $('input.personal-group').eq(3).val().trim();
+            // --- Save Profile Changes (With Full Validation & Custom Alert) ---
+$('.btn-submit').on('click', function (e) {
+    e.preventDefault();
+    const currentAdminId = localStorage.getItem("adminId");
+    
+    // 1. Fresh data uthao inputs se
+    const currentFName = $('input.personal-group').eq(0).val().trim();
+    const currentLName = $('input.personal-group').eq(1).val().trim();
+    const currentEmail = $('input.personal-group').eq(2).val().trim();
+    const currentPhone = $('input.personal-group').eq(3).val().trim();
+    const currentImage = $('#profileImagePreview').attr('src');
 
-                if (currentFName === initialProfileData.firstName && currentLName === initialProfileData.lastName &&
-                    currentPhone === initialProfileData.phoneNumber && !selectedProfileFile) {
-                    alert("No changes detected.");
-                    return;
+    // 2. Validation Logic
+    // Check missing text fields
+    if (!currentFName || !currentLName || !currentEmail || !currentPhone) {
+        showCustomAlert("Validation Error", "All personal details fields are required.", "error");
+        return;
+    }
+
+    // Check for Email format
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(currentEmail)) {
+        showCustomAlert("Invalid Email", "Please enter a valid email address.", "error");
+        return;
+    }
+
+    // Check for Profile Image (Agar default image hai ya khali hai)
+    if (!currentImage || currentImage === "#" || currentImage.includes("default-avatar")) {
+        showCustomAlert("Image Required", "Please upload a profile picture before saving.", "error");
+        return;
+    }
+
+    // 3. Agar sab sahi hai toh process shuru karein
+    const btn = $(this);
+    btn.text("Saving...").prop('disabled', true);
+
+    const updateText = () => {
+        $.ajax({
+            url: `http://localhost:8080/api/admin/settings/profile/update/${currentAdminId}`,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                firstName: currentFName, 
+                lastName: currentLName, 
+                email: currentEmail, 
+                phoneNumber: currentPhone 
+            }),
+            success: function (res) {
+                // Sync LocalStorage
+                const newFullName = currentFName + " " + currentLName;
+                localStorage.setItem("adminName", newFullName);
+                localStorage.setItem("adminEmail", currentEmail);
+
+                // UI Sync
+                $('.user-mini-profile p, .text-info h4, .d-name').text(newFullName);
+                $('.d-email').text(currentEmail);
+                
+                // ✅ SUCCESS ALERT
+                showCustomAlert("Success!", "Admin Profile has been updated successfully.", "success");
+                fetchAdminData(); 
+            },
+            error: function () {
+                showCustomAlert("Update Failed", "Server error while updating profile.", "error");
+            },
+            complete: function () { 
+                btn.text("Save Changes").prop('disabled', false); 
+            }
+        });
+    };
+
+    // Image Upload Handling
+    if (selectedProfileFile) {
+        const formData = new FormData();
+        formData.append("file", selectedProfileFile);
+        $.ajax({
+            url: `http://localhost:8080/api/admin/settings/profile/upload-logo/${currentAdminId}`,
+            type: 'POST',
+            data: formData,
+            processData: false, 
+            contentType: false,
+            success: function (logoResponse) {
+                if (logoResponse && (logoResponse.url || logoResponse.logoPath)) {
+                    const finalUrl = logoResponse.url || logoResponse.logoPath;
+                    localStorage.setItem("adminLogo", finalUrl);
+                    $('.avatar-circle img, .avatar-small img, #profileImagePreview').attr('src', finalUrl);
                 }
-
-                const btn = $(this);
-                btn.text("Saving...").prop('disabled', true);
-
-                const updateText = () => {
-                    $.ajax({
-                        url: `http://localhost:8080/api/admin/settings/profile/update/${currentAdminId}`,
-                        type: 'PUT',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ firstName: currentFName, lastName: currentLName, phoneNumber: currentPhone }),
-                        success: function (res) {
-                            const newFullName = currentFName + " " + currentLName;
-                            localStorage.setItem("adminName", newFullName);
-                            localStorage.setItem("adminEmail", currentEmail);
-
-                            // 🔴 2. UI INSTANT UPDATE: Setting page ke header/sidebar ko turant badlo
-                            $('.user-mini-profile p, .text-info h4, .d-name').text(newFullName);
-                            $('.d-email').text(currentEmail);
-                            $('.pc-text:has(span:contains("Email")) p').text(currentEmail);
-                            $('.pc-text:has(span:contains("Phone")) p').text(currentPhone);
-
-                            showCustomAlert("Success!", "Profile Updated Successfully!", "success");
-                            fetchAdminData(); // Refresh UI
-                        },
-                        error: function () {
-                            showCustomAlert("Error", "Failed to update profile details.", "error");
-                        },
-                        complete: function () { btn.text("Save Changes").prop('disabled', false); }
-                    });
-                };
-
-                if (selectedProfileFile) {
-                    const formData = new FormData();
-                    formData.append("file", selectedProfileFile);
-                    $.ajax({
-                        url: `http://localhost:8080/api/admin/settings/profile/upload-logo/${currentAdminId}`,
-                        type: 'POST',
-                        data: formData,
-                        processData: false, contentType: false,
-                        success: function () {
-                            if (logoResponse && logoResponse.url) {
-                                localStorage.setItem("adminLogo", logoResponse.url);
-                                // Instant update image on page
-                                $('.avatar-circle img, .avatar-small img, #profileImagePreview').attr('src', logoResponse.url);
-                            }
-                            updateText();
-
-                        },
-                        error: function () {
-                            showCustomAlert("Upload Failed", "Logo could not be uploaded.", "error");
-                            btn.text("Save Changes").prop('disabled', false);
-                        }
-                    });
-                } else {
-                    updateText();
-                }
-            });
+                updateText();
+            },
+            error: function () { 
+                showCustomAlert("Upload Failed", "Profile picture could not be uploaded.", "error");
+                btn.text("Save Changes").prop('disabled', false); 
+            }
+        });
+    } else {
+        updateText();
+    }
+});
 
             // --- Change Password ---
             $('#security .sys-btn-primary').on('click', function (e) {
