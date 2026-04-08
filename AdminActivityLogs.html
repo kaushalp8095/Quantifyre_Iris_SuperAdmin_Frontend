@@ -22,25 +22,27 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
-                    <li class="active"><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
+                    <li class="active"><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity
+                            Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -66,29 +68,12 @@
                                 <h4>Notifications</h4><span class="mark-read">Mark all read</span>
                             </div>
                             <ul class="notif-list">
-                                <li class="notif-item unread">
-                                    <div class="n-icon success"><i class="fa-solid fa-check"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Campaign Approved</strong></p><span>"Summer Sale" is live.</span>
-                                    </div>
-                                    <span class="n-time">2m</span>
-                                </li>
-                                <li class="notif-item unread">
-                                    <div class="n-icon info"><i class="fa-solid fa-user-plus"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>New Lead</strong></p><span>John Doe from Ahmedabad.</span>
-                                    </div>
-                                    <span class="n-time">1h</span>
-                                </li>
-                                <li class="notif-item">
-                                    <div class="n-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Budget Alert</strong></p><span>90% budget used.</span>
-                                    </div>
-                                    <span class="n-time">1d</span>
-                                </li>
+                                <div style="text-align: center; padding: 15px; color: #8b9c9c;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                                </div>
                             </ul>
-                            <div class="notif-footer"><a href="#">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -130,10 +115,10 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input type="text" placeholder="Search Logs...">
                     </div>
-                    
+
                     <div class="date-range-wrapper" id="dateRangeWrapper">
                         <button class="date-range-btn" onclick="toggleDateDropdown(event)">
-                            <span id="selectedRangeText">Data Range</span> 
+                            <span id="selectedRangeText">Data Range</span>
                             <i class="fa-solid fa-chevron-down" id="dateChevron"></i>
                         </button>
                         <div class="date-dropdown">
@@ -153,7 +138,7 @@
 
             <section class="logs-table-card">
                 <h3 class="table-heading">Recent System Activities</h3>
-                
+
                 <div class="table-responsive">
                     <table class="logs-table" id="activitylogTable">
                         <thead>
@@ -235,9 +220,9 @@
                     </table>
                 </div>
 
-                
+
             </section>
-           <div class="pagination-wrapper" id="pagination-activitylog">
+            <div class="pagination-wrapper" id="pagination-activitylog">
                 <div class="pagination-info">
                     Showing <span class="start-row">1</span> to <span class="end-row">4</span> of <span
                         class="total-rows">1250</span> entries
@@ -255,7 +240,7 @@
         </main>
     </div>
 
-     <!-- Logut Model Logic -->
+    <!-- Logut Model Logic -->
     <div class="modal-overlay" id="logoutModal">
         <div class="modal-content">
             <div class="modal-icon-box2">
@@ -271,8 +256,8 @@
     </div>
 
     <script src="Js/jquery-3.7.1.min.js"></script>
-    <script src="Js/all.js"></script> 
-    
+    <script src="Js/all.js"></script>
+
     <script>
         // --- Dropdown Logic ---
         function toggleDateDropdown(event) {
@@ -280,9 +265,9 @@
             const wrapper = document.getElementById('dateRangeWrapper');
             const chevron = document.getElementById('dateChevron');
             wrapper.classList.toggle('active');
-            
+
             // Rotate Chevron
-            if(wrapper.classList.contains('active')) {
+            if (wrapper.classList.contains('active')) {
                 chevron.style.transform = 'rotate(180deg)';
             } else {
                 chevron.style.transform = 'rotate(0deg)';
@@ -293,24 +278,24 @@
             document.getElementById('selectedRangeText').innerText = text;
             const wrapper = document.getElementById('dateRangeWrapper');
             const chevron = document.getElementById('dateChevron');
-            
+
             wrapper.classList.remove('active');
             chevron.style.transform = 'rotate(0deg)';
         }
 
         // Close on Outside Click
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const wrapper = document.getElementById('dateRangeWrapper');
             const chevron = document.getElementById('dateChevron');
-            
+
             if (wrapper && !wrapper.contains(event.target)) {
                 wrapper.classList.remove('active');
-                if(chevron) chevron.style.transform = 'rotate(0deg)';
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
             }
         });
     </script>
 
-     <script>
+    <script>
         // ---- Pagination Logic ---- //
         function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
             const table = document.getElementById(tableId);
@@ -388,4 +373,5 @@
     </script>
 
 </body>
+
 </html>
