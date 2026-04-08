@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="Css/fontstyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
 </head>
 
 <body>
@@ -45,8 +45,9 @@
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                     <div class="mobile-only-menu">
-                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System Setting</a></li>
+                    <div class="mobile-only-menu">
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System Setting</a>
+                        </li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -72,29 +73,11 @@
                                 <h4>Notifications</h4><span class="mark-read">Mark all read</span>
                             </div>
                             <ul class="notif-list">
-                                <li class="notif-item unread">
-                                    <div class="n-icon success"><i class="fa-solid fa-check"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Campaign Approved</strong></p><span>"Summer Sale" is live.</span>
-                                    </div>
-                                    <span class="n-time">2m</span>
-                                </li>
-                                <li class="notif-item unread">
-                                    <div class="n-icon info"><i class="fa-solid fa-user-plus"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>New Lead</strong></p><span>John Doe from Ahmedabad.</span>
-                                    </div>
-                                    <span class="n-time">1h</span>
-                                </li>
-                                <li class="notif-item">
-                                    <div class="n-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                    <div class="n-text">
-                                        <p><strong>Budget Alert</strong></p><span>90% budget used.</span>
-                                    </div>
-                                    <span class="n-time">1d</span>
-                                </li>
+                                <div style="text-align: center; padding: 15px; color: #8b9c9c;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                                </div>
                             </ul>
-                            <div class="notif-footer"><a href="#">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -140,24 +123,38 @@
             <div class="metrics-grid">
                 <div class="metric-card">
                     <img src="Images/TotalBill50x50.ico" alt="">
-                    <div class="m-info"><p>Total Spend</p><h2>₹1,00,000</h2></div>
+                    <div class="m-info">
+                        <p>Total Spend</p>
+                        <h2>₹1,00,000</h2>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <img src="Images/Impressions50x50.ico" alt="">
-                    <div class="m-info"><p>Impressions</p><h2>1.5M</h2></div>
+                    <div class="m-info">
+                        <p>Impressions</p>
+                        <h2>1.5M</h2>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <img src="Images/Conversions50x50.ico" alt="">
-                    <div class="m-info"><p>Conversions</p><h2>740</h2></div>
+                    <div class="m-info">
+                        <p>Conversions</p>
+                        <h2>740</h2>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <img src="Images/Roi50x50.ico" alt="">
-                    <div class="m-info"><p>ROI</p><h2>3.2x</h2></div>
+                    <div class="m-info">
+                        <p>ROI</p>
+                        <h2>3.2x</h2>
+                    </div>
                 </div>
             </div>
 
             <div class="chart-section-report">
-                <div class="chart-head"><h3>Performance Overview</h3></div>
+                <div class="chart-head">
+                    <h3>Performance Overview</h3>
+                </div>
                 <div style="flex: 1; width: 100%; position: relative;">
                     <canvas id="performanceChart"></canvas>
                 </div>
@@ -169,7 +166,7 @@
                     <table class="custom-table" id="clientReportTable">
                         <thead>
                             <tr>
-                                <th >Recent Reports</th>
+                                <th>Recent Reports</th>
                                 <th>Client</th>
                                 <th>Start Date</th>
                                 <th>PDF</th>
@@ -185,7 +182,8 @@
                                 <td>PDF</td>
                                 <td style="text-align: center;"><span class="status-badge">Generated</span></td>
                                 <td style="text-align: center;">
-                                    <button class="btn-download-action"><i class="fa-solid fa-download"></i> Download</button>
+                                    <button class="btn-download-action"><i class="fa-solid fa-download"></i>
+                                        Download</button>
                                 </td>
                             </tr>
                             <tr>
@@ -195,7 +193,8 @@
                                 <td>PDF</td>
                                 <td style="text-align: center;"><span class="status-badge">Generated</span></td>
                                 <td style="text-align: center;">
-                                    <button class="btn-download-action"><i class="fa-solid fa-download"></i> Download</button>
+                                    <button class="btn-download-action"><i class="fa-solid fa-download"></i>
+                                        Download</button>
                                 </td>
                             </tr>
                             <tr>
@@ -205,12 +204,13 @@
                                 <td>PDF</td>
                                 <td style="text-align: center;"><span class="status-badge">Generated</span></td>
                                 <td style="text-align: center;">
-                                    <button class="btn-download-action"><i class="fa-solid fa-download"></i> Download</button>
+                                    <button class="btn-download-action"><i class="fa-solid fa-download"></i>
+                                        Download</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                </div>             
+                </div>
             </div>
 
             <!-- --- Pagination Logic --- -->
@@ -227,7 +227,7 @@
             </div>
 
 
-     </main>
+        </main>
     </div>
 
     <div class="modal-overlay" id="logoutModal">
@@ -245,16 +245,16 @@
     </div>
 
     <script src="Js/jquery-3.7.1.min.js"></script>
-    <script src="Js/all.js"></script> 
-    
+    <script src="Js/all.js"></script>
+
     <script>
         // --- Improved Graph Configuration ---
         const ctx = document.getElementById('performanceChart').getContext('2d');
-        
+
         // 1. Beautiful Gradient Area
         const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
         gradientFill.addColorStop(0, 'rgba(0, 255, 157, 0.25)');
-        gradientFill.addColorStop(1, 'rgba(0, 255, 157, 0.0)'); 
+        gradientFill.addColorStop(1, 'rgba(0, 255, 157, 0.0)');
 
         new Chart(ctx, {
             type: 'line',
@@ -266,13 +266,13 @@
                     borderColor: '#00ff9d',
                     backgroundColor: gradientFill,
                     borderWidth: 4,
-                    pointRadius: 0, 
+                    pointRadius: 0,
                     pointHoverRadius: 8,
                     pointBackgroundColor: '#00ff9d',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    fill: true, 
-                    tension: 0.45 
+                    fill: true,
+                    tension: 0.45
                 }]
             },
             options: {
@@ -289,7 +289,7 @@
                         padding: 12,
                         displayColors: false,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return 'Value: ' + context.parsed.y;
                             }
                         }
@@ -303,10 +303,10 @@
                     y: {
                         grid: {
                             color: 'rgba(255, 255, 255, 0.05)',
-                            borderDash: [5, 5], 
+                            borderDash: [5, 5],
                             drawBorder: false
                         },
-                        ticks: { display: false } 
+                        ticks: { display: false }
                     }
                 },
                 interaction: {
@@ -396,4 +396,5 @@
     </script>
 
 </body>
+
 </html>
