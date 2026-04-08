@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantifyre Iris - Admin All Notifications</title>
+
+    <link rel="stylesheet" href="Css/admin_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="Js/admin-auth-guard.js"></script>
+</head>
+
+<body>
+    <div class="dashboard-container">
+         <aside class="sidebar">
+            <div class="close-sidebar-btn" id="closeSidebarBtn"><i class="fa-solid fa-xmark"></i></div>
+            <div class="logo-section">
+                <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
+            </div>
+            <div class="user-mini-profile">
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <p></p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
+                    <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
+                    <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
+
+                    <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
+                    <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
+                    <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
+                    <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
+                    <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
+                    <li class="active"><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                            Setting</a></li>
+                    <div class="mobile-only-menu">
+                        <div class="dropdown-divider"
+                            style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
+                        <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                    class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                    </div>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="menu-toggle" id="sidebarToggle"><img src="Images/Slide.ico"></div>
+                <div class="top-profile-actions" style="position: relative;">
+
+                    <div class="notification-wrapper" style="position: relative;">
+    <div class="icon-btn notification" onclick="toggleNotification(event)">
+        <img src="Images/Notifications.ico">
+        <span class="notif-count" style="display: none;">0</span> 
+    </div>
+    <div class="notif-dropdown" id="notifDropdown">
+        <div class="notif-header">
+            <h4>Notifications</h4>
+            <span class="mark-read" style="cursor: pointer;">Mark all read</span>
+        </div>
+        
+        <ul class="notif-list">
+            <div style="text-align: center; padding: 15px; color: #8b9c9c;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+            </div>
+        </ul>
+
+        <div class="notif-footer">
+            <a href="AdminAllNotifications.html">View All Notifications</a>
+        </div>
+    </div>
+</div>
+                    <div class="profile-info" onclick="toggleProfileDropdown(event)"
+                        style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar-small">
+                            <img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <div class="text-info">
+                            <h4></h4>
+                            <p>Admin</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-down" id="profileChevron" style="transition: 0.3s;"></i>
+                    </div>
+
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header-info">
+                            <p class="d-name"></p><span class="d-email"></span>
+                        </div>
+                        <ul class="dropdown-list">
+                            <li><a href="AdminSystemSetting.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+                            <div class="dropdown-divider"></div>
+                            <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
+                                        class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-header">
+                <div class="title-text">
+                    <div class="icon-square">
+                        <img src="Images/Setting50x50.ico" alt="">
+                    </div>
+                    <div>
+                        <h1>System Setting</h1>
+                        <p>Manage core system settings and platform configurations</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sys-main-container">
+                <div class="sys-box glass-card" style="background: rgba(11, 22, 21, 0.4); padding: 30px;">
+                    
+                    <div class="notif-page-header">
+                        <div class="notif-filters">
+                            <button class="filter-chip active" data-type="ALL">All</button>
+                            <button class="filter-chip" data-type="UNREAD">Unread</button>
+                            <button class="filter-chip" data-type="SUCCESS">Success</button>
+                            <button class="filter-chip" data-type="WARNING">Alerts</button>
+                        </div>
+                        <button class="sys-btn-outline" id="markAllReadBtn" style="font-size: 0.8rem; padding: 6px 15px;">
+                            <i class="fa-solid fa-check-double"></i> Mark All as Read
+                        </button>
+                    </div>
+
+                    <div class="full-notif-list" id="pageNotifList">
+                        <div style="text-align: center; color: #8b9c9c; padding: 20px;">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Logut Model Logic -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-icon-box2">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
+            <h2>Ready to Leave?</h2>
+            <p>Are you sure you want to logout? You will need to login again to access your dashboard.</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-modal btn-modal-delete" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="Js/jquery-3.7.1.min.js"></script>
+    <script src="Js/all.js"></script>
+    <script>
+       $(document).ready(function() {
+    const adminId = localStorage.getItem("adminId");
+    if(!adminId) {
+        window.location.href = "SuperAdminLogin.html";
+        return;
+    }
+
+    let allNotifications = []; 
+
+    // 1. Fetch Data from our Backend (Admin API)
+    function fetchAllNotifications() {
+        $.ajax({
+            url: `http://localhost:8080/api/admin/top-notifications/get/${adminId}`, // 👈 Admin wala URL
+            type: "GET",
+            success: function (res) {
+                allNotifications = res.notifications;
+                
+                // Top bar bell icon update
+                if (res.unreadCount > 0) {
+                    $('.notif-count').text(res.unreadCount).show();
+                } else {
+                    $('.notif-count').hide();
+                }
+
+                renderNotifications("ALL"); 
+            },
+            error: function() {
+                $('#pageNotifList').html('<div style="color:#ff4d4d; padding:20px;">Failed to load data. Please try again.</div>');
+            }
+        });
+    }
+
+    // 2. Render HTML dynamically
+    function renderNotifications(filterType) {
+        const listUI = $('#pageNotifList');
+        listUI.empty();
+
+        // Filter logic
+        let filteredList = allNotifications;
+        if(filterType === "UNREAD") {
+            filteredList = allNotifications.filter(n => !n.read);
+        } else if(filterType !== "ALL") {
+            filteredList = allNotifications.filter(n => n.type === filterType);
+        }
+
+        if (filteredList.length === 0) {
+            listUI.append(`
+                <div style="text-align: center; padding: 50px 20px; color: #5a6a6e;">
+                    <i class="fa-regular fa-bell-slash" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <p>No notifications found for this filter.</p>
+                </div>
+            `);
+            return;
+        }
+
+        filteredList.forEach(log => {
+            let iconClass = "info";
+            let iconHtml = '<i class="fa-solid fa-bell"></i>';
+
+            if (log.type === "SUCCESS") { iconClass = "success"; iconHtml = '<i class="fa-solid fa-check"></i>'; } 
+            else if (log.type === "INFO") { iconClass = "info"; iconHtml = '<i class="fa-solid fa-user-plus"></i>'; } 
+            else if (log.type === "WARNING" || log.type === "ERROR") { iconClass = "warning"; iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>'; }
+
+            let readClass = log.read ? "" : "unread";
+
+            // Yahan 'full-notif-item' hi rahega
+            let html = `
+                <div class="full-notif-item ${readClass}">
+                    <div class="f-n-icon ${iconClass}">${iconHtml}</div>
+                    <div class="f-n-content">
+                        <h4>${log.title}</h4>
+                        <p>${log.message}</p>
+                    </div>
+                    <div class="f-n-time">${timeAgo(log.createdAt)}</div>
+                </div>
+            `;
+            listUI.append(html);
+        });
+    }
+
+    // 3. Filter Buttons Click Event
+    $('.filter-chip').on('click', function() {
+        $('.filter-chip').removeClass('active');
+        $(this).addClass('active');
+        const type = $(this).data('type');
+        renderNotifications(type);
+    });
+
+    // 4. Mark All Read Button (Admin API)
+    $('#markAllReadBtn').on('click', function() {
+        $.ajax({
+            url: `http://localhost:8080/api/admin/top-notifications/mark-read/${adminId}`, // 👈 Admin wala URL
+            type: "POST",
+            success: function() {
+                $('.full-notif-item').removeClass('unread');
+                $('.notif-count').hide();
+                allNotifications.forEach(n => n.read = true);
+                if($('.filter-chip.active').data('type') === "UNREAD") {
+                    renderNotifications("UNREAD");
+                }
+            }
+        });
+    });
+
+    // Basic Profile Load (Admin Profile)
+    function fetchAdminProfile() {
+        $.get(`http://localhost:8080/api/admin/settings/profile/${adminId}`, function(data) {
+            const fullName = (data.firstName || '') + " " + (data.lastName || '');
+            const logoPath = (data.profileLogo && data.profileLogo !== "null") ? data.profileLogo : "Images/default-avatar.png";
+            
+            $('.d-name, .text-info h4, .user-mini-profile p').text(fullName || 'Admin');
+            $('.d-email').text(data.email);
+            $(".avatar-circle img, .avatar-small img").attr("src", logoPath);
+        });
+    }
+
+    // Helper function for timeAgo
+    function timeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const seconds = Math.round((now - date) / 1000);
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+    }
+
+    fetchAllNotifications();
+    fetchAdminProfile();
+});  </script>
+</body>
+
+</html>

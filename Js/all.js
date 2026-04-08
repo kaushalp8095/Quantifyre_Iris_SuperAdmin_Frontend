@@ -284,3 +284,107 @@ $(document).ready(function() {
                 }
             }
         });
+
+
+        // =========================================================
+// 5. GLOBAL NOTIFICATIONS LOGIC (No UI Conflicts)
+// =========================================================
+$(document).ready(function() {
+    const adminId = localStorage.getItem("adminId");
+    
+    // Agar login nahi hai ya main page nahi hai toh aage mat bado
+    if(!adminId || $('.main-content').length === 0) return; 
+
+    function loadGlobalNotifications() {
+        $.ajax({
+            url: `http://localhost:8080/api/admin/top-notifications/get/${adminId}`,
+            type: "GET",
+            success: function (res) {
+                // 1. Update Bell Icon Count
+                if (res.unreadCount > 0) {
+                    $('.notif-count').text(res.unreadCount).show();
+                } else {
+                    $('.notif-count').hide();
+                }
+
+                // 2. Update Dropdown List
+                const listUI = $('.notif-list');
+                listUI.empty();
+
+                if (res.notifications.length === 0) {
+                    listUI.append('<li class="notif-item" style="justify-content:center; padding:15px; color:#888;">No new notifications</li>');
+                    return;
+                }
+
+                // Top 5 notifications in dropdown
+                const top5 = res.notifications.slice(0, 5); 
+                top5.forEach(log => {
+                    let iconClass = "info";
+                    let iconHtml = '<i class="fa-solid fa-bell"></i>';
+
+                    if (log.type === "SUCCESS") { iconClass = "success"; iconHtml = '<i class="fa-solid fa-check"></i>'; } 
+                    else if (log.type === "INFO") { iconClass = "info"; iconHtml = '<i class="fa-solid fa-user-plus"></i>'; } 
+                    else if (log.type === "WARNING" || log.type === "ERROR") { iconClass = "warning"; iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>'; }
+
+                    let readClass = log.read ? "" : "unread";
+
+                    // Note: Yahan pehle wale timeAgo function ki jagah maine simple text daal diya hai taaki conflict na ho. 
+                    // Aap chahein toh apna timeAgo yahan use kar sakte hain.
+                    let html = `
+                        <li class="notif-item ${readClass}">
+                            <div class="n-icon ${iconClass}">${iconHtml}</div>
+                            <div class="n-text">
+                                <p><strong>${log.title}</strong></p><span>${log.message}</span>
+                            </div>
+                            <span class="n-time" style="font-size:0.7rem; color:#888;">${timeAgo(log.createdAt)}</span>
+                        </li>
+                    `;
+                    listUI.append(html);
+                });
+            }
+        });
+    }
+
+    // 3. Mark All as Read Logic (Dynamic binding to avoid conflicts)
+    $(document).on('click', '.mark-read, #markAllReadBtn', function(e) {
+    e.stopPropagation();
+    
+    $.ajax({
+        url: `http://localhost:8080/api/admin/top-notifications/mark-read/${adminId}`,
+        type: "POST",
+        success: function() {
+            // 1. Header ke dropdown se 'unread' class hatao
+            $('.notif-list .notif-item').removeClass('unread');
+            
+            // 2. Agar user "All Notifications" page par hai, toh wahan ki list se bhi hatao
+            $('.full-notif-item').removeClass('unread');
+            
+            // 3. Red badge (count) ko hide kar do
+            $('.notif-count').hide();
+
+            // 4. Local array ko bhi update kar do taaki filter sahi chale
+            if (typeof allNotifications !== 'undefined') {
+                allNotifications.forEach(n => n.read = true);
+            }
+        }
+    });
+});
+
+    // Run when page loads
+    loadGlobalNotifications();
+});
+
+
+// --- Helper Function: Time Calculation ---
+    function timeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const seconds = Math.round((now - date) / 1000);
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+    }

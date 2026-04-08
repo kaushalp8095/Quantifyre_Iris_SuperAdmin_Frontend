@@ -2439,3 +2439,66 @@ input {caret-color: white;}
     .pagination-left { font-size: 0.8rem; }
     .pagination-controls { margin-top: 5px; }
 }
+
+
+/* SPECIFIC CSS FOR NOTIFICATIONS PAGE  */
+.notif-page-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; }
+.notif-filters { display: flex; gap: 10px; overflow-x: auto; }
+.filter-chip { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #8b9c9c; padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.3s ease; }
+.filter-chip:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.filter-chip.active { background: rgba(0, 255, 157, 0.15); border-color: #00ff9d; color: #00ff9d; }
+.full-notif-list { display: flex; flex-direction: column; gap: 10px; }
+.full-notif-item { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 15px; transition: 0.3s; }
+.full-notif-item:hover { background: rgba(255, 255, 255, 0.05); }
+.full-notif-item.unread { border-left: 3px solid #00ff9d; background: rgba(0, 255, 157, 0.02); }
+.f-n-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.f-n-icon.success { background: rgba(0, 255, 157, 0.1); color: #00ff9d; }
+.f-n-icon.warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.f-n-icon.info { background: rgba(0, 123, 255, 0.1); color: #00a8ff; }
+.f-n-icon.error { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; }
+.f-n-content { flex: 1; }
+.f-n-content h4 { color: #fff; margin: 0 0 5px 0; font-size: 0.95rem; font-weight: 500; }
+.f-n-content p { color: #8b9c9c; margin: 0; font-size: 0.85rem; line-height: 1.4; }
+.f-n-time { color: #5a6a6e; font-size: 0.75rem; white-space: nowrap; }
+
+/* 1. Dropdown ki height aur scroll enable karna */
+.notif-list {
+    max-height: 231px; /* Lagbhag 3.5 notifications dikhayega */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 5px; /* Scrollbar aur text ke beech thodi jagah */
+}
+
+/* 2. Scrollbar ki width (Patla dikhne ke liye) */
+.notif-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* 3. Track (Peeche ki dandi) - Isko transparent rakhenge */
+.notif-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+/* 4. Thumb (Jo chalta hai) - Isko Neon Green/Glassy look denge */
+.notif-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 157, 0.3); /* Aapka theme color thoda transparent */
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.notif-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 157, 0.6);
+}
+/* --- MOBILE RESPONSIVENESS MEDIA QUERIES (CLEANED) --- */
+@media (max-width: 992px) {
+    .notif-filters { padding-bottom: 5px; margin-bottom: 10px; }
+    .notif-page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    #markAllReadBtn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 576px) {
+    .full-notif-item { padding: 12px; position: relative; }
+    .f-n-time { position: absolute; top: 12px; right: 12px; font-size: 0.7rem; }
+    .f-n-content h4 { padding-right: 40px; }
+}
