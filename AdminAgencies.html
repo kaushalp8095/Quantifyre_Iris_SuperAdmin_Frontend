@@ -378,7 +378,7 @@
         async function loadAgencies() {
             const tbody = document.getElementById('agencyDataBody');
             try {
-                const response = await fetch('http://localhost:8080/api/admin/agencies/list');
+                const response = await fetch('https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/agencies/list');
 
                 if (!response.ok) throw new Error("Backend connection failed!");
 
