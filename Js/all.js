@@ -150,7 +150,7 @@ function closeLogoutModal() {
 
             // Backend API ko call karo cookie expire karne ke liye
             $.ajax({
-                url: "http://localhost:8080/api/admin/logout",
+                url: "https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/logout",
                 type: "POST",
                 xhrFields: {
                     withCredentials: true // 🔴 Ye line sabse zaroori hai cookie delete karne ke liye
@@ -312,7 +312,7 @@ $(document).ready(function() {
 
     function loadGlobalNotifications() {
         $.ajax({
-            url: `http://localhost:8080/api/admin/top-notifications/get/${adminId}`,
+            url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/top-notifications/get/${adminId}`,
             type: "GET",
             success: function (res) {
                 // 1. Update Bell Icon Count
@@ -365,7 +365,7 @@ $(document).ready(function() {
     e.stopPropagation();
     
     $.ajax({
-        url: `http://localhost:8080/api/admin/top-notifications/mark-read/${adminId}`,
+        url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/top-notifications/mark-read/${adminId}`,
         type: "POST",
         success: function() {
             // 1. Header ke dropdown se 'unread' class hatao

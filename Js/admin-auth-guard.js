@@ -22,7 +22,7 @@
         if (isLoggedIn === "true") {
             if (isDown) return; // Server band hai toh yahi ruko
 
-            fetch(`http://localhost:8080/api/admin/settings/profile/${adminId}`)
+            fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`)
                 .then(res => {
                     if (res.ok) {
                         sessionStorage.removeItem("eclipse_is_down");
@@ -42,7 +42,7 @@
 
     // 🔴 NEW: Agar user Dashboard/Agencies par hai, toh turant check karo Eclipse UP hai ya nahi
     // Iske bina page khula reh jayega chahe Eclipse band ho
-    fetch(`http://localhost:8080/api/admin/settings/profile/${adminId}`, { priority: 'high' })
+    fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`, { priority: 'high' })
         .then(res => {
             if (!res.ok) throw new Error();
             sessionStorage.removeItem("eclipse_is_down");
