@@ -379,7 +379,7 @@
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 50px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Campaigns...</td></tr>';
 
             try {
-                const response = await fetch('http://localhost:8080/api/admin/campaigns/list');
+                const response = await fetch('https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list');
                 if (!response.ok) throw new Error("Backend connection failed!");
 
                 allCampaignsData = await response.json();
