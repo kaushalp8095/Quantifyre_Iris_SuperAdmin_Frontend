@@ -53,7 +53,7 @@
             // 🔴 REDIRECT CHECK (Only if Server is UP)
             if (isAdminLoggedIn === 'true' && adminId) {
                 // Dashboard bhejne se pehle check karo server chalu hai ya nahi
-                fetch(`http://localhost:8080/api/admin/settings/profile/${adminId}`)
+                fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`)
                     .then(res => {
                         if (res.ok) window.location.replace("AdminDashboard.html");
                     })
@@ -112,7 +112,7 @@
                 $btn.text("Verifying...").prop("disabled", true);
 
                 $.ajax({
-                    url: 'http://127.0.0.1:8080/api/admin/login',
+                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/login',
                     type: 'POST',
                     contentType: 'application/json',
                     xhrFields: {
