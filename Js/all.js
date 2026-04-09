@@ -1,14 +1,20 @@
-// ==========================================
-// 1. AJAX PREFILTER (Localhost Fix)
-// ==========================================
 $.ajaxPrefilter(function (options) {
-    var oldBase = "http://localhost:8080";
     var liveBase = "https://quantifyre-iris-superadmin-backend.onrender.com";
 
-    if (options.url.indexOf(oldBase) !== -1) {
-        options.url = options.url.replace(oldBase, liveBase);
-
+    // Agar URL localhost se shuru ho raha hai ya relative path (/) hai
+    if (options.url.startsWith("http://localhost:8080")) {
+        options.url = options.url.replace("http://localhost:8080", liveBase);
+    } 
+    else if (options.url.startsWith("/")) {
+        // Agar aapne sirf "/api/..." likha hai, toh ye uske aage Render ka URL laga dega
+        options.url = liveBase + options.url;
     }
+
+    // CORS ke liye credentials enable karna zaroori hai
+    options.crossDomain = true;
+    options.xhrFields = {
+        withCredentials: true
+    };
 });
 
 
