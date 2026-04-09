@@ -1,3 +1,18 @@
+// ==========================================
+// 1. AJAX PREFILTER (Localhost Fix)
+// ==========================================
+$.ajaxPrefilter(function (options) {
+    var oldBase = "http://localhost:8080";
+    var liveBase = "https://quantifyre-iris-superadmin-backend.onrender.com";
+
+    if (options.url.indexOf(oldBase) !== -1) {
+        options.url = options.url.replace(oldBase, liveBase);
+
+    }
+});
+
+
+
 // Isse apni "all.js" ya main script file mein paste karein
 $(document).ajaxError(function(event, jqXHR) {
     // Status 0 matlab Eclipse band hai
