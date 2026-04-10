@@ -9,6 +9,33 @@
     <link rel="stylesheet" href="css/admin_style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Js/admin-auth-guard.js"></script>
+    <style>
+        /* Table ke andar dropdown ko adjust karna */
+.status-switcher .dropdown-selected {
+    padding: 2px 10px;
+    background: transparent;
+    border: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.status-switcher .dropdown-options {
+    right: 0; /* Align to right since status is right-aligned */
+    left: auto;
+    min-width: 120px;
+    z-index: 100;
+}
+
+.status-switcher .selected-text {
+    margin-right: 5px;
+}
+
+/* Badge classes agar pehle se nahi hain */
+.sup-status-open { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.sup-status-progress { background: rgba(0, 123, 255, 0.1); color: #007bff; }
+.sup-status-resolved { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+.sup-status-closed { background: rgba(108, 117, 125, 0.1); color: #6c757d; }
+    </style>
 </head>
 
 <body>
@@ -322,6 +349,38 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupTablePagination('supportTable', 'pagination-support', 4);
         });
+
+
+        function updateTicketStatus(ticketId, newStatus, badgeClass) {
+    // 1. UI Update karein turant (Optimistic UI)
+    const dropdown = $(`#status${ticketId.replace('-', '')}`);
+    const selectedSpan = dropdown.find('.selected-text');
+    
+    // Purani classes hata kar nayi class lagana
+    selectedSpan.removeClass('sup-status-open sup-status-progress sup-status-resolved sup-status-closed')
+                .addClass(badgeClass)
+                .text(newStatus);
+    
+    dropdown.removeClass('active');
+
+    // 2. Backend API Call (AJAX)
+    $.ajax({
+        url: `http://localhost:8080/api/admin/support/update-status`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            ticketId: ticketId,
+            status: newStatus
+        }),
+        success: function(res) {
+            // Success alert dikha sakte hain
+            console.log(`Ticket ${ticketId} updated to ${newStatus}`);
+        },
+        error: function() {
+            showCustomAlert("Error", "Could not update ticket status.", "error");
+        }
+    });
+}
     </script>
 
 </body>
