@@ -241,11 +241,11 @@
                                 <td style="text-align: right;">
     <div class="status-switcher" id="statusTkt101">
         <div class="status-box sup-badge sup-status-progress" onclick="toggleStatusDropdown('statusTkt101', event)">
-            <span class="selected-text">In Progress</span>
+            <span class="selected-text">Select Status</span>
             <i class="fa-solid fa-chevron-down status-arrow"></i>
         </div>
         <ul class="status-options">
-            <li onclick="applyStatus('TKT-101', 'Open', 'sup-status-open')">Open</li>
+            <li onclick="applyStatus('TKT-101', 'Pending', 'sup-status-pending')">Pending</li>
             <li onclick="applyStatus('TKT-101', 'In Progress', 'sup-status-progress')">In Progress</li>
             <li onclick="applyStatus('TKT-101', 'Resolved', 'sup-status-resolved')">Resolved</li>
         </ul>
@@ -443,9 +443,9 @@ function applyStatus(ticketId, text, className) {
 
     // 3. Force Style Update
     let bgColor, textColor;
-    if (text === 'Open') { bgColor = 'rgba(255, 193, 7, 0.1)'; textColor = '#ffc107'; }
+    if (text === 'pending') { bgColor = 'rgba(255, 193, 7, 0.1)'; textColor = '#ffc107'; }
     else if (text === 'In Progress') { bgColor = 'rgba(0, 123, 255, 0.1)'; textColor = '#007bff'; }
-    else if (text === 'Resolved') { bgColor = 'rgba(40, 167, 69, 0.1)'; textColor = '#28a745'; }
+    else if (text === 'Resolved') { bgColor = 'rgba(0, 255, 157, 0.15)'; textColor = '#00ff9d'; }
 
     $container.find('.status-box').css({
         'background-color': bgColor,
