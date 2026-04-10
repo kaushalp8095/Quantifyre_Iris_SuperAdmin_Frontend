@@ -421,19 +421,27 @@
 }
 
 function applyStatus(ticketId, text, className) {
-    // ID normalize (TKT-101 -> statusTkt101)
-    const containerId = "status" + ticketId.replace('-', '');
+    // 🔴 FIX: ID ko small case mein handle karein taaki match ho jaye
+    // TKT-101 -> statusTkt101
+    const containerId = "statusTkt" + ticketId.split('-')[1]; 
     const $container = $('#' + containerId);
     
+    console.log("Searching for ID:", containerId); // Debugging ke liye
+
+    if($container.length === 0) {
+        console.error("Element not found: #" + containerId);
+        return;
+    }
+
     // 1. Text Update
     $container.find('.selected-text').text(text);
     
-    // 2. Class Update (Purani classes hatao aur nayi lagao)
+    // 2. Class Update
     $container.find('.status-box')
         .removeClass('sup-status-open sup-status-progress sup-status-resolved')
         .addClass(className);
 
-    // 🔴 3. FORCE COLOR CHANGE (Agar class se kaam na chale toh ye pakka chalega)
+    // 3. Force Style Update
     let bgColor, textColor;
     if (text === 'Open') { bgColor = 'rgba(255, 193, 7, 0.1)'; textColor = '#ffc107'; }
     else if (text === 'In Progress') { bgColor = 'rgba(0, 123, 255, 0.1)'; textColor = '#007bff'; }
@@ -441,14 +449,18 @@ function applyStatus(ticketId, text, className) {
 
     $container.find('.status-box').css({
         'background-color': bgColor,
-        'color': textColor
+        'color': textColor,
+        'border-color': textColor // Border bhi match kar dete hain
     });
     
     // 4. Dropdown band karo
     $container.removeClass('active');
-
-    console.log(`Ticket ${ticketId} status changed to ${text}`);
 }
+
+// Bahar click karne par band ho jaye
+$(document).on('click', function () {
+    $('.status-switcher').removeClass('active');
+});
     </script>
 
 </body>
