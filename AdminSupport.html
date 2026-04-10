@@ -10,31 +10,68 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Js/admin-auth-guard.js"></script>
     <style>
-        /* Table ke andar dropdown ko adjust karna */
+        /* Status Dropdown Main Box */
+.status-switcher {
+    width: fit-content;
+    margin-left: auto; /* Right alignment */
+    position: relative;
+}
+
+/* Attractive Badge with Arrow */
 .status-switcher .dropdown-selected {
-    padding: 2px 10px;
-    background: transparent;
-    border: none;
-    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
     cursor: pointer;
+    transition: 0.3s;
+    min-width: 110px;
+    justify-content: space-between;
 }
 
+.status-arrow {
+    font-size: 0.7rem;
+    transition: 0.3s;
+    opacity: 0.8;
+}
+
+/* Jab dropdown khulega toh arrow ghum jayega */
+.status-switcher.active .status-arrow {
+    transform: rotate(180deg);
+}
+
+/* Options attractive look */
 .status-switcher .dropdown-options {
-    right: 0; /* Align to right since status is right-aligned */
-    left: auto;
-    min-width: 120px;
-    z-index: 100;
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: #0a1615;
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    border-radius: 8px;
+    width: 130px;
+    z-index: 999;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    display: none; /* JS will handle this */
 }
 
-.status-switcher .selected-text {
-    margin-right: 5px;
+.status-switcher.active .dropdown-options {
+    display: block;
 }
 
-/* Badge classes agar pehle se nahi hain */
-.sup-status-open { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
-.sup-status-progress { background: rgba(0, 123, 255, 0.1); color: #007bff; }
-.sup-status-resolved { background: rgba(40, 167, 69, 0.1); color: #28a745; }
-.sup-status-closed { background: rgba(108, 117, 125, 0.1); color: #6c757d; }
+.status-switcher .dropdown-options li {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    color: #8b9c9c;
+    text-align: left;
+    transition: 0.2s;
+    list-style: none;
+}
+
+.status-switcher .dropdown-options li:hover {
+    background: rgba(0, 255, 157, 0.1);
+    color: #00ff9d;
+}
     </style>
 </head>
 
@@ -48,25 +85,26 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li class="active"><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -96,7 +134,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -181,15 +220,14 @@
                                 </td>
                                 <td style="text-align: right;">
     <div class="custom-dropdown status-switcher" id="statusTkt101">
-        <div class="dropdown-selected" onclick="toggleDropdown('statusTkt101', event)">
-            <span class="selected-text sup-badge sup-status-progress">In Progress</span>
-            <i class="fa-solid fa-chevron-down"></i>
+        <div class="dropdown-selected sup-badge sup-status-progress" onclick="toggleDropdown('statusTkt101', event)">
+            <span class="selected-text">In Progress</span>
+            <i class="fa-solid fa-chevron-down status-arrow"></i>
         </div>
         <ul class="dropdown-options">
-            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'Open', 'sup-status-open')">Open</li>
-            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'In Progress', 'sup-status-progress')">In Progress</li>
-            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'Resolved', 'sup-status-resolved')">Resolved</li>
-            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'Closed', 'sup-status-closed')">Closed</li>
+            <li onclick="updateTicketStatus('TKT-101', 'Open', 'sup-status-open')">Open</li>
+            <li onclick="updateTicketStatus('TKT-101', 'In Progress', 'sup-status-progress')">In Progress</li>
+            <li onclick="updateTicketStatus('TKT-101', 'Resolved', 'sup-status-resolved')">Resolved</li>
         </ul>
     </div>
 </td>
@@ -236,8 +274,8 @@
 
 
             </section>
-          
-          <div class="pagination-wrapper" id="pagination-support">
+
+            <div class="pagination-wrapper" id="pagination-support">
                 <div class="pagination-info">
                     Showing <span class="start-row">1</span> to <span class="end-row">4</span> of <span
                         class="total-rows">1250</span> entries
@@ -256,7 +294,7 @@
         </main>
     </div>
 
-     <!-- Logut Model Logic -->
+    <!-- Logut Model Logic -->
     <div class="modal-overlay" id="logoutModal">
         <div class="modal-content">
             <div class="modal-icon-box2">
@@ -351,35 +389,33 @@
         });
 
 
-        function updateTicketStatus(ticketId, newStatus, badgeClass) {
-    // 1. UI Update karein turant (Optimistic UI)
-    const dropdown = $(`#status${ticketId.replace('-', '')}`);
-    const selectedSpan = dropdown.find('.selected-text');
-    
-    // Purani classes hata kar nayi class lagana
-    selectedSpan.removeClass('sup-status-open sup-status-progress sup-status-resolved sup-status-closed')
-                .addClass(badgeClass)
-                .text(newStatus);
-    
-    dropdown.removeClass('active');
+        function toggleDropdown(id, event) {
+    if (event) event.stopPropagation();
+    // Close other dropdowns
+    $('.status-switcher').not('#' + id).removeClass('active');
+    // Toggle current
+    $('#' + id).toggleClass('active');
+}
 
-    // 2. Backend API Call (AJAX)
-    $.ajax({
-        url: `http://localhost:8080/api/admin/support/update-status`,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            ticketId: ticketId,
-            status: newStatus
-        }),
-        success: function(res) {
-            // Success alert dikha sakte hain
-            console.log(`Ticket ${ticketId} updated to ${newStatus}`);
-        },
-        error: function() {
-            showCustomAlert("Error", "Could not update ticket status.", "error");
-        }
-    });
+// Click outside to close
+$(document).on('click', function () {
+    $('.status-switcher').removeClass('active');
+});
+
+function updateTicketStatus(ticketId, newStatus, badgeClass) {
+    const id = "status" + ticketId.replace('-', '');
+    const $container = $('#' + id);
+    
+    // Update Text and Class
+    $container.find('.selected-text').text(newStatus);
+    $container.find('.dropdown-selected')
+        .removeClass('sup-status-open sup-status-progress sup-status-resolved')
+        .addClass(badgeClass);
+    
+    $container.removeClass('active');
+    
+    // Yahan apni API call add kar sakte ho
+    console.log("Status Updated:", newStatus);
 }
     </script>
 
