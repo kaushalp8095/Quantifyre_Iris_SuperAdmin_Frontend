@@ -92,6 +92,45 @@
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Badi Screens (Desktop) ke liye Dropdown dikhna chahiye */
+@media (min-width: 992px) {
+    .table-responsive {
+        overflow: visible !important;
+    }
+}
+
+/* Choti Screens (Mobile/Tablet) ke liye Table scroll honi chahiye */
+@media (max-width: 991px) {
+    .table-responsive {
+        overflow-x: auto !important; /* Scroll wapas aa jayega */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Mobile par dropdown ko table ke andar hi constrain karenge taaki page na tute */
+    .status-options {
+        position: fixed; /* Mobile par screen ke hisaab se dikhega */
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 80% !important;
+    }
+    
+    /* Overlay effect jab mobile par dropdown khule (Optional but good) */
+    .status-switcher.active::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+    }
+}
+
+/* Baaki basic design same rahega */
+.status-switcher {
+    position: relative;
+    display: inline-block;
+}
     </style>
 </head>
 
