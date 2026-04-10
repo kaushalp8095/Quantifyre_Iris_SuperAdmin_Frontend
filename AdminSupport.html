@@ -438,7 +438,7 @@ function applyStatus(ticketId, text, className) {
     
     // 2. Class Update
     $container.find('.status-box')
-        .removeClass('sup-status-open sup-status-progress sup-status-resolved')
+        .removeClass('sup-status-pending sup-status-progress sup-status-resolved')
         .addClass(className);
 
     // 3. Force Style Update
