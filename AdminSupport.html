@@ -240,12 +240,15 @@
                                 </td>
                                 <td style="text-align: right;">
     <div class="status-switcher" id="statusTkt101">
-        <div class="status-box sup-badge sup-status-progress" onclick="toggleStatusDropdown('statusTkt101', event)">
-            <span class="selected-text">In Progress</span>
+        <div class="status-box sup-badge sup-status-open" 
+             style="background-color: rgba(255, 193, 7, 0.1); color: #ffc107; border-color: #ffc107;"
+             onclick="toggleStatusDropdown('statusTkt101', event)">
+            <span class="selected-text">Pending</span>
             <i class="fa-solid fa-chevron-down status-arrow"></i>
         </div>
+        
         <ul class="status-options">
-            <li onclick="applyStatus('TKT-101', 'Open', 'sup-status-open')">Open</li>
+            <li onclick="applyStatus('TKT-101', 'Pending', 'sup-status-open')">Pending</li>
             <li onclick="applyStatus('TKT-101', 'In Progress', 'sup-status-progress')">In Progress</li>
             <li onclick="applyStatus('TKT-101', 'Resolved', 'sup-status-resolved')">Resolved</li>
         </ul>
