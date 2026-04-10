@@ -424,39 +424,44 @@
 }
 
 function applyStatus(ticketId, text, className) {
-    // 🔴 FIX: ID ko small case mein handle karein taaki match ho jaye
-    // TKT-101 -> statusTkt101
+    // ID match: TKT-101 -> statusTkt101
     const containerId = "statusTkt" + ticketId.split('-')[1]; 
     const $container = $('#' + containerId);
+    const $statusBox = $container.find('.status-box');
     
-    console.log("Searching for ID:", containerId); // Debugging ke liye
+    // 1. Sabse pehle purani saari classes aur inline styles saaf karo
+    $statusBox.removeClass('sup-status-open sup-status-progress sup-status-resolved');
+    $statusBox.removeAttr('style'); // Purana inline color hatane ke liye
 
-    if($container.length === 0) {
-        console.error("Element not found: #" + containerId);
-        return;
-    }
-
-    // 1. Text Update
+    // 2. Naya Text set karo
     $container.find('.selected-text').text(text);
     
-    // 2. Class Update
-    $container.find('.status-box')
-        .removeClass('sup-status-open sup-status-progress sup-status-resolved')
-        .addClass(className);
-
-    // 3. Force Style Update
+    // 3. Decide Colors based on text
     let bgColor, textColor;
-    if (text === 'Open') { bgColor = 'rgba(255, 193, 7, 0.1)'; textColor = '#ffc107'; }
-    else if (text === 'In Progress') { bgColor = 'rgba(0, 123, 255, 0.1)'; textColor = '#007bff'; }
-    else if (text === 'Resolved') { bgColor = 'rgba(40, 167, 69, 0.1)'; textColor = '#28a745'; }
+    if (text === 'Pending') { 
+        bgColor = 'rgba(255, 193, 7, 0.1)'; 
+        textColor = '#ffc107'; 
+    }
+    else if (text === 'In Progress') { 
+        bgColor = 'rgba(0, 123, 255, 0.1)'; 
+        textColor = '#007bff'; 
+    }
+    else if (text === 'Resolved') { 
+        bgColor = 'rgba(40, 167, 69, 0.1)'; 
+        textColor = '#28a745'; 
+    }
 
-    $container.find('.status-box').css({
+    // 4. Fresh CSS apply karo (Display flex aur alignment maintain karte hue)
+    $statusBox.css({
         'background-color': bgColor,
         'color': textColor,
-        'border-color': textColor // Border bhi match kar dete hain
-    });
+        'border-color': textColor,
+        'display': 'flex',
+        'align-items': 'center',
+        'justify-content': 'space-between'
+    }).addClass(className);
     
-    // 4. Dropdown band karo
+    // 5. Dropdown band karo
     $container.removeClass('active');
 }
 
