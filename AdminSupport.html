@@ -10,67 +10,87 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Js/admin-auth-guard.js"></script>
     <style>
-        /* Status Dropdown Main Box */
-.status-switcher {
-    width: fit-content;
-    margin-left: auto; /* Right alignment */
-    position: relative;
+  /* Container fix */
+.table-responsive {
+    overflow: visible !important; /* Bahut zaroori hai dropdown dikhane ke liye */
 }
 
-/* Attractive Badge with Arrow */
-.status-switcher .dropdown-selected {
+.status-switcher {
+    position: relative;
+    display: inline-block;
+}
+
+/* Attractive Status Box */
+.status-box {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 10px;
     padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
-    transition: 0.3s;
-    min-width: 110px;
-    justify-content: space-between;
+    min-width: 125px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.status-box:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
 }
 
 .status-arrow {
     font-size: 0.7rem;
-    transition: 0.3s;
-    opacity: 0.8;
+    transition: transform 0.3s ease;
 }
 
-/* Jab dropdown khulega toh arrow ghum jayega */
+/* Open State */
+.status-switcher.active .status-options {
+    display: block;
+    animation: fadeInDown 0.2s ease forwards;
+}
+
 .status-switcher.active .status-arrow {
     transform: rotate(180deg);
 }
 
-/* Options attractive look */
-.status-switcher .dropdown-options {
+/* Dropdown Menu */
+.status-options {
     position: absolute;
     top: 110%;
     right: 0;
     background: #0a1615;
     border: 1px solid rgba(0, 255, 157, 0.2);
     border-radius: 8px;
-    width: 130px;
-    z-index: 999;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    display: none; /* JS will handle this */
+    min-width: 140px;
+    z-index: 10000 !important; /* Sabse upar dikhega */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    display: none;
+    list-style: none;
+    padding: 5px;
+    margin: 0;
 }
 
-.status-switcher.active .dropdown-options {
-    display: block;
-}
-
-.status-switcher .dropdown-options li {
+.status-options li {
     padding: 10px 15px;
     font-size: 0.85rem;
     color: #8b9c9c;
     text-align: left;
+    cursor: pointer;
+    border-radius: 5px;
     transition: 0.2s;
-    list-style: none;
 }
 
-.status-switcher .dropdown-options li:hover {
+.status-options li:hover {
     background: rgba(0, 255, 157, 0.1);
     color: #00ff9d;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
     </style>
 </head>
@@ -219,15 +239,15 @@
                                     <span class="sup-badge sup-prio-high">High</span>
                                 </td>
                                 <td style="text-align: right;">
-    <div class="custom-dropdown status-switcher" id="statusTkt101">
-        <div class="dropdown-selected sup-badge sup-status-progress" onclick="toggleDropdown('statusTkt101', event)">
+    <div class="status-switcher" id="statusTkt101">
+        <div class="status-box sup-badge sup-status-progress" onclick="toggleStatusDropdown('statusTkt101', event)">
             <span class="selected-text">In Progress</span>
             <i class="fa-solid fa-chevron-down status-arrow"></i>
         </div>
-        <ul class="dropdown-options">
-            <li onclick="updateTicketStatus('TKT-101', 'Open', 'sup-status-open')">Open</li>
-            <li onclick="updateTicketStatus('TKT-101', 'In Progress', 'sup-status-progress')">In Progress</li>
-            <li onclick="updateTicketStatus('TKT-101', 'Resolved', 'sup-status-resolved')">Resolved</li>
+        <ul class="status-options">
+            <li onclick="applyStatus('TKT-101', 'Open', 'sup-status-open')">Open</li>
+            <li onclick="applyStatus('TKT-101', 'In Progress', 'sup-status-progress')">In Progress</li>
+            <li onclick="applyStatus('TKT-101', 'Resolved', 'sup-status-resolved')">Resolved</li>
         </ul>
     </div>
 </td>
@@ -389,34 +409,39 @@
         });
 
 
-        function toggleDropdown(id, event) {
-    if (event) event.stopPropagation();
-    // Close other dropdowns
+        function toggleStatusDropdown(id, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Baaki sab band karo
     $('.status-switcher').not('#' + id).removeClass('active');
-    // Toggle current
+    
+    // Current toggle karo
     $('#' + id).toggleClass('active');
 }
 
-// Click outside to close
+function applyStatus(ticketId, text, className) {
+    // ID normalize (TKT-101 -> statusTkt101)
+    const containerId = "status" + ticketId.replace('-', '');
+    const $container = $('#' + containerId);
+    
+    // 1. UI Update
+    $container.find('.selected-text').text(text);
+    $container.find('.status-box')
+        .removeClass('sup-status-open sup-status-progress sup-status-resolved')
+        .addClass(className);
+    
+    // 2. Dropdown band karo
+    $container.removeClass('active');
+
+    // 3. Backend call (Optional)
+    console.log(`Ticket ${ticketId} status changed to ${text}`);
+}
+
+// Bahar click karne par band ho jaye
 $(document).on('click', function () {
     $('.status-switcher').removeClass('active');
 });
-
-function updateTicketStatus(ticketId, newStatus, badgeClass) {
-    const id = "status" + ticketId.replace('-', '');
-    const $container = $('#' + id);
-    
-    // Update Text and Class
-    $container.find('.selected-text').text(newStatus);
-    $container.find('.dropdown-selected')
-        .removeClass('sup-status-open sup-status-progress sup-status-resolved')
-        .addClass(badgeClass);
-    
-    $container.removeClass('active');
-    
-    // Yahan apni API call add kar sakte ho
-    console.log("Status Updated:", newStatus);
-}
     </script>
 
 </body>
