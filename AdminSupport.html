@@ -153,8 +153,19 @@
                                     <span class="sup-badge sup-prio-high">High</span>
                                 </td>
                                 <td style="text-align: right;">
-                                    <span class="sup-badge sup-status-progress">In Progress</span>
-                                </td>
+    <div class="custom-dropdown status-switcher" id="statusTkt101">
+        <div class="dropdown-selected" onclick="toggleDropdown('statusTkt101', event)">
+            <span class="selected-text sup-badge sup-status-progress">In Progress</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <ul class="dropdown-options">
+            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'Open', 'sup-status-open')">Open</li>
+            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'In Progress', 'sup-status-progress')">In Progress</li>
+            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'Resolved', 'sup-status-resolved')">Resolved</li>
+            <li class="dropdown-item" onclick="updateTicketStatus('TKT-101', 'Closed', 'sup-status-closed')">Closed</li>
+        </ul>
+    </div>
+</td>
                             </tr>
                             <tr>
                                 <td>TKT-102</td>
