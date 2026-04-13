@@ -2556,6 +2556,7 @@ input {caret-color: white;}
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
+    margin-bottom: 10px;
 }
 .ci-agency-select-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #fff !important;
