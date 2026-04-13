@@ -378,8 +378,13 @@
             const tbody = document.getElementById('campaignDataBody');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 50px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading Campaigns...</td></tr>';
 
+            // 🔴 Login Admin ki ID uthao
+            const currentAdminId = localStorage.getItem("adminId");
+
             try {
-                const response = await fetch('https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list');
+                // Backend ko batana padega ki kis admin ka data chahiye
+                const response = await fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list?adminId=${currentAdminId}`);
+
                 if (!response.ok) throw new Error("Backend connection failed!");
 
                 allCampaignsData = await response.json();
@@ -388,7 +393,7 @@
 
             } catch (error) {
                 console.error("Error:", error);
-                tbody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center; padding: 30px;">Error loading data. Make sure Backend is running.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center; padding: 30px;">Error loading data.</td></tr>`;
             }
         }
 
