@@ -1306,7 +1306,7 @@ textarea.form-input { height: 120px; padding-top: 15px; resize: vertical; line-h
 /* ========================================= ADMIN CREATE INVOICE PAGE CSS ========================================= */
 
 .invoice-layout-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; align-items: start; }
-.ci-label { display: block; color: #8b9c9c; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500; }
+.ci-label { display: block; color: #8b9c9c; font-size: 0.85rem; font-weight: 500; }
 
 .ci-input { width: 100%; background: #0b1615; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; transition: all 0.3s ease; }
 .ci-input:focus { border-color: #00ff9d; background: #081a17; box-shadow: 0 0 10px rgba(0, 255, 157, 0.15); }
@@ -1369,8 +1369,6 @@ input[type="date"] { color-scheme: dark; }
 /* ========================================= ADMIN EDIT INVOICE STYLES ========================================= */
 
 .invoice-layout-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; align-items: start; }
-
-.ci-label { display: block; color: #8b9c9c; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500; }
 
 .ci-input { width: 100%; background: #0b1615; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; transition: all 0.3s ease; }
 .ci-input:focus { border-color: #00ff9d; background: #081a17; box-shadow: 0 0 10px rgba(0, 255, 157, 0.15); }
