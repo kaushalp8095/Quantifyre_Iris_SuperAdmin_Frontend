@@ -170,7 +170,7 @@
                                 List</label>
 
                             <div class="item-list-container">
-                                
+
                                 <div class="form-group ci-plan-group">
                                     <span class="item-header-label"
                                         style="margin-bottom: 8px; display: inline-block;">Plan</span>
@@ -184,7 +184,8 @@
                                             <li class="dropdown-item"
                                                 onclick="selectItem('planDropdown', 'Basic(Default)')">Basic(Default)
                                             </li>
-                                            <li class="dropdown-item active" onclick="selectItem('planDropdown', 'Pro')">Pro
+                                            <li class="dropdown-item active"
+                                                onclick="selectItem('planDropdown', 'Pro')">Pro
                                             </li>
                                             <li class="dropdown-item" onclick="selectItem('planDropdown', 'Premium')">
                                                 Premium</li>
@@ -209,7 +210,7 @@
                                     <button type="button" class="btn-action-icon btn-remove"><i
                                             class="fa-solid fa-trash"></i></button>
                                 </div>
-                               
+
 
                                 <div class="calculation-area">
                                     <div class="calc-row">
@@ -229,17 +230,19 @@
                                 </div>
                             </div>
 
-                            <div class="form-group" style="margin-top: 7px;">
-                                <label class="ci-label">Notes</label>
-                                <textarea class="ci-textarea">Payment due within 15 days of invoice date.</textarea>
-                            </div>
-
                         </div>
                     </div>
 
+                    <div class="form-group" style="margin-top: 7px;">
+                        <label class="ci-label">Notes</label>
+                        <textarea class="ci-textarea">Payment due within 15 days of invoice date.</textarea>
+                    </div>
+
                     <div class="form-footer-actions">
-                        <a href="AdminPreviewInvoice.html" class="btn btn-cancel" style="text-decoration: none;text-align: center;">Preview</a>
-                        <a href="AdminBilling.html" class="btn-submit btn" style="text-decoration: none;text-align: center;">Update
+                        <a href="AdminPreviewInvoice.html" class="btn btn-cancel"
+                            style="text-decoration: none;text-align: center;">Preview</a>
+                        <a href="AdminBilling.html" class="btn-submit btn"
+                            style="text-decoration: none;text-align: center;">Update
                             Invoice</a>
                     </div>
                 </form>
@@ -309,22 +312,22 @@
 
                         const agencySet = new Set();
                         // Add the existing value to the set to prevent duplicates if it's in the API response
-                        agencySet.add("Adrite Solutions"); 
-                        
+                        agencySet.add("Adrite Solutions");
+
                         if (data && data.length > 0) {
                             data.forEach(item => {
                                 const name = item.agencyName || item.agency_name;
                                 if (name) agencySet.add(name);
                             });
                         }
-                        
+
                         agencySelect.empty().append('<option></option>');
                         agencySet.forEach(agencyName => {
                             // Select "Adrite Solutions" as default since we are editing
                             const isSelected = agencyName === "Adrite Solutions" ? true : false;
                             agencySelect.append(new Option(agencyName, agencyName, false, isSelected));
                         });
-                        
+
                         agencySelect.trigger('change');
                     },
                     error: function () {
