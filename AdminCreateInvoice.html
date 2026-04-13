@@ -128,10 +128,10 @@
                             <div class="form-group" style="margin-bottom: 20px; margin-top: 5px;">
                                 <label class="ci-label">Agency Name</label>
                                 <div style="width: 220px;">
-                            <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
-                                <option></option>
-                            </select>
-                        </div>
+                                    <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
+                                        <option></option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="form-group" style="margin-bottom: 20px;">
@@ -173,23 +173,27 @@
 
                             <div class="item-list-container">
                                 <div class="form-group">
-                                <span class="item-header-label">Plan</span>
-                                <div class="custom-dropdown" id="planDropdown">
-                                    <div class="dropdown-selected" onclick="toggleDropdown('planDropdown')">
-                                        <span class="selected-text">Basic(Default)</span>
-                                        <i class="fa-solid fa-chevron-down"></i>
+                                    <span class="item-header-label">Plan</span>
+                                    <div class="custom-dropdown" id="planDropdown">
+                                        <div class="dropdown-selected" onclick="toggleDropdown('planDropdown')">
+                                            <span class="selected-text">Basic(Default)</span>
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </div>
+                                        <ul class="dropdown-options">
+                                            <li class="dropdown-item active"
+                                                onclick="selectItem('planDropdown', 'Basic(Default)')">Basic(Default)
+                                            </li>
+                                            <li class="dropdown-item" onclick="selectItem('planDropdown', 'Pro')">Pro
+                                            </li>
+                                            <li class="dropdown-item" onclick="selectItem('planDropdown', 'Premium')">
+                                                Premium</li>
+                                            <li class="dropdown-item"
+                                                onclick="selectItem('planDropdown', 'Enterprise')">
+                                                Enterprise</li>
+                                        </ul>
+                                        <input type="hidden" name="plan" id="planInput" value="Basic(Default)">
                                     </div>
-                                    <ul class="dropdown-options">
-                                        <li class="dropdown-item active"
-                                            onclick="selectItem('planDropdown', 'Basic(Default)')">Basic(Default)</li>
-                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Pro')">Pro</li>
-                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Premium')">Premium</li>
-                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Enterprise')">
-                                            Enterprise</li>
-                                    </ul>
-                                    <input type="hidden" name="plan" id="planInput" value="Basic(Default)">
                                 </div>
-                            </div>
                                 <div class="item-grid-header">
                                     <span class="item-header-label">Description</span>
                                     <span class="item-header-label">Rate</span>
@@ -257,100 +261,95 @@
         </div>
     </div>
 
-    <script src="Js/jquery-3.7.1.min.js"></script>    
+    <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="Js/flatpickr.js"></script>
     <script>
-        $(document).ready(function () {
-            const fpConfig = {
-                dateFormat: "d M, Y",
-                altInput: true,
-                altFormat: "d M, Y",
-                allowInput: true,
-                theme: "dark"
-            };
+    $(document).ready(function () {
+        // 1. FLATPIKR (DATE PICKER) SETUP
+        const fpConfig = {
+            dateFormat: "d M, Y",
+            altInput: true,
+            altFormat: "d M, Y",
+            allowInput: true,
+            theme: "dark"
+        };
 
-            const issuePicker = flatpickr("#issueDate", {
-                ...fpConfig,
-                onChange: function (selectedDates, dateStr) {
-                    duePicker.set('minDate', dateStr);
-                }
-            });
-
-            const duePicker = flatpickr("#dueDate", fpConfig);
-        });
-
-$(document).ready(function () {
-    // 1. Initialize Select2 for Agency Search
-    const agencySelect = $('#agencySearchSelect');
-    agencySelect.select2({
-        placeholder: "Select an Agency",
-        allowClear: true,
-        width: '100%'
-    });
-
-    // 2. API se Agencies load karke Dropdown mein bharna (Fixes "No data found")
-    function fetchAgenciesForInvoice() {
-        $.ajax({
-            url: 'http://localhost:8080/api/admin/agencies/list', // Aapka backend URL
-            type: 'GET',
-            success: function(data) {
-                agencySelect.empty().append('<option></option>'); // Reset dropdown
-                
-                if (data && data.length > 0) {
-                    data.forEach(item => {
-                        // Backend fields check karein (agencyName ya agency_name)
-                        const name = item.agencyName || item.agency_name;
-                        const id = item.id;
-                        agencySelect.append(new Option(name, name));
-                    });
-                }
-            },
-            error: function() {
-                console.error("Failed to load agencies");
+        const issuePicker = flatpickr("#issueDate", {
+            ...fpConfig,
+            onChange: function (selectedDates, dateStr) {
+                duePicker.set('minDate', dateStr);
             }
         });
-    }
-    fetchAgenciesForInvoice();
+        const duePicker = flatpickr("#dueDate", fpConfig);
 
-    // 3. Plan Dropdown Toggle Logic (Global Scope fix)
-    window.toggleDropdown = function(id) {
-        // Dropdown open/close karne ke liye
-        $('#' + id).toggleClass('active');
-        // Dusre khule dropdowns band karne ke liye
-        $('.custom-dropdown').not('#' + id).removeClass('active');
-        event.stopPropagation();
-    };
+        // 2. SELECT2 INITIALIZATION (AGENCY SEARCH)
+        const agencySelect = $('#agencySearchSelect');
+        agencySelect.select2({
+            placeholder: "Select an Agency",
+            allowClear: true,
+            width: '100%'
+        });
 
-    // 4. Plan Selection Logic
-    window.selectItem = function(dropdownId, text) {
-        let dropdown = $('#' + dropdownId);
-        dropdown.find('.selected-text').text(text).css('color', '#fff');
-        
-        // Agar hidden input hai toh value update karein
-        if (dropdownId === 'planDropdown') {
-            $('#planInput').val(text);
+        // 3. API SE UNIQUE AGENCIES LOAD KARNA (ADMIN FILTERED)
+        function fetchAgenciesForInvoice() {
+            const currentAdminId = localStorage.getItem("adminId");
+            
+            $.ajax({
+                url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list',
+                type: 'GET',
+                data: { adminId: currentAdminId }, // Only your agencies
+                success: function (data) {
+                    agencySelect.empty().append('<option></option>'); 
+                    
+                    const agencySet = new Set();
+                    if (data && data.length > 0) {
+                        data.forEach(item => {
+                            const name = item.agencyName || item.agency_name;
+                            if (name) agencySet.add(name);
+                        });
+
+                        // Set se unique names dropdown mein daalein
+                        agencySet.forEach(agencyName => {
+                            agencySelect.append(new Option(agencyName, agencyName));
+                        });
+                    }
+                    agencySelect.trigger('change'); // UI Refresh
+                },
+                error: function () {
+                    console.error("Failed to load agencies");
+                }
+            });
         }
-        
-        dropdown.removeClass('active');
-    };
+        fetchAgenciesForInvoice();
 
-    // Click outside to close dropdowns
-    $(document).on('click', function (e) {
-        if (!$(e.target).closest('.custom-dropdown').length) {
-            $('.custom-dropdown').removeClass('active');
-        }
+        // 4. CUSTOM DROPDOWN (PLAN) TOGGLE LOGIC
+        window.toggleDropdown = function (id) {
+            event.stopPropagation();
+            $('.custom-dropdown').not('#' + id).removeClass('active');
+            $('#' + id).toggleClass('active');
+        };
+
+        // 5. PLAN SELECTION LOGIC
+        window.selectItem = function (dropdownId, text) {
+            let dropdown = $('#' + dropdownId);
+            dropdown.find('.selected-text').text(text).css('color', '#fff');
+
+            if (dropdownId === 'planDropdown') {
+                $('#planInput').val(text);
+            }
+            dropdown.removeClass('active');
+        };
+
+        // Click outside to close dropdowns
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.custom-dropdown').length) {
+                $('.custom-dropdown').removeClass('active');
+            }
+        });
     });
-
-    // 5. Date Pickers Init
-    if (typeof flatpickr !== "undefined") {
-        flatpickr("#issueDate", { dateFormat: "d M, Y", theme: "dark" });
-        flatpickr("#dueDate", { dateFormat: "d M, Y", theme: "dark" });
-    }
-});
-
-    </script>
+</script>
 
 </body>
 
