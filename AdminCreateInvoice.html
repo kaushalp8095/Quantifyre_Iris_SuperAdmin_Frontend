@@ -125,13 +125,11 @@
 
                         <div class="form-column-left">
 
-                            <div class="form-group" style="margin-bottom: 20px; margin-top: 5px;">
+                            <div class="ci-agency-select-wrapper" style="width: 100%;">
                                 <label class="ci-label">Agency Name</label>
-                                <div style="width: 220px;">
-                                    <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
-                                        <option></option>
-                                    </select>
-                                </div>
+                                <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
+                                    <option></option>
+                                </select>
                             </div>
 
                             <div class="form-group" style="margin-bottom: 20px;">
@@ -172,10 +170,12 @@
                                 List</label>
 
                             <div class="item-list-container">
-                                <div class="form-group">
-                                    <span class="item-header-label">Plan</span>
-                                    <div class="custom-dropdown" id="planDropdown">
-                                        <div class="dropdown-selected" onclick="toggleDropdown('planDropdown')">
+                                <div class="form-group ci-plan-group">
+                                    <span class="item-header-label"
+                                        style="margin-bottom: 8px; display: inline-block;">Plan</span>
+                                    <div class="custom-dropdown ci-plan-dropdown" id="planDropdown">
+                                        <div class="dropdown-selected ci-plan-selected"
+                                            onclick="toggleDropdown('planDropdown')">
                                             <span class="selected-text">Basic(Default)</span>
                                             <i class="fa-solid fa-chevron-down"></i>
                                         </div>
@@ -188,8 +188,7 @@
                                             <li class="dropdown-item" onclick="selectItem('planDropdown', 'Premium')">
                                                 Premium</li>
                                             <li class="dropdown-item"
-                                                onclick="selectItem('planDropdown', 'Enterprise')">
-                                                Enterprise</li>
+                                                onclick="selectItem('planDropdown', 'Enterprise')">Enterprise</li>
                                         </ul>
                                         <input type="hidden" name="plan" id="planInput" value="Basic(Default)">
                                     </div>
@@ -265,90 +264,90 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="Js/flatpickr.js"></script>
     <script>
-    $(document).ready(function () {
-        // 1. FLATPIKR (DATE PICKER) SETUP
-        const fpConfig = {
-            dateFormat: "d M, Y",
-            altInput: true,
-            altFormat: "d M, Y",
-            allowInput: true,
-            theme: "dark"
-        };
+        $(document).ready(function () {
+            // 1. FLATPIKR (DATE PICKER) SETUP
+            const fpConfig = {
+                dateFormat: "d M, Y",
+                altInput: true,
+                altFormat: "d M, Y",
+                allowInput: true,
+                theme: "dark"
+            };
 
-        const issuePicker = flatpickr("#issueDate", {
-            ...fpConfig,
-            onChange: function (selectedDates, dateStr) {
-                duePicker.set('minDate', dateStr);
-            }
-        });
-        const duePicker = flatpickr("#dueDate", fpConfig);
-
-        // 2. SELECT2 INITIALIZATION (AGENCY SEARCH)
-        const agencySelect = $('#agencySearchSelect');
-        agencySelect.select2({
-            placeholder: "Select an Agency",
-            allowClear: true,
-            width: '100%'
-        });
-
-        // 3. API SE UNIQUE AGENCIES LOAD KARNA (ADMIN FILTERED)
-        function fetchAgenciesForInvoice() {
-            const currentAdminId = localStorage.getItem("adminId");
-            
-            $.ajax({
-                url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list',
-                type: 'GET',
-                data: { adminId: currentAdminId }, // Only your agencies
-                success: function (data) {
-                    agencySelect.empty().append('<option></option>'); 
-                    
-                    const agencySet = new Set();
-                    if (data && data.length > 0) {
-                        data.forEach(item => {
-                            const name = item.agencyName || item.agency_name;
-                            if (name) agencySet.add(name);
-                        });
-
-                        // Set se unique names dropdown mein daalein
-                        agencySet.forEach(agencyName => {
-                            agencySelect.append(new Option(agencyName, agencyName));
-                        });
-                    }
-                    agencySelect.trigger('change'); // UI Refresh
-                },
-                error: function () {
-                    console.error("Failed to load agencies");
+            const issuePicker = flatpickr("#issueDate", {
+                ...fpConfig,
+                onChange: function (selectedDates, dateStr) {
+                    duePicker.set('minDate', dateStr);
                 }
             });
-        }
-        fetchAgenciesForInvoice();
+            const duePicker = flatpickr("#dueDate", fpConfig);
 
-        // 4. CUSTOM DROPDOWN (PLAN) TOGGLE LOGIC
-        window.toggleDropdown = function (id) {
-            event.stopPropagation();
-            $('.custom-dropdown').not('#' + id).removeClass('active');
-            $('#' + id).toggleClass('active');
-        };
+            // 2. SELECT2 INITIALIZATION (AGENCY SEARCH)
+            const agencySelect = $('#agencySearchSelect');
+            agencySelect.select2({
+                placeholder: "Select an Agency",
+                allowClear: true,
+                width: '100%'
+            });
 
-        // 5. PLAN SELECTION LOGIC
-        window.selectItem = function (dropdownId, text) {
-            let dropdown = $('#' + dropdownId);
-            dropdown.find('.selected-text').text(text).css('color', '#fff');
+            // 3. API SE UNIQUE AGENCIES LOAD KARNA (ADMIN FILTERED)
+            function fetchAgenciesForInvoice() {
+                const currentAdminId = localStorage.getItem("adminId");
 
-            if (dropdownId === 'planDropdown') {
-                $('#planInput').val(text);
+                $.ajax({
+                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list',
+                    type: 'GET',
+                    data: { adminId: currentAdminId }, // Only your agencies
+                    success: function (data) {
+                        agencySelect.empty().append('<option></option>');
+
+                        const agencySet = new Set();
+                        if (data && data.length > 0) {
+                            data.forEach(item => {
+                                const name = item.agencyName || item.agency_name;
+                                if (name) agencySet.add(name);
+                            });
+
+                            // Set se unique names dropdown mein daalein
+                            agencySet.forEach(agencyName => {
+                                agencySelect.append(new Option(agencyName, agencyName));
+                            });
+                        }
+                        agencySelect.trigger('change'); // UI Refresh
+                    },
+                    error: function () {
+                        console.error("Failed to load agencies");
+                    }
+                });
             }
-            dropdown.removeClass('active');
-        };
+            fetchAgenciesForInvoice();
 
-        // Click outside to close dropdowns
-        $(document).on('click', function (e) {
-            if (!$(e.target).closest('.custom-dropdown').length) {
-                $('.custom-dropdown').removeClass('active');
-            }
+            // 4. CUSTOM DROPDOWN (PLAN) TOGGLE LOGIC
+            window.toggleDropdown = function (id) {
+                event.stopPropagation();
+                $('.custom-dropdown').not('#' + id).removeClass('active');
+                $('#' + id).toggleClass('active');
+            };
+
+            // 5. PLAN SELECTION LOGIC
+            window.selectItem = function (dropdownId, text) {
+                let dropdown = $('#' + dropdownId);
+                dropdown.find('.selected-text').text(text).css('color', '#fff');
+
+                if (dropdownId === 'planDropdown') {
+                    $('#planInput').val(text);
+                }
+                dropdown.removeClass('active');
+            };
+
+            // Click outside to close dropdowns
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.custom-dropdown').length) {
+                    $('.custom-dropdown').removeClass('active');
+                }
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
 

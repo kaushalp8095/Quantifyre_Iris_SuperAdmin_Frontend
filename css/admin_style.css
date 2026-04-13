@@ -2538,3 +2538,78 @@ input {caret-color: white;}
 .edit-trigger:hover { background: #00ff9d !important; color: #000 !important; box-shadow: 0 0 15px rgba(0, 255, 157, 0.5); transform: scale(1.1); }
 /* Ensure FontAwesome icon doesn't have extra margin */
 .edit-trigger.fa-pencil, .edit-trigger.fa-check { margin: 0 !important; padding: 0 !important; }
+
+
+
+
+/* =========================================================================
+   CREATE INVOICE SPECIFIC FIXES (NO CONFLICTS WITH OTHER PAGES)
+   ========================================================================= */
+
+/* 1. Agency Select Dropdown Width & Dark Theme (Matches .ci-input) */
+.ci-agency-select-wrapper { width: 100% !important; display: block; }
+.ci-agency-select-wrapper .select2-container--default .select2-selection--single {
+    background-color: #0b1615 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    height: 48px !important; /* Matching standard ci-input height */
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.ci-agency-select-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #fff !important;
+    font-size: 0.9rem;
+    padding-left: 14px;
+}
+.ci-agency-select-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px !important;
+    right: 10px !important;
+}
+/* Select2 Focus/Open State */
+.ci-agency-select-wrapper .select2-container--default.select2-container--focus .select2-selection--single,
+.ci-agency-select-wrapper .select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #00ff9d !important;
+    background-color: #081a17 !important;
+    box-shadow: 0 0 10px rgba(0, 255, 157, 0.15) !important;
+}
+
+/* 2. Plan Dropdown Height & Gap Alignment */
+.ci-plan-group {
+    margin-bottom: 25px !important; /* Dropdown aur Description ke beech ka GAP */
+}
+.ci-plan-dropdown .ci-plan-selected {
+    height: 38px !important; /* Description input field ke jitni exact height */
+    padding: 8px 15px !important;
+    font-size: 0.85rem !important;
+    background-color: #0b1615;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+.ci-plan-dropdown .ci-plan-selected:hover,
+.ci-plan-dropdown.active .ci-plan-selected {
+    border-color: #00ff9d;
+}
+
+/* 3. Strict Height Matching for Description Row */
+.item-row .ci-input {
+    height: 38px !important; /* Force matching height */
+    padding: 8px 10px !important;
+    font-size: 0.85rem !important;
+}
+.btn-add-item {
+    height: 38px !important; /* Match Add button height to input */
+}
+
+/* 4. Mobile Responsive Fixes for these exact elements */
+@media (max-width: 768px) {
+    .ci-plan-group {
+        margin-bottom: 15px !important;
+    }
+    .ci-agency-select-wrapper {
+        width: 100% !important;
+    }
+    .ci-plan-dropdown .ci-plan-selected {
+        width: 100% !important;
+    }
+}
