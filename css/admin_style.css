@@ -1382,7 +1382,7 @@ input[type="date"] { color-scheme: dark; }
 
 .item-list-container { background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.05); }
 
-.item-grid-header, .item-row { display: grid; grid-template-columns: 3fr 0.8fr 1fr 1fr 0.5fr; gap: 10px; align-items: center; }
+.item-grid-header, .item-row { display: grid; grid-template-columns: 3fr 1.5fr 1.5fr 0.6fr; gap: 10px; align-items: center; }
 .item-grid-header { margin-bottom: 8px; padding-left: 2px; }
 .item-header-label { color: #00ff9d; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
 
