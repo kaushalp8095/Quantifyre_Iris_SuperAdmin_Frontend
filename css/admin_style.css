@@ -1360,7 +1360,7 @@ input[type="date"] { color-scheme: dark; }
     .item-row .ci-input:nth-child(2) { width: calc(50% - 5px); order: 2; }
     .item-row .ci-input:nth-child(3) { width: calc(50% - 5px); order: 3; }
     .item-row .ci-input:nth-child(4) { width: calc(100% - 50px); order: 4; }
-    .btn-add-item { width: 40px; order: 5; }
+    .btn-add-item { width: 100%; order: 5; }
     
     .form-footer-actions { flex-direction: column-reverse; }
     .ci-btn { width: 100%; }
