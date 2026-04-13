@@ -2552,11 +2552,10 @@ input {caret-color: white;}
     background-color: #0b1615 !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 8px !important;
-    height: 40px !important; /* Matching standard ci-input height */
+    height: 45px !important; /* Matching standard ci-input height */
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
-    margin-bottom: 10px;
 }
 .ci-agency-select-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #fff !important;
