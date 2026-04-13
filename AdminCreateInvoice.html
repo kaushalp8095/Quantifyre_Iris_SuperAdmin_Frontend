@@ -279,7 +279,19 @@
             const duePicker = flatpickr("#dueDate", fpConfig);
         });
 
+// ---------------   Plan DropDown ---------------- //        
 
+         function selectItem(dropdownId, text) {
+            let dropdown = $('#' + dropdownId);
+            dropdown.find('.selected-text').text(text);
+            // Hidden input update logic
+            if (dropdownId === 'planDropdown') $('#planInput').val(text);
+            if (dropdownId === 'statusDropdown') $('#statusInput').val(text);
+            dropdown.removeClass('active');
+        }
+
+
+// ------------ Select & Search Agency Dropdown ----------- //
         $(document).ready(function () {
 
             // 🔴 1. Initialize Agency Select2
