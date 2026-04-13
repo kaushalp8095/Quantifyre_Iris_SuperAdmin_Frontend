@@ -125,8 +125,12 @@
                         <div class="form-column-left">
 
                             <div class="form-group" style="margin-bottom: 20px; margin-top: 5px;">
-                                <label class="ci-label">Client Name</label>
-                                <input type="text" class="ci-input" placeholder="Enter Client Name">
+                                <label class="ci-label">Agency Name</label>
+                                <div style="width: 220px;">
+                            <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
+                                <option></option>
+                            </select>
+                        </div>
                             </div>
 
                             <div class="form-group" style="margin-bottom: 20px;">
@@ -167,9 +171,26 @@
                                 List</label>
 
                             <div class="item-list-container">
+                                <div class="form-group">
+                                <label>Plan</label>
+                                <div class="custom-dropdown" id="planDropdown">
+                                    <div class="dropdown-selected" onclick="toggleDropdown('planDropdown')">
+                                        <span class="selected-text">Basic(Default)</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                    <ul class="dropdown-options">
+                                        <li class="dropdown-item active"
+                                            onclick="selectItem('planDropdown', 'Basic(Default)')">Basic(Default)</li>
+                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Pro')">Pro</li>
+                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Premium')">Premium</li>
+                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Enterprise')">
+                                            Enterprise</li>
+                                    </ul>
+                                    <input type="hidden" name="plan" id="planInput" value="Basic(Default)">
+                                </div>
+                            </div>
                                 <div class="item-grid-header">
                                     <span class="item-header-label">Description</span>
-                                    <span class="item-header-label">Quantity</span>
                                     <span class="item-header-label">Rate</span>
                                     <span class="item-header-label">Amount</span>
                                     <span class="item-header-label"></span>
@@ -257,6 +278,66 @@
 
             const duePicker = flatpickr("#dueDate", fpConfig);
         });
+
+
+        $(document).ready(function () {
+
+            // 🔴 1. Initialize Agency Select2
+            $('#agencySearchSelect').select2({
+                placeholder: "Search Agency",
+                allowClear: true,
+                width: '100%'
+            }).on('change', function () {
+                applyFilters();
+            });
+        });
+
+        // ==========================================
+        // API se data aane par Dropdowns bharna
+        // ==========================================
+        function populateAgencyAndClientDropdowns(data) {
+            const agencySet = new Set();
+            
+            // Unique Agency aur Client nikalna
+            data.forEach(camp => {
+                const aName = camp.agencyName || camp.agencyname;
+                
+                if (aName) agencySet.add(aName);
+               
+            });
+
+            // Agency Select2 ko bharna
+            const agencySelect = $('#agencySearchSelect');
+            agencySelect.empty().append('<option value="all_agencies">All Agencies</option>');
+            agencySet.forEach(agency => {
+                agencySelect.append(new Option(agency, agency));
+            });
+            agencySelect.val(null).trigger('change.select2'); // Reset placeholder
+        }
+
+        // ==========================================
+        // Asli Filter Logic (Status + Select2)
+        // ==========================================
+        function applyFilters() {
+            
+            // Agency aur Client naye Select2 `.val()` se aayenge
+            const selAgency = $('#agencySearchSelect').val();
+            
+            const filteredData = allCampaignsData.filter(camp => {
+                let agencyMatch = true;               
+
+                // 2. Agency Match Check
+                if (selAgency && selAgency !== "all_agencies") {
+                    const campAgency = camp.agencyName || camp.agencyname || 'N/A';
+                    if (campAgency !== selAgency) agencyMatch = false;
+                }
+
+                return agencyMatch;
+            });
+
+            renderTable(filteredData);
+        }
+
     </script>
 
 </body>
