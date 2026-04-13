@@ -298,6 +298,7 @@
             });
 
             // 3. API SE UNIQUE AGENCIES LOAD KARNA
+            // 3. API SE UNIQUE AGENCIES LOAD KARNA
             function fetchAgenciesForInvoice() {
                 const currentAdminId = localStorage.getItem("adminId");
 
@@ -306,29 +307,21 @@
                     type: 'GET',
                     data: { adminId: currentAdminId },
                     success: function (data) {
-                        // In an Edit scenario, we don't want to completely clear the existing selection immediately
-                        // if we want to preserve what the invoice currently holds, but for this implementation
-                        // we'll append to existing options.
+                        agencySelect.empty().append('<option></option>');
 
                         const agencySet = new Set();
-                        // Add the existing value to the set to prevent duplicates if it's in the API response
-                        agencySet.add("Adrite Solutions");
-
                         if (data && data.length > 0) {
                             data.forEach(item => {
                                 const name = item.agencyName || item.agency_name;
                                 if (name) agencySet.add(name);
                             });
+
+                            // Set se unique names dropdown mein daalein
+                            agencySet.forEach(agencyName => {
+                                agencySelect.append(new Option(agencyName, agencyName));
+                            });
                         }
-
-                        agencySelect.empty().append('<option></option>');
-                        agencySet.forEach(agencyName => {
-                            // Select "Adrite Solutions" as default since we are editing
-                            const isSelected = agencyName === "Adrite Solutions" ? true : false;
-                            agencySelect.append(new Option(agencyName, agencyName, false, isSelected));
-                        });
-
-                        agencySelect.trigger('change');
+                        agencySelect.trigger('change'); // UI Refresh
                     },
                     error: function () {
                         console.error("Failed to load agencies");
