@@ -281,76 +281,74 @@
             const duePicker = flatpickr("#dueDate", fpConfig);
         });
 
-// ---------------   Plan DropDown ---------------- //        
+$(document).ready(function () {
+    // 1. Initialize Select2 for Agency Search
+    const agencySelect = $('#agencySearchSelect');
+    agencySelect.select2({
+        placeholder: "Select an Agency",
+        allowClear: true,
+        width: '100%'
+    });
 
-         function selectItem(dropdownId, text) {
-            let dropdown = $('#' + dropdownId);
-            dropdown.find('.selected-text').text(text);
-            // Hidden input update logic
-            if (dropdownId === 'planDropdown') $('#planInput').val(text);
-            if (dropdownId === 'statusDropdown') $('#statusInput').val(text);
-            dropdown.removeClass('active');
-        }
-
-
-// ------------ Select & Search Agency Dropdown ----------- //
-        $(document).ready(function () {
-
-            // 🔴 1. Initialize Agency Select2
-            $('#agencySearchSelect').select2({
-                placeholder: "Search Agency",
-                allowClear: true,
-                width: '100%'
-            }).on('change', function () {
-                applyFilters();
-            });
-        });
-
-        // ==========================================
-        // API se data aane par Dropdowns bharna
-        // ==========================================
-        function populateAgencyAndClientDropdowns(data) {
-            const agencySet = new Set();
-            
-            // Unique Agency aur Client nikalna
-            data.forEach(camp => {
-                const aName = camp.agencyName || camp.agencyname;
+    // 2. API se Agencies load karke Dropdown mein bharna (Fixes "No data found")
+    function fetchAgenciesForInvoice() {
+        $.ajax({
+            url: 'http://localhost:8080/api/admin/agencies/list', // Aapka backend URL
+            type: 'GET',
+            success: function(data) {
+                agencySelect.empty().append('<option></option>'); // Reset dropdown
                 
-                if (aName) agencySet.add(aName);
-               
-            });
-
-            // Agency Select2 ko bharna
-            const agencySelect = $('#agencySearchSelect');
-            agencySelect.empty().append('<option value="all_agencies">All Agencies</option>');
-            agencySet.forEach(agency => {
-                agencySelect.append(new Option(agency, agency));
-            });
-            agencySelect.val(null).trigger('change.select2'); // Reset placeholder
-        }
-
-        // ==========================================
-        // Asli Filter Logic (Status + Select2)
-        // ==========================================
-        function applyFilters() {
-            
-            // Agency aur Client naye Select2 `.val()` se aayenge
-            const selAgency = $('#agencySearchSelect').val();
-            
-            const filteredData = allCampaignsData.filter(camp => {
-                let agencyMatch = true;               
-
-                // 2. Agency Match Check
-                if (selAgency && selAgency !== "all_agencies") {
-                    const campAgency = camp.agencyName || camp.agencyname || 'N/A';
-                    if (campAgency !== selAgency) agencyMatch = false;
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        // Backend fields check karein (agencyName ya agency_name)
+                        const name = item.agencyName || item.agency_name;
+                        const id = item.id;
+                        agencySelect.append(new Option(name, name));
+                    });
                 }
+            },
+            error: function() {
+                console.error("Failed to load agencies");
+            }
+        });
+    }
+    fetchAgenciesForInvoice();
 
-                return agencyMatch;
-            });
+    // 3. Plan Dropdown Toggle Logic (Global Scope fix)
+    window.toggleDropdown = function(id) {
+        // Dropdown open/close karne ke liye
+        $('#' + id).toggleClass('active');
+        // Dusre khule dropdowns band karne ke liye
+        $('.custom-dropdown').not('#' + id).removeClass('active');
+        event.stopPropagation();
+    };
 
-            renderTable(filteredData);
+    // 4. Plan Selection Logic
+    window.selectItem = function(dropdownId, text) {
+        let dropdown = $('#' + dropdownId);
+        dropdown.find('.selected-text').text(text).css('color', '#fff');
+        
+        // Agar hidden input hai toh value update karein
+        if (dropdownId === 'planDropdown') {
+            $('#planInput').val(text);
         }
+        
+        dropdown.removeClass('active');
+    };
+
+    // Click outside to close dropdowns
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.custom-dropdown').length) {
+            $('.custom-dropdown').removeClass('active');
+        }
+    });
+
+    // 5. Date Pickers Init
+    if (typeof flatpickr !== "undefined") {
+        flatpickr("#issueDate", { dateFormat: "d M, Y", theme: "dark" });
+        flatpickr("#dueDate", { dateFormat: "d M, Y", theme: "dark" });
+    }
+});
 
     </script>
 
