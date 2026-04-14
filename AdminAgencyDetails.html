@@ -131,28 +131,28 @@
                             <div class="d-icon-custom"><img src="Images/Revenue50x50.ico"></div>
                             <div class="d-info-custom">
                                 <p>Total Revenue</p>
-                                <h3>₹ 9,80,460</h3>
+                                <h3></h3>
                             </div>
                         </div>
                         <div class="detail-card-custom">
                             <div class="d-icon-custom"><img src="Images/Customer50x50.ico"></div>
                             <div class="d-info-custom">
                                 <p>Total Clients</p>
-                                <h3>25</h3>
+                                <h3></h3>
                             </div>
                         </div>
                         <div class="detail-card-custom">
                             <div class="d-icon-custom"><img src="Images/Calander50x50.ico"></div>
                             <div class="d-info-custom">
                                 <p>Plan Expiry</p>
-                                <h3>25-01-2026</h3>
+                                <h3></h3>
                             </div>
                         </div>
                         <div class="detail-card-custom">
                             <div class="d-icon-custom"><img src="Images/Clock50x50.ico"></div>
                             <div class="d-info-custom">
                                 <p>Last Active</p>
-                                <h3>2 Day Ago</h3>
+                                <h3></h3>
                             </div>
                         </div>
                     </div>
@@ -177,24 +177,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>John Smith</td>
-                                    <td>Admin</td>
-                                    <td>john@acme.com</td>
-                                    <td><span class="status-pill st-active">Active</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Emma Wilson</td>
-                                    <td>Editor</td>
-                                    <td>emma@tech.com</td>
-                                    <td><span class="status-pill st-disabled">Inactive</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Sarah Davis</td>
-                                    <td>Viewer</td>
-                                    <td>sarah@lux.com</td>
-                                    <td><span class="status-pill st-active">Active</span></td>
-                                </tr>
+                                
                             </tbody>
                         </table>
                     </div>
@@ -325,8 +308,8 @@
                         if (agencyStats) {
                             // --- Card 0: Total Revenue ---
                             // Aapke DTO mein field ka naam 'totalBilled' hai
-                            let rev = agencyStats.totalRevenue || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹' + parseFloat(revenueValue).toLocaleString('en-IN'));
+                            let rev = agencyStats.totalBilled || 0;
+                            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹ ' + parseFloat(rev).toLocaleString('en-IN'));
 
                             // --- Card 1: Total Clients ---
                             // DTO field name: 'totalClients'
