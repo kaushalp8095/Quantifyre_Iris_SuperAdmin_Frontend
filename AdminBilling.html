@@ -72,7 +72,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -143,10 +144,10 @@
                 </div>
 
                 <div class="billing-stat-card">
-                    <img src="Images/Calander50x50.ico" alt="">
+                    <img src="Images/Revenue50x50.ico" alt="">
                     <div class="b-info">
-                        <p>Next Due</p>
-                        <h2></h2>
+                        <p>This Month Revenue</p>
+                        <h2 id="current-month-revenue">₹0</h2>
                     </div>
                 </div>
 
@@ -196,7 +197,7 @@
                                     </div>
                                 </td>
                             </tr>
-                           
+
                         </tbody>
                     </table>
                 </div>
@@ -398,36 +399,36 @@
     </script>
     <script>
         $(document).ready(function () {
-    const adminId = localStorage.getItem("adminId");
+            const adminId = localStorage.getItem("adminId");
 
-    // ==========================================
-    // 1. DASHBOARD DATA LOAD (STATS + TABLE)
-    // ==========================================
-    function loadBillingDashboard() {
-        if (!adminId) {
-            console.error("Admin ID not found in localStorage");
-            return;
-        }
+            // ==========================================
+            // 1. DASHBOARD DATA LOAD (STATS + TABLE)
+            // ==========================================
+            function loadBillingDashboard() {
+                if (!adminId) {
+                    console.error("Admin ID not found in localStorage");
+                    return;
+                }
 
-        $.ajax({
-            url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/dashboard`,
-            type: 'GET',
-            data: { adminId: adminId },
-            success: function (data) {
-                // --- A. Stats Update (Cards) ---
-                $('.billing-stat-card:nth-child(1) h2').text('₹' + data.totalBilled.toLocaleString('en-IN'));
-                $('.billing-stat-card:nth-child(2) h2').text('₹' + data.paidAmount.toLocaleString('en-IN'));
-                $('.billing-stat-card:nth-child(3) h2').text('₹' + data.outstanding.toLocaleString('en-IN'));
+                $.ajax({
+                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/dashboard`,
+                    type: 'GET',
+                    data: { adminId: adminId },
+                    success: function (data) {
+                        // --- A. Stats Update (Cards) ---
+                        $('.billing-stat-card:nth-child(1) h2').text('₹' + data.totalBilled.toLocaleString('en-IN'));
+                        $('.billing-stat-card:nth-child(2) h2').text('₹' + data.paidAmount.toLocaleString('en-IN'));
+                        $('.billing-stat-card:nth-child(3) h2').text('₹' + data.outstanding.toLocaleString('en-IN'));
+                        $('#current-month-revenue').text('₹' + (data.currentMonthRevenue || 0).toLocaleString('en-IN'));
+                        // --- B. Table Update ---
+                        const tbody = $('#invoicesTable tbody');
+                        tbody.empty();
 
-                // --- B. Table Update ---
-                const tbody = $('#invoicesTable tbody');
-                tbody.empty();
+                        if (data.invoices && data.invoices.length > 0) {
+                            data.invoices.forEach(inv => {
+                                const statusClass = inv.status === 'Paid' ? 'st-active' : 'st-disabled';
 
-                if (data.invoices && data.invoices.length > 0) {
-                    data.invoices.forEach(inv => {
-                        const statusClass = inv.status === 'Paid' ? 'st-active' : 'st-disabled';
-                        
-                        tbody.append(`
+                                tbody.append(`
                             <tr>
                                 <td>${inv.invoiceNo}</td>
                                 <td>${inv.agencyName}</td>
@@ -443,62 +444,62 @@
                                 </td>
                             </tr>
                         `);
-                    });
-                } else {
-                    tbody.append('<tr><td colspan="6" style="text-align:center; padding:20px;">No invoices found.</td></tr>');
-                }
+                            });
+                        } else {
+                            tbody.append('<tr><td colspan="6" style="text-align:center; padding:20px;">No invoices found.</td></tr>');
+                        }
 
-                // Re-initialize pagination after data load
-                setupTablePagination('invoicesTable', 'pagination-invoices', 4);
-            },
-            error: function (err) {
-                console.error("Error loading dashboard data:", err);
+                        // Re-initialize pagination after data load
+                        setupTablePagination('invoicesTable', 'pagination-invoices', 4);
+                    },
+                    error: function (err) {
+                        console.error("Error loading dashboard data:", err);
+                    }
+                });
             }
-        });
-    }
 
-    // --- Helper: Format Date ---
-    function formatDate(dateString) {
-        if(!dateString) return "N/A";
-        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-IN', options);
-    }
-
-    // ==========================================
-    // 2. DELETE LOGIC
-    // ==========================================
-    let invoiceToDelete = null;
-
-    window.handleDelete = function(id) {
-        invoiceToDelete = id;
-        $('#deleteModal').addClass('active');
-    };
-
-    window.confirmDelete = function() {
-        if (!invoiceToDelete) return;
-
-        $.ajax({
-            url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/delete/${invoiceToDelete}`,
-            type: 'DELETE',
-            success: function (res) {
-                $('#deleteModal').removeClass('active');
-                alert("Invoice deleted successfully!");
-                loadBillingDashboard(); // Table refresh karo
-            },
-            error: function (err) {
-                alert("Error deleting invoice");
+            // --- Helper: Format Date ---
+            function formatDate(dateString) {
+                if (!dateString) return "N/A";
+                const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+                return new Date(dateString).toLocaleDateString('en-IN', options);
             }
+
+            // ==========================================
+            // 2. DELETE LOGIC
+            // ==========================================
+            let invoiceToDelete = null;
+
+            window.handleDelete = function (id) {
+                invoiceToDelete = id;
+                $('#deleteModal').addClass('active');
+            };
+
+            window.confirmDelete = function () {
+                if (!invoiceToDelete) return;
+
+                $.ajax({
+                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/delete/${invoiceToDelete}`,
+                    type: 'DELETE',
+                    success: function (res) {
+                        $('#deleteModal').removeClass('active');
+                        alert("Invoice deleted successfully!");
+                        loadBillingDashboard(); // Table refresh karo
+                    },
+                    error: function (err) {
+                        alert("Error deleting invoice");
+                    }
+                });
+            };
+
+            // Initialize Dashboard
+            loadBillingDashboard();
         });
-    };
 
-    // Initialize Dashboard
-    loadBillingDashboard();
-});
-
-// Modal close helper
-function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-}
+        // Modal close helper
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
     </script>
 </body>
 
