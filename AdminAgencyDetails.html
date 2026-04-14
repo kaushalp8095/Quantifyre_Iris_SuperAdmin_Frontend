@@ -265,75 +265,88 @@
             if (!$(event.target).closest('.details-dropdown').length) {
                 $('.details-dropdown').removeClass('active');
             }
-        });
+       
 
         // ==========================================
-        // 3. DYNAMIC DATA FETCHING (Step 1)
-        // ==========================================
-        $(document).ready(function () {
-            // URL se Agency ID nikalna (?id=5)
-            const urlParams = new URLSearchParams(window.location.search);
-            const agencyId = urlParams.get('id');
+    // 2. DATA LOAD & KPI CALCULATION
+    // ==========================================
+    async function loadAgencies() {
+        const tbody = document.getElementById('agencyDataBody');
+        try {
+            // URL mein adminId filter zaroori hai
+            const response = await fetch(`http://localhost:8080/api/admin/agencies/list?adminId=${currentAdminId}`);
+            if (!response.ok) throw new Error("Backend connection failed!");
 
-            if (agencyId) {
-                fetchAgencyDetails(agencyId);
-            } else {
-                alert("Agency ID is missing in URL!");
+            const data = await response.json();
+            tbody.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 50px;">No Agencies Found.</td></tr>';
+                updateKPICards(0, 0, 0, 0); // Reset KPIs to 0
+                return;
             }
 
-            function fetchAgencyDetails(id) {
-                // 1. BASIC DETAILS FETCH KARNA
-                $.ajax({
-                    url: `http://localhost:8080/api/admin/agencies/details/${id}`,
-                    type: 'GET',
-                    success: function (data) {
-                        $('.header-left div h1').last().text(data.agencyName);
+            let totalAgencies = data.length;
+            let activeAgencies = 0;
+            let totalCampaigns = 0;
+            let totalRevenue = 0;
 
-                        let status = data.status || "Pending";
-                        let statusColor = status.toLowerCase() === 'active' ? '#00ff9d' : '#ff4d4d';
-                        $('.status-badge-custom').html(`Status: ${status} <i class="fa-solid fa-circle-check"></i>`).css('color', statusColor);
+            data.forEach(agency => {
+                // Fields mapping (Backend DTO keys check karein: agencyName, totalBilled, etc.)
+                const status = (agency.status || 'Active').toLowerCase();
+                const campaigns = parseInt(agency.totalCampaigns || 0);
+                const revenue = parseFloat(agency.totalBilled || 0);
 
-                        let contactHtml = `
-                            <h3 style="color:#fff; margin-bottom:15px; font-weight:500;">Key Agency Contacts</h3>
-                            <p style="color:#8b9c9c; margin-bottom: 5px;">Owner Name: <span style="color:#fff;">${data.ownerName}</span></p>
-                            <p style="color:#8b9c9c; margin-bottom: 5px;">Email: <span style="color:#fff;">${data.email}</span></p>
-                            <p style="color:#8b9c9c; margin-bottom: 5px;">Phone: <span style="color:#fff;">${data.phoneNumber}</span></p>
-                            <p style="color:#8b9c9c;">Location: <span style="color:#fff;">${data.city || ''}, ${data.state || ''}, ${data.country || ''}</span></p>
-                        `;
-                        $('.contacts-section').html(contactHtml);
+                if (status === 'active') activeAgencies++;
+                totalCampaigns += campaigns;
+                totalRevenue += revenue;
 
-                        // Update Plan Card
-                        $('.details-stats-grid .detail-card-custom').eq(2).find('p').text('Current Plan');
-                        $('.details-stats-grid .detail-card-custom').eq(2).find('h3').text(data.plan || 'N/A');
-                    }
-                });
+                // Table Row Design
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <img src="${agency.agencyLogo || 'Images/agency50x50.ico'}" width="35" height="35" style="border-radius:4px; object-fit:cover;">
+                                <strong>${agency.agencyName || 'N/A'}</strong>
+                            </div>
+                        </td>
+                        <td>${agency.email || 'N/A'}<br><small>${agency.phoneNumber || ''}</small></td>
+                        <td>${agency.totalClients || 0}</td>
+                        <td>${campaigns}</td>
+                        <td>₹${revenue.toLocaleString('en-IN')}</td>
+                        <td><span class="status-pill ${status === 'active' ? 'st-active' : 'st-inactive'}">${agency.status}</span></td>
+                        <td>
+                            <div class="action-icons">
+                                <a href="AdminAgencyDetails.html?id=${agency.id}" class="action-btn view"><i class="fa-regular fa-eye"></i></a>
+                                <a href="AdminEditAgency.html?id=${agency.id}" class="action-btn edit"><i class="fa-solid fa-pen"></i></a>
+                                <div class="action-btn delete" onclick="openDeleteModal(${agency.id})"><i class="fa-regular fa-trash-can"></i></div>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
 
-                // 2. STATS FETCH KARNA (Existing List API ka use karke)
-                $.ajax({
-                    url: `http://localhost:8080/api/admin/agencies/list`,
-                    type: 'GET',
-                    success: function (listData) {
-                        // List mein se apni agency dhoondho
-                        let agencyStats = listData.find(item => item.id == id);
+            // 🔴 KPI CARDS UPDATE LOGIC
+            updateKPICards(totalAgencies, activeAgencies, totalCampaigns, totalRevenue);
+            
+            // Pagination initialize
+            setupTablePagination('agencyTable', 'pagination-agency', 4);
 
-                        if (agencyStats) {
-                            // Update Revenue Card
-                            let rawRev = agencyStats.totalRevenue || agencyStats.total_revenue || agencyStats.revenue || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹ ' + parseFloat(rawRev).toLocaleString('en-IN'));
+        } catch (error) {
+            console.error("Error:", error);
+            tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center; padding: 30px;">Error loading data.</td></tr>`;
+        }
+    }
 
-                            // Update Active Clients Card
-                            let clients = agencyStats.totalClients || agencyStats.total_clients || agencyStats.totalclients || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(clients);
+    function updateKPICards(total, active, campaigns, revenue) {
+        $('#kpi-total-agencies').text(total);
+        $('#kpi-active-agencies').text(active);
+        $('#kpi-total-campaigns').text(campaigns);
+        $('#kpi-total-revenue').text('₹' + revenue.toLocaleString('en-IN'));
+    }
 
-                            // Update Campaigns Card
-                            let campaigns = agencyStats.totalCampaigns || agencyStats.total_campaigns || agencyStats.totalcampaigns || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(3).find('p').text('Total Campaigns');
-                            $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(campaigns);
-                        }
-                    }
-                });
-            }
-        });
+    // Call function
+    loadAgencies();
+ });
     </script>
 </body>
 
