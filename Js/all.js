@@ -223,39 +223,57 @@ window.onclick = function (event) {
 
 
 // =========================================================
-// GLOBAL PROFILE SYNC LOGIC (Runs on Every Admin Page)
+// GLOBAL PROFILE SYNC LOGIC (Updated for Real-time Sync)
 // =========================================================
 $(document).ready(function() {
-    // 1. LocalStorage se data uthao
-    const savedName = localStorage.getItem("adminName");
-    const savedLogo = localStorage.getItem("adminLogo");
-    const savedEmail = localStorage.getItem("adminEmail"); 
+    const adminId = localStorage.getItem("adminId");
+    if (!adminId) return;
 
-    // 2. Agar Naam save hai, toh har jagah update karo
-    if (savedName && savedName !== "null" && savedName !== "") {
-        $('.user-mini-profile p').text(savedName);                 // Sidebar Name
-        $('.text-info h4').text(savedName);                        // Header Name
-        $('.dropdown-header-info .d-name').text(savedName);        // Dropdown Name
+    // Helper function: UI ko update karne ke liye
+    function updateUI(name, email, logo) {
+        const defaultLogo = "Images/ClientSlider.ico";
+        const finalLogo = (logo && logo !== "null" && logo !== "") ? logo : defaultLogo;
+
+        // Names update
+        $('.user-mini-profile p, .text-info h4, .dropdown-header-info .d-name').text(name || 'Admin');
+        // Email update
+        $('.dropdown-header-info .d-email').text(email || '');
+        // Logos update
+        $('.avatar-circle img, .avatar-small img').attr('src', finalLogo);
     }
 
-    // 3. Agar Email save hai, toh Dropdown mein update karo
-    if (savedEmail && savedEmail !== "null" && savedEmail !== "") {
-        $('.dropdown-header-info .d-email').text(savedEmail);      // Dropdown Email
+    // STEP 1: Pehle LocalStorage se data uthao (taaki page load hote hi khali na dikhe)
+    const sName = localStorage.getItem("adminName");
+    const sLogo = localStorage.getItem("adminLogo");
+    const sEmail = localStorage.getItem("adminEmail");
+    
+    if (sName) {
+        updateUI(sName, sEmail, sLogo);
     }
 
-    // 4. Logo Update (Supabase URL with Default Fallback)
-    if (savedLogo && savedLogo !== "null" && savedLogo !== "") {
-        // Agar real logo hai toh lagao
-        $('.avatar-circle img').attr('src', savedLogo);
-        $('.avatar-small img').attr('src', savedLogo);
-    } else {
-        // Agar DB mein photo nahi hai toh default lagao
-        const defaultLogo = "Images/ClientSlider.ico"; 
-        $('.avatar-circle img').attr('src', defaultLogo);
-        $('.avatar-small img').attr('src', defaultLogo);
-    }
+    // STEP 2: Background mein Backend se Fresh Data Fetch karo
+    // Isse ensure hoga ki agar DB mein image change hui hai toh har page par dikhegi
+    $.ajax({
+        url: `http://localhost:8080/api/admin/settings/profile/${adminId}`,
+        type: 'GET',
+        success: function (data) {
+            const fullName = (data.firstName || '') + " " + (data.lastName || '');
+            const freshLogo = data.profileLogo;
+            const freshEmail = data.email;
+
+            // UI Update with Fresh Data
+            updateUI(fullName, freshEmail, freshLogo);
+
+            // LocalStorage Sync (Future ke liye update kardo)
+            localStorage.setItem("adminName", fullName);
+            localStorage.setItem("adminEmail", freshEmail);
+            localStorage.setItem("adminLogo", freshLogo || "");
+        },
+        error: function() {
+            console.log("Profile Sync: Backend unreachable, using cached data.");
+        }
+    });
 });
-
 
 
 // ==========================================
