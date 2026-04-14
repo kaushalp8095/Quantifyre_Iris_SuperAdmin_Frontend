@@ -426,7 +426,11 @@
 
                         if (data.invoices && data.invoices.length > 0) {
                             data.invoices.forEach(inv => {
-                                const statusClass = inv.status === 'Paid' ? 'st-active' : 'st-disabled';
+                                // DB se aane wala asli status
+                                const currentStatus = inv.status || 'Pending';
+
+                                // Case-insensitive check for CSS class
+                                const statusClass = (currentStatus.toLowerCase() === 'paid') ? 'st-active' : 'st-disabled';
 
                                 tbody.append(`
                             <tr>
