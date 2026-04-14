@@ -248,54 +248,53 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
     <script>
+        $(document).ready(function () {
+            // Tab Logic
+            window.openTab = function (evt, tabName) {
+                $('.tab-content').removeClass('active').hide();
+                $('.tab-btn').removeClass('active');
+                $('#' + tabName).addClass('active').fadeIn(300);
+
+                if (evt && evt.currentTarget && $(evt.currentTarget).hasClass('tab-btn')) {
+                    $(evt.currentTarget).addClass('active');
+                } else {
+                    $('.tabs-nav-custom').find(`.tab-btn[onclick*="${tabName}"]`).addClass('active');
+                }
+            }
+            //-- Close Custom Details Dropdowns --//
+            if (!$(event.target).closest('.details-dropdown').length) {
+                $('.details-dropdown').removeClass('active');
+            }
+        });
+
+        
 $(document).ready(function () {
-    // 1. URL Parameters aur LocalStorage se IDs nikalna
     const urlParams = new URLSearchParams(window.location.search);
     const agencyId = urlParams.get('id');
-    const currentAdminId = localStorage.getItem("adminId");
+    const currentAdminId = localStorage.getItem("adminId"); // Admin ID mandatory hai
 
-    // Check agar ID missing hai
     if (!agencyId) {
-        alert("Agency ID is missing in the URL!");
-        window.location.href = "AdminAgencies.html";
+        alert("Agency ID is missing in URL!");
         return;
     }
 
-    // Tab Navigation Logic (Global access ke liye window object par dala hai)
-    window.openTab = function (evt, tabName) {
-        $('.tab-content').removeClass('active').hide();
-        $('.tab-btn').removeClass('active');
-        $('#' + tabName).addClass('active').fadeIn(300);
-
-        if (evt && evt.currentTarget) {
-            $(evt.currentTarget).addClass('active');
-        } else {
-            $('.tabs-nav-custom').find(`.tab-btn[onclick*="${tabName}"]`).addClass('active');
-        }
-    };
-
     // ==========================================
-    // 2. MAIN DATA FETCHING FUNCTION
+    // MAIN DATA FETCHING FOR KPI CARDS
     // ==========================================
-    async function loadAgencyFullDetails() {
+    async function loadAgencyKPIData() {
         try {
-            // --- A. BASIC DETAILS FETCH (Name, Email, Address, Plan) ---
-            // Endpoint: /api/admin/agencies/details/{id}
+            // 1. Basic Info Fetch (Name, Plan, Status, Contacts)
             const detailsRes = await fetch(`http://localhost:8080/api/admin/agencies/details/${agencyId}`);
             if (detailsRes.ok) {
                 const data = await detailsRes.json();
-
-                // 1. Header Name Update
+                
+                // Header & Status
                 $('.header-left div h1').last().text(data.agencyName);
-
-                // 2. Status Badge Update
                 let status = data.status || "Pending";
                 let statusColor = status.toLowerCase() === 'active' ? '#00ff9d' : '#ff4d4d';
-                $('.status-badge-custom')
-                    .html(`Status: ${status} <i class="fa-solid fa-circle-check"></i>`)
-                    .css('color', statusColor);
+                $('.status-badge-custom').html(`Status: ${status} <i class="fa-solid fa-circle-check"></i>`).css('color', statusColor);
 
-                // 3. Contact Info Update
+                // Contact Section
                 let contactHtml = `
                     <h3 style="color:#fff; margin-bottom:15px; font-weight:500;">Key Agency Contacts</h3>
                     <p style="color:#8b9c9c; margin-bottom: 5px;">Owner Name: <span style="color:#fff;">${data.ownerName || 'N/A'}</span></p>
@@ -305,45 +304,41 @@ $(document).ready(function () {
                 `;
                 $('.contacts-section').html(contactHtml);
 
-                // 4. KPI Card: Plan (Assuming it's the 3rd card, index 2)
+                // KPI Card 3: Current Plan Update (Index 2)
                 $('.details-stats-grid .detail-card-custom').eq(2).find('h3').text(data.plan || 'Basic');
             }
 
-            // --- B. STATS FETCH (Revenue, Clients, Campaigns) ---
-            // Endpoint: /api/admin/agencies/list?adminId={adminId}
-            // Kyunki List API me DTO calculated data bhejta hai
+            // 2. Stats Fetch (Revenue, Clients, Campaigns) 
+            // Note: Hum Admin ID ke saath list call kar rahe hain taaki calculated fields (DTO) mil sakein
             const listRes = await fetch(`http://localhost:8080/api/admin/agencies/list?adminId=${currentAdminId}`);
             if (listRes.ok) {
                 const allAgencies = await listRes.json();
-                
-                // Sirf current agency ka data filter karo
                 const agencyStats = allAgencies.find(item => item.id == agencyId);
 
                 if (agencyStats) {
-                    // 1. KPI Card: Total Revenue (index 0)
+                    // KPI Card 1: Total Revenue (Matching DTO field totalBilled)
                     let rev = agencyStats.totalBilled || 0;
                     $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹' + rev.toLocaleString('en-IN'));
 
-                    // 2. KPI Card: Active Clients (index 1)
+                    // KPI Card 2: Active Clients
                     let clients = agencyStats.totalClients || 0;
                     $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(clients);
 
-                    // 4. KPI Card: Total Campaigns (index 3)
+                    // KPI Card 4: Total Campaigns
                     let campaigns = agencyStats.totalCampaigns || 0;
                     $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(campaigns);
                 }
             }
 
         } catch (error) {
-            console.error("Error loading agency details:", error);
-            alert("Critical Error: Unable to fetch data from server.");
+            console.error("Critical Error: Unable to fetch data from server.", error);
         }
     }
 
-    // Call the main function
-    loadAgencyFullDetails();
+    loadAgencyKPIData();
 });
-</script>
+
+    </script>
 </body>
 
 </html>
