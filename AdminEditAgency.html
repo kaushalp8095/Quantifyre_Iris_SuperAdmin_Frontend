@@ -553,7 +553,7 @@
                     btn.prop('disabled', true).text('Updating...');
 
                     $.ajax({
-                        url: `/api/admin/agencies/update/${agencyId}`,
+                        url: `http://localhost:8080/api/admin/agencies/update/${agencyId}`,
                         type: 'POST',
                         data: formData,
                         processData: false,
