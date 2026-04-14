@@ -147,7 +147,7 @@
                     <img src="Images/Revenue50x50.ico" alt="">
                     <div class="b-info">
                         <p>This Month Revenue</p>
-                        <h2 id="current-month-revenue">₹0</h2>
+                        <h2>₹0</h2>
                     </div>
                 </div>
 
@@ -419,7 +419,7 @@
                         $('.billing-stat-card:nth-child(1) h2').text('₹' + data.totalBilled.toLocaleString('en-IN'));
                         $('.billing-stat-card:nth-child(2) h2').text('₹' + data.paidAmount.toLocaleString('en-IN'));
                         $('.billing-stat-card:nth-child(3) h2').text('₹' + data.outstanding.toLocaleString('en-IN'));
-                        $('#current-month-revenue').text('₹' + (data.currentMonthRevenue || 0).toLocaleString('en-IN'));
+                        $('.billing-stat-card:nth-child(4) h2').text('₹' + data.currentMonthRevenue.toLocaleString('en-IN'));
                         // --- B. Table Update ---
                         const tbody = $('#invoicesTable tbody');
                         tbody.empty();
