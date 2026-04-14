@@ -308,30 +308,46 @@
                     }
                 });
 
-                // 2. STATS FETCH KARNA (Existing List API ka use karke)
-                $.ajax({
-                    url: `http://localhost:8080/api/admin/agencies/list`,
-                    type: 'GET',
-                    success: function (listData) {
-                        // List mein se apni agency dhoondho
-                        let agencyStats = listData.find(item => item.id == id);
+                // LocalStorage se Admin ID nikalna zaroori hai
+const currentAdminId = localStorage.getItem("adminId");
 
-                        if (agencyStats) {
-                            // Update Revenue Card
-                            let rawRev = agencyStats.totalRevenue || agencyStats.total_revenue || agencyStats.revenue || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹ ' + parseFloat(rawRev).toLocaleString('en-IN'));
+$.ajax({
+    // 1. URL mein adminId pass karna compulsory hai
+    url: `http://localhost:8080/api/admin/agencies/list?adminId=${currentAdminId}`,
+    type: 'GET',
+    success: function (listData) {
+        console.log("Full List Data:", listData); // Debugging ke liye check karein data aa raha hai ya nahi
 
-                            // Update Active Clients Card
-                            let clients = agencyStats.totalClients || agencyStats.total_clients || agencyStats.totalclients || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(clients);
+        // 2. Agency ID se match karna (URL params wali id use karein)
+        let agencyStats = listData.find(item => item.id == agencyId);
 
-                            // Update Campaigns Card
-                            let campaigns = agencyStats.totalCampaigns || agencyStats.total_campaigns || agencyStats.totalcampaigns || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(3).find('p').text('Total Campaigns');
-                            $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(campaigns);
-                        }
-                    }
-                });
+        if (agencyStats) {
+            // --- Card 0: Total Revenue ---
+            // Aapke DTO mein field ka naam 'totalBilled' hai
+            let rev = agencyStats.totalBilled || 0; 
+            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹ ' + parseFloat(rev).toLocaleString('en-IN'));
+
+            // --- Card 1: Total Clients ---
+            // DTO field name: 'totalClients'
+            let clients = agencyStats.totalClients || 0;
+            $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(clients);
+
+            // --- Card 2: Current Plan ---
+            // Iska data Basic Details wali API se pehle hi aa chuka hoga
+            
+            // --- Card 3: Total Campaigns ---
+            // DTO field name: 'totalCampaigns'
+            let campaigns = agencyStats.totalCampaigns || 0;
+            $('.details-stats-grid .detail-card-custom').eq(3).find('p').text('Total Campaigns');
+            $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(campaigns);
+        } else {
+            console.warn("Agency stats not found for ID:", agencyId);
+        }
+    },
+    error: function(xhr) {
+        console.error("Stats Fetch Error:", xhr.responseText);
+    }
+});
             }
         });
     </script>
