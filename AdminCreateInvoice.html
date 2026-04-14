@@ -386,6 +386,7 @@
         // Check if ID is present
     const adminId = localStorage.getItem("adminId");
     const selectedAgencyId = $('#agencySearchSelect').val();
+    const selectedAgencyName = $('#agencySearchSelect').find("option:selected").text();
 
     if(!selectedAgencyId) {
         alert("Please select an agency first!");
@@ -395,7 +396,7 @@
         const invoiceData = {
             adminId: adminId,
             agencyId: selectedAgencyId,
-            agencyName: $('#agencySearchSelect find("option:selected").text()'),
+            agencyName: selectedAgencyName,
             billToAddress: $('input[placeholder="Enter billing address"]').val(),
             contactPerson: $('input[placeholder="Enter Contact Person"]').val(),
             invoiceNo: $('input[placeholder="#INV-0001"]').val(),
