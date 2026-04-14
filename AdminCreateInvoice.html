@@ -144,7 +144,7 @@
 
                             <div class="form-group" style="margin-bottom: 15px;">
                                 <label class="ci-label">Invoice No.</label>
-                                <input type="text" class="ci-input" placeholder="#INV-0001">
+                                <input type="text"  id="invoiceNo" class="ci-input" placeholder="#INV-0001" readonly>
                                 <span class="input-helper">Auto-generated</span>
                             </div>
 
@@ -297,7 +297,7 @@
     function generateInvoiceNumber() {
         const randomNum = Math.floor(1000 + Math.random() * 9000);
         const invNo = "#INV-" + new Date().getFullYear() + "-" + randomNum;
-        $('input[placeholder="#INV-0001"]').val(invNo);
+        $('#invoiceNo').val(invNo);
     }
     generateInvoiceNumber();
 
@@ -382,11 +382,20 @@
     // 9. SAVE INVOICE (AJAX)
     $('.btn-submit').on('click', function (e) {
         e.preventDefault();
+
+        // Check if ID is present
+    const adminId = localStorage.getItem("adminId");
+    const selectedAgencyId = $('#agencySearchSelect').val();
+
+    if(!selectedAgencyId) {
+        alert("Please select an agency first!");
+        return;
+    }
         
         const invoiceData = {
-            adminId: localStorage.getItem("adminId"),
-            agencyId: agencySelect.val(),
-            agencyName: agencySelect.find("option:selected").text(),
+            adminId: adminId,
+            agencyId: selectedAgencyId,
+            agencyName: $('#agencySearchSelect find("option:selected").text()'),
             billToAddress: $('input[placeholder="Enter billing address"]').val(),
             contactPerson: $('input[placeholder="Enter Contact Person"]').val(),
             invoiceNo: $('input[placeholder="#INV-0001"]').val(),
@@ -403,6 +412,9 @@
             alert("Please select an agency first!");
             return;
         }
+
+        const btn = $(this);
+    btn.text("Processing...").prop('disabled', true);
 
         $.ajax({
             url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
