@@ -70,7 +70,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -309,45 +310,45 @@
                 });
 
                 // LocalStorage se Admin ID nikalna zaroori hai
-const currentAdminId = localStorage.getItem("adminId");
+                const currentAdminId = localStorage.getItem("adminId");
 
-$.ajax({
-    // 1. URL mein adminId pass karna compulsory hai
-    url: `http://localhost:8080/api/admin/agencies/list?adminId=${currentAdminId}`,
-    type: 'GET',
-    success: function (listData) {
-        console.log("Full List Data:", listData); // Debugging ke liye check karein data aa raha hai ya nahi
+                $.ajax({
+                    // 1. URL mein adminId pass karna compulsory hai
+                    url: `http://localhost:8080/api/admin/agencies/list?adminId=${currentAdminId}`,
+                    type: 'GET',
+                    success: function (listData) {
+                        console.log("Full List Data:", listData); // Debugging ke liye check karein data aa raha hai ya nahi
 
-        // 2. Agency ID se match karna (URL params wali id use karein)
-        let agencyStats = listData.find(item => item.id == agencyId);
+                        // 2. Agency ID se match karna (URL params wali id use karein)
+                        let agencyStats = listData.find(item => item.id == agencyId);
 
-        if (agencyStats) {
-            // --- Card 0: Total Revenue ---
-            // Aapke DTO mein field ka naam 'totalBilled' hai
-            let rev = agencyStats.totalBilled || 0; 
-            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹ ' + parseFloat(rev).toLocaleString('en-IN'));
+                        if (agencyStats) {
+                            // --- Card 0: Total Revenue ---
+                            // Aapke DTO mein field ka naam 'totalBilled' hai
+                            let rev = agencyStats.totalRevenue || 0;
+                            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹' + parseFloat(revenueValue).toLocaleString('en-IN'));
 
-            // --- Card 1: Total Clients ---
-            // DTO field name: 'totalClients'
-            let clients = agencyStats.totalClients || 0;
-            $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(clients);
+                            // --- Card 1: Total Clients ---
+                            // DTO field name: 'totalClients'
+                            let clients = agencyStats.totalClients || 0;
+                            $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(clients);
 
-            // --- Card 2: Current Plan ---
-            // Iska data Basic Details wali API se pehle hi aa chuka hoga
-            
-            // --- Card 3: Total Campaigns ---
-            // DTO field name: 'totalCampaigns'
-            let campaigns = agencyStats.totalCampaigns || 0;
-            $('.details-stats-grid .detail-card-custom').eq(3).find('p').text('Total Campaigns');
-            $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(campaigns);
-        } else {
-            console.warn("Agency stats not found for ID:", agencyId);
-        }
-    },
-    error: function(xhr) {
-        console.error("Stats Fetch Error:", xhr.responseText);
-    }
-});
+                            // --- Card 2: Current Plan ---
+                            // Iska data Basic Details wali API se pehle hi aa chuka hoga
+
+                            // --- Card 3: Total Campaigns ---
+                            // DTO field name: 'totalCampaigns'
+                            let campaigns = agencyStats.totalCampaigns || 0;
+                            $('.details-stats-grid .detail-card-custom').eq(3).find('p').text('Total Campaigns');
+                            $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(campaigns);
+                        } else {
+                            console.warn("Agency stats not found for ID:", agencyId);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Stats Fetch Error:", xhr.responseText);
+                    }
+                });
             }
         });
     </script>
