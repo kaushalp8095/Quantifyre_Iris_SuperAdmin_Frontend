@@ -308,7 +308,7 @@
 
     <script>
     // =====================================
-    // 1. CUSTOM DROPDOWN & LOGO PREVIEW
+    // 1. GLOBAL UI LOGIC
     // =====================================
     function toggleDropdown(id, event) {
         if (event) event.stopPropagation();
@@ -319,11 +319,8 @@
     function selectItem(dropdownId, text) {
         let dropdown = $('#' + dropdownId);
         dropdown.find('.selected-text').text(text);
-        
-        // 🔴 Fix: Update Hidden Inputs
         if (dropdownId === 'planDropdown') $('#planInput').val(text);
         if (dropdownId === 'statusDropdown') $('#statusInput').val(text);
-        
         dropdown.removeClass('active');
     }
 
@@ -333,7 +330,7 @@
         }
     });
 
-    // Logo Upload Preview
+    // Logo Preview logic
     $(document).on('change', '.drop-zone-input', function () {
         const file = this.files[0];
         const uploadZone = $(this).closest('.upload-zone');
@@ -348,51 +345,131 @@
         }
     });
 
-    // Password Toggle
-    $('#togglePassword').on('click', function () {
-        const field = $('#agencyPass');
-        const type = field.attr('type') === 'password' ? 'text' : 'password';
-        field.attr('type', type);
-        $(this).toggleClass('fa-eye fa-eye-slash');
-    });
-
-    // =====================================
-    // 2. DATA LOAD & SUBMIT LOGIC
-    // =====================================
     $(document).ready(function () {
         const currentAdminId = localStorage.getItem("adminId");
         const urlParams = new URLSearchParams(window.location.search);
         const agencyId = urlParams.get('id');
 
-        // Select2 Config
-        const select2Config = { width: '100%', dropdownParent: $('.dashboard-container'), allowClear: true };
-        $('#countrySearchSelect').select2({ ...select2Config, placeholder: "Select Country" });
-        $('#stateSearchSelect').select2({ ...select2Config, placeholder: "Select State" });
-        $('#citySearchSelect').select2({ ...select2Config, placeholder: "Select City" });
-
         if (!currentAdminId) { window.location.replace("SuperAdminLogin.html"); return; }
-        if (!agencyId) { alert("ID Missing!"); return; }
+        if (!agencyId) { alert("Agency ID missing!"); return; }
 
-        // Fetch Existing Data
+        // =====================================
+        // 2. COUNTRY / STATE / CITY LOGIC
+        // =====================================
+        const countrySelect = $('#countrySearchSelect');
+        const stateSelect = $('#stateSearchSelect');
+        const citySelect = $('#citySearchSelect');
+
+        const select2Config = { 
+            width: '100%', 
+            dropdownParent: $('.dashboard-container'), 
+            allowClear: true 
+        };
+
+        countrySelect.select2({ ...select2Config, placeholder: "Select Country" });
+        stateSelect.select2({ ...select2Config, placeholder: "Select State First" });
+        citySelect.select2({ ...select2Config, placeholder: "Select City First" });
+
+        // Storage for Edit Mode
+        window.loadedCountry = null;
+        window.loadedState = null;
+        window.loadedCity = null;
+
+        // Fetch Countries
+        fetch("https://countriesnow.space/api/v0.1/countries/positions")
+            .then(res => res.json())
+            .then(res => {
+                const options = res.data.map(c => ({ id: c.name, text: c.name }));
+                countrySelect.select2({ ...select2Config, data: options });
+                if (window.loadedCountry) countrySelect.val(window.loadedCountry).trigger('change');
+            });
+
+        // Country Change -> Fetch States
+        countrySelect.on('change', function () {
+            const country = $(this).val();
+            stateSelect.empty().append('<option></option>').trigger('change');
+            citySelect.empty().append('<option></option>').trigger('change');
+            if (!country) return;
+
+            stateSelect.select2({ ...select2Config, placeholder: "Loading States..." });
+            fetch("https://countriesnow.space/api/v0.1/countries/states", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ country: country })
+            })
+            .then(res => res.json())
+            .then(res => {
+                const states = res.data.states.map(s => ({ id: s.name, text: s.name }));
+                stateSelect.select2({ ...select2Config, data: states, placeholder: "Select State" });
+                if (window.loadedState) {
+                    stateSelect.val(window.loadedState).trigger('change');
+                    window.loadedState = null; // reset after use
+                }
+            });
+        });
+
+        // State Change -> Fetch Cities
+        stateSelect.on('change', function () {
+            const country = countrySelect.val();
+            const state = $(this).val();
+            citySelect.empty().append('<option></option>').trigger('change');
+            if (!state || !country) return;
+
+            citySelect.select2({ ...select2Config, placeholder: "Loading Cities..." });
+            fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ country: country, state: state })
+            })
+            .then(res => res.json())
+            .then(res => {
+                const cities = res.data.map(city => ({ id: city, text: city }));
+                citySelect.select2({ ...select2Config, data: cities, placeholder: "Select City" });
+                if (window.loadedCity) {
+                    citySelect.val(window.loadedCity).trigger('change');
+                    window.loadedCity = null; // reset after use
+                }
+            });
+        });
+
+        // =====================================
+        // 3. FETCH DATA & POPULATE FORM
+        // =====================================
         $.get(`/api/admin/agencies/details/${agencyId}`, function (data) {
             $('#agencyName').val(data.agencyName);
             $('#ownerName').val(data.ownerName);
             $('#agencyEmail').val(data.email);
             $('#agencyPhone').val(data.phoneNumber);
             $('#pincode').val(data.pincode);
+
             if (data.address) {
                 let parts = data.address.split(', ');
                 $('#address1').val(parts[0]);
                 $('#address2').val(parts[1] || '');
             }
+
             selectItem('planDropdown', data.plan || 'Basic(Default)');
             selectItem('statusDropdown', data.status || 'Pending(Default)');
+
             if (data.agencyLogo) $('.existing-preview-img').attr('src', data.agencyLogo);
 
-            // Trigger Country Select (Optional: handle country chain here)
+            // Set variables for Dropdown Chain
+            if (data.country) {
+                window.loadedCountry = data.country;
+                window.loadedState = data.state;
+                window.loadedCity = data.city;
+                
+                // If country not in list yet, add it
+                if (countrySelect.find("option[value='" + data.country + "']").length === 0) {
+                    countrySelect.append(new Option(data.country, data.country, true, true));
+                }
+                countrySelect.val(data.country).trigger('change');
+            }
         });
 
-        // 🔴 Fix: ADDED MISSING validateForm FUNCTION
+        // =====================================
+        // 4. VALIDATION & SUBMIT
+        // =====================================
         function validateForm() {
             let isValid = true;
             $('.error-msg').hide();
@@ -403,14 +480,13 @@
             if ($('#agencyEmail').val().trim() === "") { $('#emailError').show(); $('#agencyEmail').css('border-color', 'red'); isValid = false; }
             if ($('#agencyPhone').val().trim() === "") { $('#phoneError').show(); $('#agencyPhone').css('border-color', 'red'); isValid = false; }
             if ($('#address1').val().trim() === "") { $('#address1Error').show(); $('#address1').css('border-color', 'red'); isValid = false; }
+            if (!$('#countrySearchSelect').val()) { $('#countryError').show(); isValid = false; }
             
             return isValid;
         }
 
-        // Submit Logic
         $('.btn-submit').on('click', function (e) {
             e.preventDefault();
-
             if (validateForm()) {
                 const btn = $(this);
                 btn.prop('disabled', true).text('Updating...');
@@ -445,12 +521,12 @@
                     processData: false,
                     contentType: false,
                     success: function (res) {
-                        showCustomAlert("Success", "Agency updated successfully!", "success");
+                        showCustomAlert("Update Successful", "Agency details updated.", "success");
                         $('.btn-alert-ok').click(() => window.location.href = "AdminAgencies.html");
                     },
                     error: function (xhr) {
                         btn.prop('disabled', false).text('Update Agency');
-                        showCustomAlert("Error", xhr.responseText || "Update failed", "error");
+                        showCustomAlert("Update Failed", xhr.responseText || "Error updating agency.", "error");
                     }
                 });
             }
@@ -460,9 +536,9 @@
     function showCustomAlert(title, message, type) {
         $('#alertTitle').text(title);
         $('#alertMessage').text(message);
-        $('#customAlertOverlay').addClass('active');
         const icon = type === 'success' ? 'fa-check' : 'fa-triangle-exclamation';
         $('#alertIconBox').html(`<i class="fa-solid ${icon}"></i>`);
+        $('#customAlertOverlay').addClass('active');
     }
     $('.btn-alert-ok').click(() => $('#customAlertOverlay').removeClass('active'));
 </script>
