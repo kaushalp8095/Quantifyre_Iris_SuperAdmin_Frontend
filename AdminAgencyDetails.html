@@ -308,8 +308,8 @@
                         if (agencyStats) {
                             // --- Card 0: Total Revenue ---
                             // Aapke DTO mein field ka naam 'totalBilled' hai
-                            let rev = agencyStats.totalBilled || 0;
-                            $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹ ' + parseFloat(rev).toLocaleString('en-IN'));
+                            let rev = agencyStats.totalBilled || agencyStats.totalRevenue || 0;
+                        $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹' + parseFloat(rev).toLocaleString('en-IN'));
 
                             // --- Card 1: Total Clients ---
                             // DTO field name: 'totalClients'
