@@ -70,7 +70,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -267,89 +268,89 @@
             }
         });
 
-       
-$(document).ready(function () {
-    // URL se ID aur LocalStorage se Admin ID nikalna
-    const urlParams = new URLSearchParams(window.location.search);
-    const agencyId = urlParams.get('id');
-    const currentAdminId = localStorage.getItem("adminId");
 
-    // Check agar ID missing hai
-    if (!agencyId) {
-        console.error("Agency ID is missing in URL!");
-        return;
-    }
+        $(document).ready(function () {
+            // URL se ID aur LocalStorage se Admin ID nikalna
+            const urlParams = new URLSearchParams(window.location.search);
+            const agencyId = urlParams.get('id');
+            const currentAdminId = localStorage.getItem("adminId");
 
-    // 1. FIXED: Dropdown click logic (target error fixed)
-    $(document).on('click', function (e) {
-        if (!$(e.target).closest('.details-dropdown').length) {
-            $('.details-dropdown').removeClass('active');
-        }
-    });
+            // Check agar ID missing hai
+            if (!agencyId) {
+                console.error("Agency ID is missing in URL!");
+                return;
+            }
 
-    // 2. Tab Navigation Logic
-    window.openTab = function (evt, tabName) {
-        $('.tab-content').removeClass('active').hide();
-        $('.tab-btn').removeClass('active');
-        $('#' + tabName).addClass('active').fadeIn(300);
+            // 1. FIXED: Dropdown click logic (target error fixed)
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.details-dropdown').length) {
+                    $('.details-dropdown').removeClass('active');
+                }
+            });
 
-        if (evt && evt.currentTarget) {
-            $(evt.currentTarget).addClass('active');
-        }
-    };
+            // 2. Tab Navigation Logic
+            window.openTab = function (evt, tabName) {
+                $('.tab-content').removeClass('active').hide();
+                $('.tab-btn').removeClass('active');
+                $('#' + tabName).addClass('active').fadeIn(300);
 
-    // 3. MAIN DATA FETCHING logic with error handling
-    async function loadAgencyKPIData() {
-        try {
-            // A. Basic Details Fetch
-            const detailsRes = await fetch(`http://localhost:8080/api/admin/agencies/details/${agencyId}`);
-            
-            if (!detailsRes.ok) throw new Error("Agency details not found");
-            const data = await detailsRes.json();
+                if (evt && evt.currentTarget) {
+                    $(evt.currentTarget).addClass('active');
+                }
+            };
 
-            // Populate UI
-            $('.header-left div h1').last().text(data.agencyName || "N/A");
-            
-            let status = data.status || "Pending";
-            let statusColor = status.toLowerCase() === 'active' ? '#00ff9d' : '#ff4d4d';
-            $('.status-badge-custom')
-                .html(`Status: ${status} <i class="fa-solid fa-circle-check"></i>`)
-                .css('color', statusColor);
+            // 3. MAIN DATA FETCHING logic with error handling
+            async function loadAgencyKPIData() {
+                try {
+                    // A. Basic Details Fetch
+                    const detailsRes = await fetch(`http://localhost:8080/api/admin/agencies/details/${agencyId}`);
 
-            let contactHtml = `
+                    if (!detailsRes.ok) throw new Error("Agency details not found");
+                    const data = await detailsRes.json();
+
+                    // Populate UI
+                    $('.header-left div h1').last().text(data.agencyName || "N/A");
+
+                    let status = data.status || "Pending";
+                    let statusColor = status.toLowerCase() === 'active' ? '#00ff9d' : '#ff4d4d';
+                    $('.status-badge-custom')
+                        .html(`Status: ${status} <i class="fa-solid fa-circle-check"></i>`)
+                        .css('color', statusColor);
+
+                    let contactHtml = `
                 <h3 style="color:#fff; margin-bottom:15px; font-weight:500;">Key Agency Contacts</h3>
                 <p style="color:#8b9c9c; margin-bottom: 5px;">Owner Name: <span style="color:#fff;">${data.ownerName || 'N/A'}</span></p>
                 <p style="color:#8b9c9c; margin-bottom: 5px;">Email: <span style="color:#fff;">${data.email || 'N/A'}</span></p>
                 <p style="color:#8b9c9c; margin-bottom: 5px;">Phone: <span style="color:#fff;">${data.phoneNumber || 'N/A'}</span></p>
                 <p style="color:#8b9c9c;">Location: <span style="color:#fff;">${data.city || ''}, ${data.state || ''}, ${data.country || ''}</span></p>
             `;
-            $('.contacts-section').html(contactHtml);
-            $('.details-stats-grid .detail-card-custom').eq(2).find('h3').text(data.plan || 'Basic');
+                    $('.contacts-section').html(contactHtml);
+                    $('.details-stats-grid .detail-card-custom').eq(2).find('h3').text(data.plan || 'Basic');
 
-            // B. Stats Fetch (Revenue, Clients, Campaigns)
-            if (currentAdminId) {
-                const listRes = await fetch(`http://localhost:8080/api/admin/agencies/list?adminId=${currentAdminId}`);
-                if (listRes.ok) {
-                    const allAgencies = await listRes.json();
-                    const agencyStats = allAgencies.find(item => item.id == agencyId);
+                    // B. Stats Fetch (Revenue, Clients, Campaigns)
+                    if (currentAdminId) {
+                        const listRes = await fetch(`http://localhost:8080/api/admin/agencies/list?adminId=${currentAdminId}`);
+                        if (listRes.ok) {
+                            const allAgencies = await listRes.json();
+                            const agencyStats = allAgencies.find(item => item.id == agencyId);
 
-                    if (agencyStats) {
-                        $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹' + (agencyStats.totalBilled || 0).toLocaleString('en-IN'));
-                        $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(agencyStats.totalClients || 0);
-                        $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(agencyStats.totalCampaigns || 0);
+                            if (agencyStats) {
+                                $('.details-stats-grid .detail-card-custom').eq(0).find('h3').text('₹' + (agencyStats.totalBilled || 0).toLocaleString('en-IN'));
+                                $('.details-stats-grid .detail-card-custom').eq(1).find('h3').text(agencyStats.totalClients || 0);
+                                $('.details-stats-grid .detail-card-custom').eq(3).find('h3').text(agencyStats.totalCampaigns || 0);
+                            }
+                        }
                     }
+
+                } catch (error) {
+                    console.error("Critical Error:", error.message);
+                    // Table/KPIs mein empty state dikhana better hai alert se
+                    $('.details-stats-grid h3').text('--');
                 }
             }
 
-        } catch (error) {
-            console.error("Critical Error:", error.message);
-            // Table/KPIs mein empty state dikhana better hai alert se
-            $('.details-stats-grid h3').text('--');
-        }
-    }
-
-    loadAgencyKPIData();
-});
+            loadAgencyKPIData();
+        });
     </script>
 </body>
 
