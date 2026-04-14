@@ -45,120 +45,77 @@
     <script>
 
 
-        $(document).ready(function () {
+       $(document).ready(function () {
+    const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn');
+    const adminId = localStorage.getItem('adminId');
 
-            const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn');
-            const adminId = localStorage.getItem('adminId');
+    // 1. Quick Redirect
+    if (isAdminLoggedIn === 'true' && adminId) {
+        window.location.replace("AdminDashboard.html");
+    }
 
-            // 🔴 REDIRECT CHECK (Only if Server is UP)
-            if (isAdminLoggedIn === 'true' && adminId) {
-                // Dashboard bhejne se pehle check karo server chalu hai ya nahi
-                fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`)
-                    .then(res => {
-                        if (res.ok) window.location.replace("AdminDashboard.html");
-                    })
-                    .catch(() => {
-                        console.warn("Server Down: Staying on Login page to prevent loop.");
-                        // Agar server down hai toh hum yahi rukenge, redirect nahi karenge
-                    });
-            }
+    // 2. Password Eye Toggle
+    $('#toggleAdminEye').click(function () {
+        var passwordField = $('#admin_password');
+        var icon = $(this);
+        var type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+        passwordField.attr('type', type);
+        icon.toggleClass('fa-eye fa-eye-slash');
+    });
 
+    // 3. Enter Key Support
+    $('#admin_password, #admin_email').keypress(function (e) {
+        if (e.which == 13) $("#adminLoginBtn").click();
+    });
 
-            // Password Eye Toggle
-            $('#toggleAdminEye').click(function () {
-                var passwordField = $('#admin_password');
-                var icon = $(this);
-                var type = passwordField.attr('type') === 'password' ? 'text' : 'password';
-                passwordField.attr('type', type);
+    // 4. Login AJAX Logic
+    $("#adminLoginBtn").click(function (e) {
+        e.preventDefault();
+        var email = $("#admin_email").val().trim();
+        var password = $("#admin_password").val().trim();
+        var errorBox = $("#loginError");
+        var $btn = $(this);
 
-                if (type === 'text') {
-                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        errorBox.hide().text("");
+
+        if (email === "" || password === "") {
+            errorBox.text("Both fields are required.").show();
+            return;
+        }
+
+        $btn.text("Verifying...").prop("disabled", true);
+
+        $.ajax({
+            url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/login',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ email: email, password: password }),
+            success: function (response) {
+                if (response.status === "success" || response.adminId) {
+                    localStorage.setItem('isAdminLoggedIn', 'true');
+                    localStorage.setItem('adminId', response.adminId); // 👈 Most Important
+                    localStorage.setItem('adminName', response.name);
+                    localStorage.setItem('adminEmail', response.email);
+                    
+                    $btn.text("Success! Redirecting...");
+                    setTimeout(function () {
+                        window.location.href = "AdminDashboard.html";
+                    }, 500);
                 } else {
-                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                    errorBox.text("Login failed. Please try again.").show();
+                    $btn.text("Login").prop("disabled", false);
                 }
-            });
-
-            // 🔴 Real Login AJAX Logic
-            $("#adminLoginBtn").click(function (e) {
-                e.preventDefault();
-                var emailField = $("#admin_email");
-                var passwordField = $("#admin_password");
-                var errorBox = $("#loginError");
-
-                var email = emailField.val().trim();
-                var password = passwordField.val().trim();
-                var $btn = $(this);
-
-                // Reset Errors (Removed class removal here)
-                errorBox.hide().text("");
-
-                // Empty Checks
-                if (email === "") {
-                    errorBox.text("Email is required.").show();
-                    return;
-                }
-                if (password === "") {
-                    errorBox.text("Password is required.").show();
-                    return;
-                }
-
-                // Email Format Check
-                var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    errorBox.text("Invalid Credentials!").show();
-                    return;
-                }
-
-                $btn.text("Verifying...").prop("disabled", true);
-
-                $.ajax({
-                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/login',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    xhrFields: {
-                        withCredentials: true
-                    },
-                    data: JSON.stringify({
-                        email: email,
-                        password: password
-                    }),
-                    success: function (response) {
-                        if (response.status === "success") {
-                            localStorage.setItem('isAdminLoggedIn', 'true');
-                            localStorage.setItem('adminId', response.adminId);
-                            localStorage.setItem('adminName', response.name);
-                            localStorage.setItem('adminLogo', response.profileLogo);
-                            localStorage.setItem("adminEmail", response.email);
-
-                            localStorage.setItem('loginTime', new Date().getTime());
-
-                            $btn.text("Login Successful!");
-
-                            setTimeout(function () {
-                                window.location.href = "AdminDashboard.html";
-                            }, 500);
-                        }
-                    },
-                    error: function (xhr) {
-                        let errorMessage = "*Invalid Credentials!";
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
-
-                        // Show error below form only
-                        errorBox.text(errorMessage).show();
-
-                        $btn.text("Login").prop("disabled", false);
-                    }
-                });
-            });
-
-            // 🔴 Clear error when user starts typing again
-            $("input").on("input", function () {
-                $("#loginError").hide();
-            });
-
+            },
+            error: function (xhr) {
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : "Invalid Credentials!";
+                errorBox.text(msg).show();
+                $btn.text("Login").prop("disabled", false);
+            }
         });
+    });
+
+    $("input").on("input", function () { $("#loginError").hide(); });
+});
     </script>
 </body>
 

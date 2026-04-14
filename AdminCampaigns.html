@@ -263,6 +263,12 @@
         let allCampaignsData = [];
         let currentRowsPerPage = 4;
         let campaignIdToDelete = null;
+        const currentAdminId = localStorage.getItem("adminId");
+
+        // Login Check: Agar admin logged in nahi hai toh wapas bhej do
+    if (!currentAdminId) {
+        window.location.replace("SuperAdminLogin.html");
+    }
 
         // ==========================================
         // 2. DROPDOWN LOGIC

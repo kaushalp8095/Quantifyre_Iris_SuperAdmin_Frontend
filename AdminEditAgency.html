@@ -177,7 +177,8 @@
                                         <li class="dropdown-item active"
                                             onclick="selectItem('planDropdown', 'Basic(Default)')">Basic(Default)</li>
                                         <li class="dropdown-item" onclick="selectItem('planDropdown', 'Pro')">Pro</li>
-                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Premium')">Premium</li>
+                                        <li class="dropdown-item" onclick="selectItem('planDropdown', 'Premium')">
+                                            Premium</li>
                                         <li class="dropdown-item" onclick="selectItem('planDropdown', 'Enterprise')">
                                             Enterprise</li>
                                     </ul>
@@ -319,6 +320,8 @@
             let dropdown = $('#' + dropdownId);
             dropdown.find('.selected-text').text(text);
             dropdown.find('input[type="hidden"]').val(text);
+            if (dropdownId === 'planDropdown') $('#planInput').val(text);
+            if (dropdownId === 'statusDropdown') $('#statusInput').val(text);
             dropdown.removeClass('active');
         }
 
@@ -463,102 +466,74 @@
             // =====================================
             // 3. GET DATA & POPULATE FORM
             // =====================================
+
+            const currentAdminId = localStorage.getItem("adminId");
             const urlParams = new URLSearchParams(window.location.search);
             const agencyId = urlParams.get('id');
 
-            if (agencyId) {
-                $.get(`http://localhost:8080/api/admin/agencies/details/${agencyId}`, function (data) {
+            if (!currentAdminId) {
+                window.location.replace("SuperAdminLogin.html");
+                return;
+            }
 
-                    $('#agencyName').val(data.agencyName);
-                    $('#ownerName').val(data.ownerName);
-                    $('#agencyEmail').val(data.email);
-                    $('#agencyPhone').val(data.phoneNumber);
-                    $('#pincode').val(data.pincode);
-
-                    if (data.address) {
-                        let addrParts = data.address.split(', ');
-                        $('#address1').val(addrParts[0]);
-                        $('#address2').val(addrParts[1] || '');
-                    }
-
-                    selectItem('planDropdown', data.plan || 'Basic(Default)');
-                    selectItem('statusDropdown', data.status || 'Pending(Default)');
-
-                    if (data.agencyLogo) {
-                        // Direct Supabase ka public URL set ho jayega
-                        $('.existing-preview-img').attr('src', data.agencyLogo);
-                    }
-
-                    // --- SMART DROPDOWN FILL ---
-                    if (data.country) {
-                        window.loadedCountry = data.country;
-                        window.loadedState = data.state;
-                        window.loadedCity = data.city;
-
-                        // Insert temporary options to show immediately
-                        if (countrySelect.find("option[value='" + data.country + "']").length === 0) {
-                            countrySelect.append(new Option(data.country, data.country, true, true));
-                        }
-                        if (data.state && stateSelect.find("option[value='" + data.state + "']").length === 0) {
-                            stateSelect.append(new Option(data.state, data.state, true, true));
-                        }
-                        if (data.city && citySelect.find("option[value='" + data.city + "']").length === 0) {
-                            citySelect.append(new Option(data.city, data.city, true, true));
-                        }
-
-                        // Trigger API chain
-                        countrySelect.val(data.country).trigger('change');
-                    }
-                }).fail(function () {
-                    alert("Failed to load agency details. Please check the backend connection.");
-                });
-            } else {
-                alert("Agency ID is missing!");
+            if (!agencyId) {
+                alert("Agency ID missing!");
+                window.location.href = "AdminAgencies.html";
+                return;
             }
 
             // =====================================
-            // 4. VALIDATION & SUBMIT
+            // 1. GET DATA & POPULATE FORM
             // =====================================
-            $('.error-msg').hide();
+            $.get(`/api/admin/agencies/details/${agencyId}`, function (data) {
+                $('#agencyName').val(data.agencyName);
+                $('#ownerName').val(data.ownerName);
+                $('#agencyEmail').val(data.email);
+                $('#agencyPhone').val(data.phoneNumber);
+                $('#pincode').val(data.pincode);
 
-            function validateForm() {
-                let isValid = true;
-                $('.error-msg').hide();
-                $('.form-input').css('border-color', '');
-                $('.select2-selection').css('border-color', '');
+                if (data.address) {
+                    let addrParts = data.address.split(', ');
+                    $('#address1').val(addrParts[0]);
+                    $('#address2').val(addrParts[1] || '');
+                }
 
-                if ($('#agencyName').val().trim() === "") { $('#agencyNameError').fadeIn(); $('#agencyName').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#ownerName').val().trim() === "") { $('#ownerNameError').fadeIn(); $('#ownerName').css('border-color', '#ff4d4d'); isValid = false; }
+                selectItem('planDropdown', data.plan || 'Basic(Default)');
+                selectItem('statusDropdown', data.status || 'Pending(Default)');
 
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test($('#agencyEmail').val())) { $('#emailError').fadeIn(); $('#agencyEmail').css('border-color', '#ff4d4d'); isValid = false; }
+                if (data.agencyLogo) {
+                    $('.existing-preview-img').attr('src', data.agencyLogo);
+                }
 
-                if ($('#agencyPass').val().trim() === "") { $('#passError').fadeIn(); $('#agencyPass').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#agencyPhone').val().trim() === "") { $('#phoneError').fadeIn(); $('#agencyPhone').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#address1').val().trim() === "") { $('#address1Error').fadeIn(); $('#address1').css('border-color', '#ff4d4d'); isValid = false; }
+                // Trigger Country/State/City chain
+                if (data.country) {
+                    window.loadedCountry = data.country;
+                    window.loadedState = data.state;
+                    window.loadedCity = data.city;
 
-                if (!$('#countrySearchSelect').val()) { $('#countryError').fadeIn(); $('#countrySearchSelect').next('.select2').find('.select2-selection').css('border-color', '#ff4d4d'); isValid = false; }
-                if (!$('#stateSearchSelect').val()) { $('#stateError').fadeIn(); $('#stateSearchSelect').next('.select2').find('.select2-selection').css('border-color', '#ff4d4d'); isValid = false; }
-                if (!$('#citySearchSelect').val()) { $('#cityError').fadeIn(); $('#citySearchSelect').next('.select2').find('.select2-selection').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#pincode').val().trim() === "") { $('#pincodeError').fadeIn(); $('#pincode').css('border-color', '#ff4d4d'); isValid = false; }
+                    if ($('#countrySearchSelect').find("option[value='" + data.country + "']").length === 0) {
+                        $('#countrySearchSelect').append(new Option(data.country, data.country, true, true));
+                    }
+                    $('#countrySearchSelect').val(data.country).trigger('change');
+                }
+            });
 
-                return isValid;
-            }
-
+            // =====================================
+            // 2. VALIDATION & SUBMIT (Admin ID Integrated)
+            // =====================================
             $('.btn-submit').on('click', function (e) {
                 e.preventDefault();
 
                 if (validateForm()) {
                     let formData = new FormData();
-
                     let agencyData = {
                         agencyName: $('#agencyName').val(),
                         ownerName: $('#ownerName').val(),
                         email: $('#agencyEmail').val(),
                         password: $('#agencyPass').val(),
                         phoneNumber: $('#agencyPhone').val(),
-                        plan: $('#planInput').val(), // Fetched from hidden input
-                        status: $('#statusInput').val(), // Fetched from hidden input
+                        plan: $('#planInput').val(),
+                        status: $('#statusInput').val(),
                         country: $('#countrySearchSelect').val(),
                         state: $('#stateSearchSelect').val(),
                         city: $('#citySearchSelect').val(),
@@ -567,30 +542,25 @@
                     };
 
                     formData.append("agencyData", JSON.stringify(agencyData));
+                    formData.append("adminId", currentAdminId); // 🔴 Bhej rahe hain Backend ko
 
                     let logoFile = $('#agencyLogo')[0].files[0];
                     if (logoFile) {
                         formData.append("agencyLogo", logoFile);
                     }
 
-                    $('.btn-submit').prop('disabled', true).text('Updating...');
+                    const btn = $(this);
+                    btn.prop('disabled', true).text('Updating...');
 
                     $.ajax({
-                        url: `http://localhost:8080/api/admin/agencies/update/${agencyId}`,
+                        url: `/api/admin/agencies/update/${agencyId}`,
                         type: 'POST',
                         data: formData,
                         processData: false,
                         contentType: false,
                         success: function (response) {
-                            showCustomAlert(
-                                "Update Successful",
-                                response.message || "Agency details have been updated successfully.",
-                                "success"
-                            );
-
-                            // OK dabane par hi redirect hoga
+                            showCustomAlert("Update Successful", "Agency details updated.", "success");
                             $('.btn-alert-ok').off('click').on('click', function () {
-                                $('#customAlertOverlay').removeClass('active');
                                 window.location.href = "AdminAgencies.html";
                             });
                         },

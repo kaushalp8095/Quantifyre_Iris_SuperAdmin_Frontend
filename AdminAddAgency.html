@@ -307,23 +307,26 @@
     <script src="Js/all.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        //--- Custom Dropdown Logic ---//
+    $(document).ready(function () {
+        const currentAdminId = localStorage.getItem("adminId");
 
-        function toggleDropdown(id) { // Ise change karke toggleDropdown(e) ya toggleDropdown(id, e) karein
+        // --- 1. GLOBAL UI LOGIC (Dropdowns & Logo) ---
+
+        window.toggleDropdown = function(id) {
             $('.custom-dropdown').not('#' + id).removeClass('active');
             $('#' + id).toggleClass('active');
-            if (window.event) window.event.stopPropagation(); // Safe way
-        }
+            if (window.event) window.event.stopPropagation();
+        };
 
-        function selectItem(dropdownId, text) {
+        window.selectItem = function(dropdownId, text) {
             let dropdown = $('#' + dropdownId);
             dropdown.find('.selected-text').text(text);
-            // Hidden input update logic
             if (dropdownId === 'planDropdown') $('#planInput').val(text);
             if (dropdownId === 'statusDropdown') $('#statusInput').val(text);
             dropdown.removeClass('active');
-        }
+        };
 
+        // Logo Drag & Drop Preview
         $(document).on('change', '.drop-zone-input', function () {
             const file = this.files[0];
             const uploadZone = $(this).closest('.upload-zone');
@@ -333,294 +336,193 @@
                 reader.onload = function (e) {
                     uploadZone.find('.preview-img').remove();
                     uploadContent.hide();
-                    uploadZone.append(`<img src="${e.target.result}" class="preview-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 8px; z-index: 5; padding: 5px; pointer-events: none; ">`);
+                    uploadZone.append(`<img src="${e.target.result}" class="preview-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 8px; z-index: 5; padding: 5px; pointer-events: none;">`);
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Outside click se dropdown band karne ka logic
         $(document).on('click', function (e) {
             if (!$(e.target).closest('.custom-dropdown').length) {
                 $('.custom-dropdown').removeClass('active');
             }
         });
 
-        function toggleDropdown(id) {
-            $('.custom-dropdown').not('#' + id).removeClass('active');
-            $('#' + id).toggleClass('active');
-            event.stopPropagation();
-        }
+        // Password Toggle
+        $('#togglePassword').on('click', function () {
+            const passwordInput = $('#agencyPass');
+            const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+            passwordInput.attr('type', type);
+            $(this).toggleClass('fa-eye fa-eye-slash');
+        });
 
-        $(document).ready(function () {
-            // 1. Stats Load Karein
-            $.get('http://localhost:8080/api/admin/agencies/stats', function (data) {
-                $('.agency-stat-card h2').eq(0).text(data.total_agencies);
-                $('.agency-stat-card h2').eq(1).text(data.active_agencies);
-                $('.agency-stat-card h2').eq(2).text(data.total_campaigns);
-                $('.agency-stat-card h2').eq(3).text('₹' + data.total_revenue);
+
+        // --- 2. COUNTRY / STATE / CITY LOGIC (Select2) ---
+
+        const countrySelect = $('#countrySearchSelect');
+        const stateSelect = $('#stateSearchSelect');
+        const citySelect = $('#citySearchSelect');
+
+        const select2Config = {
+            width: '100%',
+            dropdownParent: $('.dashboard-container'),
+            allowClear: true
+        };
+
+        countrySelect.select2({ ...select2Config, placeholder: "Searching Countries..." });
+        stateSelect.select2({ ...select2Config, placeholder: "Select Country First" });
+        citySelect.select2({ ...select2Config, placeholder: "Select State First" });
+
+        // Fetch Countries
+        fetch("https://countriesnow.space/api/v0.1/countries/positions")
+            .then(res => res.json())
+            .then(res => {
+                const options = res.data.map(c => ({ id: c.name, text: c.name }));
+                countrySelect.select2({ ...select2Config, placeholder: "Select Country", data: options });
             });
 
-            // 2. Table Load Karein
-            $.ajax({
-                url: 'http://localhost:8080/api/admin/agencies/all-dynamic',
-                type: 'GET',
-                success: function (data) {
-                    let rows = '';
-                    data.forEach(item => {
-                        let logo = 'Images/agency50x50.ico'; // Default
-                        if (item.agency_logo) {
-                            if (item.agency_logo.startsWith('http')) {
-                                // Nayi Supabase Image
-                                logo = item.agency_logo;
-                            } else {
-                                // Purani Local Image (agar pehle se DB me ho)
-                                logo = `uploads/logos/${item.agency_logo}`;
-                            }
-                        }
-                        rows += `
-                <tr>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${logo}" width="35" height="35" style="border-radius:4px; object-fit:cover;">
-                            <strong>${item.agency_name}</strong>
-                        </div>
-                    </td>
-                    <td>${item.owner_name}</td>
-                    <td>${item.email}</td>
-                    <td>${item.phone_number}</td>
-                    <td>${item.total_clients || 0}</td>
-                    <td>${item.total_campaigns || 0}</td>
-                    <td>₹0</td> 
-                    <td><span class="status-pill ${item.status === 'Active' ? 'st-active' : 'st-disabled'}">${item.status}</span></td>
-                    <td>
-                        <div class="action-icons">
-                            <a href="AdminAgencyDetails.html?id=${item.id}" class="action-btn view"><i class="fa-regular fa-eye"></i></a>
-                            <a href="AdminEditAgency.html?id=${item.id}" class="action-btn edit"><i class="fa-solid fa-pen"></i></a>
-                            <div class="action-btn delete" onclick="openDeleteModal(${item.id})"><i class="fa-regular fa-trash-can"></i></div>
-                        </div>
-                    </td>
-                </tr>`;
-                    });
-                    $('#agencyTable tbody').html(rows);
-                    // Pagination call karein
-                    setupTablePagination('agencyTable', 'pagination-agency', 4);
-                }
+        // Fetch States
+        countrySelect.on('change', function () {
+            const country = $(this).val();
+            stateSelect.empty().append('<option></option>').trigger('change');
+            citySelect.empty().append('<option></option>').trigger('change');
+            if (!country) return;
+
+            stateSelect.select2({ ...select2Config, placeholder: "Loading States..." });
+            fetch("https://countriesnow.space/api/v0.1/countries/states", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ country: country })
+            })
+            .then(res => res.json())
+            .then(res => {
+                const states = res.data.states.map(s => ({ id: s.name, text: s.name }));
+                stateSelect.select2({ ...select2Config, placeholder: "Select State", data: states });
             });
         });
 
-    </script>
-    <script>
-        $(document).ready(function () {
-            const countrySelect = $('#countrySearchSelect');
-            const stateSelect = $('#stateSearchSelect');
-            const citySelect = $('#citySearchSelect');
+        // Fetch Cities
+        stateSelect.on('change', function () {
+            const country = countrySelect.val();
+            const state = $(this).val();
+            citySelect.empty().append('<option></option>').trigger('change');
+            if (!state) return;
 
-            // Select2 base options
-            const select2Config = {
-                width: '100%',
-                dropdownParent: $('.dashboard-container'),
-                allowClear: true
-            };
-
-            // Initialize all as Select2
-            countrySelect.select2({ ...select2Config, placeholder: "Searching Countries..." });
-            stateSelect.select2({ ...select2Config, placeholder: "Select Country First" });
-            citySelect.select2({ ...select2Config, placeholder: "Select State First" });
-
-            // 1. Fetch All Countries
-            fetch("https://countriesnow.space/api/v0.1/countries/positions")
-                .then(response => response.json())
-                .then(res => {
-                    const countryOptions = res.data.map(c => ({ id: c.name, text: c.name }));
-                    countrySelect.select2({ ...select2Config, placeholder: "Select Country", data: countryOptions });
-                })
-                .catch(err => console.error("Country API Error:", err));
-
-            // 2. Fetch States when Country changes
-            countrySelect.on('change', function () {
-                const countryName = $(this).val();
-
-                // Reset State and City
-                stateSelect.empty().append('<option></option>').trigger('change');
-                citySelect.empty().append('<option></option>').trigger('change');
-
-                if (!countryName) return;
-
-                stateSelect.select2({ ...select2Config, placeholder: "Loading States..." });
-
-                fetch("https://countriesnow.space/api/v0.1/countries/states", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ country: countryName })
-                })
-                    .then(response => response.json())
-                    .then(res => {
-                        const states = res.data.states.map(s => ({ id: s.name, text: s.name }));
-                        stateSelect.select2({ ...select2Config, placeholder: "Select State", data: states });
-                    })
-                    .catch(err => stateSelect.select2({ ...select2Config, placeholder: "No States Found" }));
-            });
-
-            // 3. Fetch Cities when State changes
-            stateSelect.on('change', function () {
-                const countryName = countrySelect.val();
-                const stateName = $(this).val();
-
-                // Reset City
-                citySelect.empty().append('<option></option>').trigger('change');
-
-                if (!stateName) return;
-
-                citySelect.select2({ ...select2Config, placeholder: "Loading Cities..." });
-
-                fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ country: countryName, state: stateName })
-                })
-                    .then(response => response.json())
-                    .then(res => {
-                        const cities = res.data.map(city => ({ id: city, text: city }));
-                        citySelect.select2({ ...select2Config, placeholder: "Select City", data: cities });
-                    })
-                    .catch(err => citySelect.select2({ ...select2Config, placeholder: "No Cities Found" }));
+            citySelect.select2({ ...select2Config, placeholder: "Loading Cities..." });
+            fetch("https://countriesnow.space/api/v0.1/countries/state/cities", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ country: country, state: state })
+            })
+            .then(res => res.json())
+            .then(res => {
+                const cities = res.data.map(city => ({ id: city, text: city }));
+                citySelect.select2({ ...select2Config, placeholder: "Select City", data: cities });
             });
         });
-    </script>
-    <script>
-        $(document).ready(function () {
 
-            // Show/Hide Password Toggle Logic
-            $('#togglePassword').on('click', function () {
-                const passwordInput = $('#agencyPass');
-                const icon = $(this);
 
-                // Toggle the type attribute
-                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
-                passwordInput.attr('type', type);
+        // --- 3. SUBMIT & VALIDATION LOGIC ---
 
-                // Toggle the eye / eye-slash icon
-                icon.toggleClass('fa-eye fa-eye-slash');
-            });
+        $('.error-msg').hide();
 
+        $('.btn-submit').on('click', function (e) {
+            e.preventDefault();
+            let isValid = true;
             $('.error-msg').hide();
+            $('.form-input').css('border-color', '');
 
-            // 1. Submit Logic
-            $('.btn-submit').on('click', function (e) {
-                e.preventDefault();
-                let isValid = true;
-                $('.error-msg').hide();
-                $('.form-input').css('border-color', '');
+            // Validations
+            if ($('#agencyName').val().trim() === "") { $('#agencyNameError').fadeIn(); $('#agencyName').css('border-color', '#ff4d4d'); isValid = false; }
+            if ($('#logoZone').find('.preview-img').length === 0) { $('#logoError').fadeIn(); $('#logoZone').css('border-color', '#ff4d4d'); isValid = false; }
+            if ($('#ownerName').val().trim() === "") { $('#ownerNameError').fadeIn(); $('#ownerName').css('border-color', '#ff4d4d'); isValid = false; }
+            
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test($('#agencyEmail').val())) { $('#emailError').fadeIn(); $('#agencyEmail').css('border-color', '#ff4d4d'); isValid = false; }
+            if ($('#agencyPass').val().length < 6) { $('#passError').fadeIn(); $('#agencyPass').css('border-color', '#ff4d4d'); isValid = false; }
+            if ($('#agencyPhone').val().trim().length < 10) { $('#phoneError').fadeIn(); $('#agencyPhone').css('border-color', '#ff4d4d'); isValid = false; }
+            if ($('#address1').val().trim() === "") { $('#address1Error').fadeIn(); $('#address1').css('border-color', '#ff4d4d'); isValid = false; }
+            if (!$('#countrySearchSelect').val()) { $('#countryError').fadeIn(); isValid = false; }
+            if (!$('#stateSearchSelect').val()) { $('#stateError').fadeIn(); isValid = false; }
+            if (!$('#citySearchSelect').val()) { $('#cityError').fadeIn(); isValid = false; }
+            if ($('#pincode').val().trim() === "") { $('#pincodeError').fadeIn(); $('#pincode').css('border-color', '#ff4d4d'); isValid = false; }
 
-                // Validations
-                if ($('#agencyName').val().trim() === "") { $('#agencyNameError').fadeIn(); $('#agencyName').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#logoZone').find('.preview-img').length === 0) { $('#logoError').fadeIn(); $('#logoZone').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#ownerName').val().trim() === "") { $('#ownerNameError').fadeIn(); $('#ownerName').css('border-color', '#ff4d4d'); isValid = false; }
+            // 🔴 Admin ID Check
+            if (!currentAdminId) {
+                showCustomAlert("Session Expired", "Please login as Admin to add agencies.", "error");
+                return;
+            }
 
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test($('#agencyEmail').val())) { $('#emailError').fadeIn(); $('#agencyEmail').css('border-color', '#ff4d4d'); isValid = false; }
+            if (isValid) {
+                const btn = $(this);
+                btn.text("Creating...").prop('disabled', true);
 
-                if ($('#agencyPass').val().length < 6) { $('#passError').fadeIn(); $('#agencyPass').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#agencyPhone').val().trim().length < 10) { $('#phoneError').fadeIn(); $('#agencyPhone').css('border-color', '#ff4d4d'); isValid = false; }
+                let formData = new FormData();
+                let agencyData = {
+                    agencyName: $('#agencyName').val(),
+                    ownerName: $('#ownerName').val(),
+                    email: $('#agencyEmail').val(),
+                    password: $('#agencyPass').val(),
+                    phoneNumber: $('#agencyPhone').val(),
+                    plan: $('#planInput').val(),
+                    status: $('#statusInput').val(),
+                    country: $('#countrySearchSelect').val(),
+                    state: $('#stateSearchSelect').val(),
+                    city: $('#citySearchSelect').val(),
+                    pincode: $('#pincode').val(),
+                    address: $('#address1').val() + ($('#address2').val() ? ", " + $('#address2').val() : "")
+                };
 
-                if ($('#address1').val().trim() === "") { $('#address1Error').fadeIn(); $('#address1').css('border-color', '#ff4d4d'); isValid = false; }
-                if ($('#address2').val().trim() === "") { $('#address2Error').fadeIn(); $('#address2').css('border-color', '#ff4d4d'); isValid = false; }
-                if (!$('#countrySearchSelect').val()) { $('#countryError').fadeIn(); isValid = false; }
-                if (!$('#stateSearchSelect').val()) { $('#stateError').fadeIn(); isValid = false; }
-                if (!$('#citySearchSelect').val()) { $('#cityError').fadeIn(); isValid = false; }
-                if ($('#pincode').val().trim() === "") { $('#pincodeError').fadeIn(); $('#pincode').css('border-color', '#ff4d4d'); isValid = false; }
-
-                if (isValid) {
-                    // 1. Ek hi baar declare karein
-                    let formData = new FormData();
-
-                    // 2. Data Object taiyar karein
-                    let agencyData = {
-                        agencyName: $('#agencyName').val(),
-                        ownerName: $('#ownerName').val(),
-                        email: $('#agencyEmail').val(),
-                        password: $('#agencyPass').val(),
-                        phoneNumber: $('#agencyPhone').val(),
-                        plan: $('#planInput').val(),
-                        status: $('#statusInput').val(),
-                        country: $('#countrySearchSelect').val(),
-                        state: $('#stateSearchSelect').val(),
-                        city: $('#citySearchSelect').val(),
-                        pincode: $('#pincode').val(),
-                        address: $('#address1').val() + ($('#address2').val() ? ", " + $('#address2').val() : "")
-                    };
-
-                    // 3. Sab kuch formData mein append karein
-                    formData.append("agencyData", JSON.stringify(agencyData));
-
-                    // Admin ID jo login hai (Taki notification sahi admin ko jaye)
-                    const currentLoginAdminId = localStorage.getItem("adminId");
-                    formData.append("adminId", currentLoginAdminId);
-
-                    // Logo File append karein
-                    let logoFile = $('#agencyLogo')[0].files[0];
-                    if (logoFile) {
-                        formData.append("agencyLogo", logoFile);
-                    }
-
-                    // 4. AJAX Call
-                    $.ajax({
-                        url: 'http://localhost:8080/api/admin/agencies/add',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function (response) {
-                            showCustomAlert(
-                                "Success!",
-                                response.message || "Agency Created Successfully!",
-                                "success"
-                            );
-
-                            // OK dabane par hi redirect hoga
-                            $('.btn-alert-ok').off('click').on('click', function () {
-                                $('#customAlertOverlay').removeClass('active');
-                                window.location.href = "AdminAgencies.html";
-                            });
-                        },
-                        error: function (xhr) {
-                            $('.btn-submit').text("Create Agency").prop('disabled', false);
-
-                            // ❌ ERROR CUSTOM ALERT (Email duplicate ya server error)
-                            let errorMsg = xhr.responseText || "Something went wrong";
-                            if (xhr.status === 400 || xhr.status === 500) {
-                                // Agar backend se "Ye Email pehle se registered hai" wala message aaye
-                                errorMsg = xhr.responseText.includes("Email") ? "This Email is already registered!" : errorMsg;
-                            }
-
-                            showCustomAlert("Action Failed", errorMsg, "error");
-                        }
-                    });
+                // 🔴 APEND DATA (Matching your Controller @RequestParam)
+                formData.append("agencyData", JSON.stringify(agencyData));
+                formData.append("adminId", currentAdminId); 
+                
+                let logoFile = $('#agencyLogo')[0].files[0];
+                if (logoFile) {
+                    formData.append("agencyLogo", logoFile);
                 }
-            });
+
+                // 🔴 AJAX CALL (Full URL as requested)
+                $.ajax({
+                    url: 'http://localhost:8080/api/admin/agencies/add',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        showCustomAlert("Success!", "Agency Created Successfully!", "success");
+                        $('.btn-alert-ok').off('click').on('click', function () {
+                            $('#customAlertOverlay').removeClass('active');
+                            window.location.href = "AdminAgencies.html";
+                        });
+                    },
+                    error: function (xhr) {
+                        btn.text("Create Agency").prop('disabled', false);
+                        let msg = xhr.responseText || "Server Error. Please try again.";
+                        if(msg.includes("Email")) msg = "This Email is already registered!";
+                        showCustomAlert("Failed", msg, "error");
+                    }
+                });
+            }
         });
 
+        // Global Alert Function
         function showCustomAlert(title, message, type) {
             $('#alertTitle').text(title);
             $('#alertMessage').text(message);
-
+            const iconBox = $('#alertIconBox');
             if (type === 'success') {
-                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
-                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+                iconBox.html('<i class="fa-solid fa-check"></i>').removeClass('alert-icon-error').addClass('alert-icon-success');
             } else {
-                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
-                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+                iconBox.html('<i class="fa-solid fa-triangle-exclamation"></i>').removeClass('alert-icon-success').addClass('alert-icon-error');
             }
-
             $('#customAlertOverlay').addClass('active');
-
             $('.btn-alert-ok').off('click').on('click', function () {
                 $('#customAlertOverlay').removeClass('active');
             });
         }
-
-    </script>
+    });
+</script>
 
 </body>
 
