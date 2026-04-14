@@ -268,7 +268,7 @@
             function fetchAgencyDetails(id) {
                 // 1. BASIC DETAILS FETCH KARNA
                 $.ajax({
-                    url: `http://localhost:8080/api/admin/agencies/details?adminId=${currentAdminId}`,
+                    url: `http://localhost:8080/api/admin/agencies/details/${id}`,
                     type: 'GET',
                     success: function (data) {
                         $('.header-left div h1').last().text(data.agencyName);
