@@ -254,28 +254,111 @@
     <script src="Js/all.js"></script>
 
     <script>
-        // --- Billing Chart Logic ---
-        document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('paymentTrendsChart').getContext('2d');
+    $(document).ready(function () {
+        const adminId = localStorage.getItem("adminId");
+        let myBillingChart = null; // Chart instance handle karne ke liye global variable
+
+        // ==========================================
+        // 1. MAIN DASHBOARD LOAD FUNCTION
+        // ==========================================
+        function loadBillingDashboard() {
+            if (!adminId) {
+                console.error("Admin ID not found in localStorage");
+                return;
+            }
+
+            $.ajax({
+                url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/dashboard`,
+                type: 'GET',
+                data: { adminId: adminId },
+                success: function (data) {
+                    console.log("API Response:", data);
+
+                    // --- A. KPI Cards Update ---
+                    $('.billing-stat-card:nth-child(1) h2').text('₹' + (data.totalBilled || 0).toLocaleString('en-IN'));
+                    $('.billing-stat-card:nth-child(2) h2').text('₹' + (data.paidAmount || 0).toLocaleString('en-IN'));
+                    $('.billing-stat-card:nth-child(3) h2').text('₹' + (data.outstanding || 0).toLocaleString('en-IN'));
+                    $('.billing-stat-card:nth-child(4) h2').text('₹' + (data.currentMonthRevenue || 0).toLocaleString('en-IN'));
+
+                    // --- B. Dynamic Chart (Graph) Update ---
+                    if (data.chartData && data.chartData.length > 0) {
+                        const labels = data.chartData.map(item => item.month); // e.g. ['Jan', 'Feb']
+                        const values = data.chartData.map(item => item.total); // e.g. [5000, 15000]
+                        renderTrendsChart(labels, values);
+                    } else {
+                        // Agar data nahi hai toh empty graph dikhao
+                        renderTrendsChart(['No Data'], [0]);
+                    }
+
+                    // --- C. Table Update ---
+                    const tbody = $('#invoicesTable tbody');
+                    tbody.empty();
+
+                    if (data.invoices && data.invoices.length > 0) {
+                        data.invoices.forEach(inv => {
+                            const statusText = inv.status || 'Pending';
+                            const statusClass = (statusText.toLowerCase() === 'paid') ? 'st-active' : 'st-disabled';
+
+                            tbody.append(`
+                                <tr>
+                                    <td>${inv.invoiceNo}</td>
+                                    <td>${inv.agencyName}</td>
+                                    <td>${formatDate(inv.issueDate)}</td>
+                                    <td>₹${(inv.totalAmount || 0).toLocaleString('en-IN')}</td>
+                                    <td style="text-align: center;"><span class="status-pill ${statusClass}">${statusText}</span></td>
+                                    <td>
+                                        <div class="billing-actions">
+                                            <a href="AdminIndividualBillDetails.html?id=${inv.id}" class="b-action-btn view" title="View"><i class="fa-regular fa-eye"></i></a>
+                                            <a href="#" class="b-action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
+                                            <div class="action-btn delete" onclick="handleDelete(${inv.id})"><i class="fa-regular fa-trash-can"></i></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    } else {
+                        tbody.append('<tr><td colspan="6" style="text-align:center; padding:20px;">No invoices found.</td></tr>');
+                    }
+
+                    // Pagination re-initialize
+                    setupTablePagination('invoicesTable', 'pagination-invoices', 4);
+                },
+                error: function (err) {
+                    console.error("Dashboard failed to load:", err);
+                }
+            });
+        }
+
+        // ==========================================
+        // 2. CHART RENDERING LOGIC
+        // ==========================================
+        function renderTrendsChart(labels, values) {
+            const canvas = document.getElementById('paymentTrendsChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            // Purane chart instance ko destroy karna zaroori hai
+            if (myBillingChart) {
+                myBillingChart.destroy();
+            }
 
             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
             gradient.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
             gradient.addColorStop(1, 'rgba(0, 255, 157, 0)');
 
-            new Chart(ctx, {
+            myBillingChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+                    labels: labels,
                     datasets: [{
                         label: 'Payment Received',
-                        data: [10000, 22000, 15000, 38000, 28000, 65000],
+                        data: values,
                         borderColor: '#00ff9d',
                         backgroundColor: gradient,
                         borderWidth: 3,
                         pointBackgroundColor: '#00ff9d',
                         pointBorderColor: '#fff',
                         pointRadius: 4,
-                        pointHoverRadius: 6,
                         tension: 0.4,
                         fill: true
                     }]
@@ -283,50 +366,28 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(5, 20, 15, 0.9)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(255,255,255,0.1)',
-                            borderWidth: 1,
-                            padding: 10,
-                            displayColors: false,
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                color: '#00ff9d',
-                                font: { family: "'Poppins', sans-serif" }
-                            }
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#00ff9d' }
                         },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#00ff9d',
-                                font: { family: "'Poppins', sans-serif" }
-                            }
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: '#00ff9d' }
                         }
                     }
                 }
             });
-        });
-    </script>
-    <script>
-        // ---- Pagination Logic ---- //
+        }
+
+        // ==========================================
+        // 3. PAGINATION LOGIC
+        // ==========================================
         function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
             const table = document.getElementById(tableId);
             const wrapper = document.getElementById(paginationWrapperId);
-
             if (!table || !wrapper) return;
 
             const tbody = table.querySelector('tbody');
@@ -338,234 +399,70 @@
             const pageNumbersContainer = wrapper.querySelector('.page-numbers');
             const prevBtn = wrapper.querySelector('.prev-btn');
             const nextBtn = wrapper.querySelector('.next-btn');
-            const startRowSpan = wrapper.querySelector('.start-row');
-            const endRowSpan = wrapper.querySelector('.end-row');
-            const totalRowsSpan = wrapper.querySelector('.total-rows');
 
             function render() {
                 const start = (currentPage - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
-
                 rows.forEach((row, index) => {
                     row.style.display = (index >= start && index < end) ? '' : 'none';
                 });
 
-                startRowSpan.innerText = totalRows === 0 ? 0 : start + 1;
-                endRowSpan.innerText = end > totalRows ? totalRows : end;
-                totalRowsSpan.innerText = totalRows;
+                wrapper.querySelector('.start-row').innerText = totalRows === 0 ? 0 : start + 1;
+                wrapper.querySelector('.end-row').innerText = end > totalRows ? totalRows : end;
+                wrapper.querySelector('.total-rows').innerText = totalRows;
 
                 pageNumbersContainer.innerHTML = '';
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement('button');
                     btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
                     btn.innerText = i;
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        currentPage = i;
-                        render();
-                    };
+                    btn.onclick = (e) => { currentPage = i; render(); };
                     pageNumbersContainer.appendChild(btn);
                 }
-
                 prevBtn.disabled = (currentPage === 1);
                 nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
-
-                prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
-                nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
             }
 
-            prevBtn.onclick = (e) => {
-                e.preventDefault();
-                if (currentPage > 1) {
-                    currentPage--;
-                    render();
-                }
-            };
-
-            nextBtn.onclick = (e) => {
-                e.preventDefault();
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    render();
-                }
-            };
-
+            prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; render(); } };
+            nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; render(); } };
             render();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            setupTablePagination('invoicesTable', 'pagination-invoices', 4);
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
-            const adminId = localStorage.getItem("adminId");
-            let myBillingChart = null;
+        // ==========================================
+        // 4. DELETE & HELPER LOGIC
+        // ==========================================
+        let invoiceToDelete = null;
+        window.handleDelete = function (id) {
+            invoiceToDelete = id;
+            $('#deleteModal').addClass('active');
+        };
 
-            // ==========================================
-            // 1. DASHBOARD DATA LOAD (STATS + TABLE)
-            // ==========================================
-            function loadBillingDashboard() {
-                if (!adminId) {
-                    console.error("Admin ID not found in localStorage");
-                    return;
+        window.confirmDelete = function () {
+            if (!invoiceToDelete) return;
+            $.ajax({
+                url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/delete/${invoiceToDelete}`,
+                type: 'DELETE',
+                success: function () {
+                    $('#deleteModal').removeClass('active');
+                    alert("Invoice deleted!");
+                    loadBillingDashboard();
                 }
+            });
+        };
 
-                $.ajax({
-                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/dashboard`,
-                    type: 'GET',
-                    data: { adminId: adminId },
-                    success: function (data) {
-                        // --- A. Stats Update (Cards) ---
-                        $('.billing-stat-card:nth-child(1) h2').text('₹' + data.totalBilled.toLocaleString('en-IN'));
-                        $('.billing-stat-card:nth-child(2) h2').text('₹' + data.paidAmount.toLocaleString('en-IN'));
-                        $('.billing-stat-card:nth-child(3) h2').text('₹' + data.outstanding.toLocaleString('en-IN'));
-                        $('.billing-stat-card:nth-child(4) h2').text('₹' + data.currentMonthRevenue.toLocaleString('en-IN'));
-                        // --- B. Table Update ---
-                        const tbody = $('#invoicesTable tbody');
-                        tbody.empty();
-
-                        if (data.invoices && data.invoices.length > 0) {
-                            data.invoices.forEach(inv => {
-                                // DB se aane wala asli status
-                                const currentStatus = inv.status || 'Pending';
-
-                                // Case-insensitive check for CSS class
-                                const statusClass = (currentStatus.toLowerCase() === 'paid') ? 'st-active' : 'st-disabled';
-
-                                tbody.append(`
-                            <tr>
-                                <td>${inv.invoiceNo}</td>
-                                <td>${inv.agencyName}</td>
-                                <td>${formatDate(inv.issueDate)}</td>
-                                <td>₹${inv.totalAmount.toLocaleString('en-IN')}</td>
-                                <td style="text-align: center;"><span class="status-pill ${statusClass}">${inv.status}</span></td>
-                                <td>
-                                    <div class="billing-actions">
-                                        <a href="AdminIndividualBillDetails.html?id=${inv.id}" class="b-action-btn view" title="View"><i class="fa-regular fa-eye"></i></a>
-                                        <a href="#" class="b-action-btn download" title="Download"><i class="fa-solid fa-download"></i></a>
-                                        <div class="action-btn delete" onclick="handleDelete(${inv.id})"><i class="fa-regular fa-trash-can"></i></div>
-                                    </div>
-                                </td>
-                            </tr>
-                        `);
-                            });
-                        } else {
-                            tbody.append('<tr><td colspan="6" style="text-align:center; padding:20px;">No invoices found.</td></tr>');
-                        }
-
-                        // --- C. DYNAMIC CHART UPDATE ---
-                        if (data.chartData && data.chartData.length > 0) {
-                            const months = data.chartData.map(item => item.month); // ['Jan', 'Feb', ...]
-                            const totals = data.chartData.map(item => item.total); // [5000, 15000, ...]
-                            updateChart(months, totals);
-                        }
-
-                        // Re-initialize pagination after data load
-                        setupTablePagination('invoicesTable', 'pagination-invoices', 4);
-                    },
-                    error: function (err) {
-                        console.error("Error loading dashboard data:", err);
-                    }
-                });
-            }
-
-            // ==========================================
-            // 2. GRAPH LOGIC (YAHAN ADD KIYA HAI)
-            // ==========================================
-            function updateChart(labels, values) {
-                const canvas = document.getElementById('paymentTrendsChart');
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-
-                // Purane chart ko clear karna zaroori hai warna naya upar overlap hoga
-                if (myBillingChart) {
-                    myBillingChart.destroy();
-                }
-
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
-                gradient.addColorStop(1, 'rgba(0, 255, 157, 0)');
-
-                myBillingChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels, // Backend se aane wale mahine
-                        datasets: [{
-                            label: 'Payment Received',
-                            data: values, // Backend se aane wale amounts
-                            borderColor: '#00ff9d',
-                            backgroundColor: gradient,
-                            borderWidth: 3,
-                            pointBackgroundColor: '#00ff9d',
-                            pointBorderColor: '#fff',
-                            pointRadius: 4,
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#00ff9d' }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: { color: '#00ff9d' }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // --- Helper: Format Date ---
-            function formatDate(dateString) {
-                if (!dateString) return "N/A";
-                const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-                return new Date(dateString).toLocaleDateString('en-IN', options);
-            }
-
-            // ==========================================
-            // 2. DELETE LOGIC
-            // ==========================================
-            let invoiceToDelete = null;
-
-            window.handleDelete = function (id) {
-                invoiceToDelete = id;
-                $('#deleteModal').addClass('active');
-            };
-
-            window.confirmDelete = function () {
-                if (!invoiceToDelete) return;
-
-                $.ajax({
-                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/delete/${invoiceToDelete}`,
-                    type: 'DELETE',
-                    success: function (res) {
-                        $('#deleteModal').removeClass('active');
-                        alert("Invoice deleted successfully!");
-                        loadBillingDashboard(); // Table refresh karo
-                    },
-                    error: function (err) {
-                        alert("Error deleting invoice");
-                    }
-                });
-            };
-
-            // Initialize Dashboard
-            loadBillingDashboard();
-        });
-
-        // Modal close helper
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+        function formatDate(dateString) {
+            if (!dateString) return "N/A";
+            return new Date(dateString).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
-    </script>
+
+        // Dashboard Initial Load
+        loadBillingDashboard();
+    });
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+</script>
 </body>
 
 </html>
