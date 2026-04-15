@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Js/admin-auth-guard.js"></script>
 </head>
+
 <body>
 
     <div class="dashboard-container">
@@ -260,23 +261,37 @@
         });
 
 
-        $('.btn-submit').last().text('Confirm & Save').on('click', function (e) {
+        // Confirm & Save button logic
+        $('.btn-submit').on('click', function (e) {
             e.preventDefault();
-            const data = JSON.parse(sessionStorage.getItem('pendingInvoicePreview'));
 
-            // Yahan wahi same AJAX call chalega jo Create page par tha
+            const rawData = sessionStorage.getItem('pendingInvoicePreview');
+            if (!rawData) {
+                alert("Session expired. Please create invoice again.");
+                return;
+            }
+
+            const invoiceData = JSON.parse(rawData);
+            const btn = $(this);
+            btn.text("Processing...").prop('disabled', true);
+
             $.ajax({
                 url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function () {
-                    alert("Invoice Saved!");
+                data: JSON.stringify(invoiceData),
+                success: function (response) {
+                    alert("Invoice Saved Successfully!");
                     sessionStorage.removeItem('pendingInvoicePreview');
                     window.location.href = "AdminBilling.html";
+                },
+                error: function (xhr) {
+                    btn.text("Confirm & Save").prop('disabled', false);
+                    alert("Error: " + (xhr.responseJSON ? xhr.responseJSON.error : "Failed to save invoice"));
                 }
             });
         });
+
     </script>
 </body>
 

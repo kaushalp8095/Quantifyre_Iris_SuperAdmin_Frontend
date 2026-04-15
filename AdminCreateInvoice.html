@@ -447,12 +447,21 @@
         });
 
 
-        // Preview button click handler
+        // Preview button click handler (AdminCreateInvoice.html mein)
         $('.btn-cancel').on('click', function (e) {
             e.preventDefault();
 
-            // Saara data collect karein
+            const selectedAgencyId = $('#agencySearchSelect').val(); // 👈 Agency ID yahan se milegi
+            const adminId = localStorage.getItem("adminId"); // 👈 Admin ID yahan se
+
+            if (!selectedAgencyId) {
+                alert("Please select an agency first!");
+                return;
+            }
+
             const previewData = {
+                adminId: parseInt(adminId), // Number mein convert karein
+                agencyId: parseInt(selectedAgencyId), // Number mein convert karein
                 agencyName: $('#agencySearchSelect option:selected').text(),
                 billToAddress: $('input[placeholder="Enter billing address"]').val(),
                 contactPerson: $('input[placeholder="Enter Contact Person"]').val(),
@@ -463,16 +472,13 @@
                 description: $('input[placeholder="Description"]').val(),
                 rate: parseFloat($('input[placeholder="Rate"]').val()) || 0,
                 taxPercent: parseFloat($('input[placeholder="18"]').val()) || 18,
-                notes: $('.ci-textarea').val()
+                notes: $('.ci-textarea').val(),
+                status: "Pending" // Default status
             };
 
-            // SessionStorage mein save karein (JSON string banakar)
             sessionStorage.setItem('pendingInvoicePreview', JSON.stringify(previewData));
-
-            // Preview page par bhej dein
             window.location.href = "AdminPreviewInvoice.html";
         });
-
     </script>
 
 </body>
