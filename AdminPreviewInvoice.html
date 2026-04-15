@@ -269,56 +269,56 @@
         $('#btnSendInvoice').on('click', function (e) {
             e.preventDefault();
 
-            // Custom Alert ko modify karna options ke liye
             $('#alertTitle').text("Send Invoice");
-            $('#alertMessage').html(`Choose how you want to send <b>${data.invoiceNo}</b>:`);
+            $('#alertMessage').html(`Choose how you want to send <b>${invoiceDataObj.invoiceNo}</b>:`);
             $('#alertIconBox').html('<i class="fa-solid fa-paper-plane"></i>').css('color', '#00ff9d');
 
-            $('.btn-alert-ok').hide(); // Normal OK button chhupao
+            $('.btn-alert-ok').hide(); // Purana OK button chhupao
 
-            // Naye buttons add karo
+            // Buttons inject karein agar nahi hain
             if ($('#send-options').length === 0) {
                 $('.custom-alert-box').append(`
-                    <div id="send-options" style="display:flex; flex-direction:column; gap:10px; margin-top:20px; width:100%;">
-                        <button class="btn-whatsapp" style="background:#25D366; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
-                            <i class="fa-brands fa-whatsapp"></i> Send via WhatsApp
-                        </button>
-                        <button class="btn-email" style="background:#EA4335; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
-                            <i class="fa-solid fa-envelope"></i> Send via Email
-                        </button>
-                        <button class="btn-close-opt" style="background:transparent; color:#888; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
-                            Cancel
-                        </button>
-                    </div>
-                `);
+            <div id="send-options" style="display:flex; flex-direction:column; gap:10px; margin-top:20px; width:100%;">
+                <button id="waSend" type="button" style="background:#25D366; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
+                    <i class="fa-brands fa-whatsapp"></i> Send via WhatsApp
+                </button>
+                <button id="mailSend" type="button" style="background:#EA4335; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
+                    <i class="fa-solid fa-envelope"></i> Send via Email
+                </button>
+                <button id="btnCancelOpt" type="button" style="background:transparent; color:#888; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
+                    Cancel
+                </button>
+            </div>
+        `);
             }
-            
+
             $('#customAlertOverlay').addClass('active');
-
-            // WhatsApp Button Action
-            $('.btn-whatsapp').off('click').on('click', function() {
-                const msg = `Hello ${data.agencyName}, here is your Invoice ${data.invoiceNo} for ₹${grandTotal.toLocaleString('en-IN')}. Please check details on Quantifyre Iris.`;
-                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-                closeSendOptions();
-            });
-
-            // Email Button Action
-            $('.btn-email').off('click').on('click', function() {
-                const subject = `Invoice ${data.invoiceNo} from Quantifyre Iris`;
-                const body = `Hello ${data.agencyName},\n\nYour invoice ${data.invoiceNo} for amount ₹${grandTotal.toLocaleString('en-IN')} has been generated.\n\nRegards,\nQuantifyre Iris`;
-                window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                closeSendOptions();
-            });
-
-            $('.btn-close-opt').off('click').on('click', closeSendOptions);
         });
 
+        // 🔥 EVENT DELEGATION: Ye naye dynamic buttons ko pakadne ka sahi tarika hai
+        $(document).on('click', '#waSend', function () {
+            const msg = `Hello ${invoiceDataObj.agencyName}, here is your Invoice ${invoiceDataObj.invoiceNo} for ₹${finalGrandTotal.toLocaleString('en-IN')}.`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            closeSendOptions();
+        });
+
+        $(document).on('click', '#mailSend', function () {
+            const subject = `Invoice ${invoiceDataObj.invoiceNo} - Quantifyre Iris`;
+            const body = `Hello ${invoiceDataObj.agencyName},\n\nYour invoice for ₹${finalGrandTotal.toLocaleString('en-IN')} is ready.\n\nTeam Quantifyre Iris`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            closeSendOptions();
+        });
+
+        $(document).on('click', '#btnCancelOpt', function () {
+            closeSendOptions();
+        });
+
+        // Helper function to cleanup
         function closeSendOptions() {
             $('#customAlertOverlay').removeClass('active');
-            $('#send-options').remove(); 
-            $('.btn-alert-ok').show();
+            $('#send-options').remove(); // Har baar options clear karo
+            $('.btn-alert-ok').show();   // OK button wapas dalo
         }
-
 
         // Confirm & Save button logic
         $('#btnFinalSave').on('click', function (e) {
