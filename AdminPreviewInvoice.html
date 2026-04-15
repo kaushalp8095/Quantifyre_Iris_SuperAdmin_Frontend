@@ -181,7 +181,7 @@
                     <button type="button" class="btn-submit btn">Send Invoice</button>
                     <a href="AdminEditInvoice.html" class="btn btn-cancel" style="text-decoration: none;">Edit
                         Invoice</a>
-                    <button type="button" class="btn btn-submit">Create Invoice</button>
+                    <button type="button" id="btnFinalSave" class="btn btn-submit">Create Invoice</button>
                 </div>
 
             </section>
@@ -321,7 +321,7 @@
 
 
         // Confirm & Save button logic
-        $('.btn-submit').on('click', function (e) {
+        $('#btnFinalSave').on('click', function (e) {
             e.preventDefault();
 
             const rawData = sessionStorage.getItem('pendingInvoicePreview');
