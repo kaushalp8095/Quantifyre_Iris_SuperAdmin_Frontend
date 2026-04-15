@@ -400,6 +400,7 @@
     <script>
         $(document).ready(function () {
             const adminId = localStorage.getItem("adminId");
+            let myBillingChart = null;
 
             // ==========================================
             // 1. DASHBOARD DATA LOAD (STATS + TABLE)
@@ -453,11 +454,71 @@
                             tbody.append('<tr><td colspan="6" style="text-align:center; padding:20px;">No invoices found.</td></tr>');
                         }
 
+                        // --- C. DYNAMIC CHART UPDATE ---
+                        if (data.chartData && data.chartData.length > 0) {
+                            const months = data.chartData.map(item => item.month); // ['Jan', 'Feb', ...]
+                            const totals = data.chartData.map(item => item.total); // [5000, 15000, ...]
+                            updateChart(months, totals);
+                        }
+
                         // Re-initialize pagination after data load
                         setupTablePagination('invoicesTable', 'pagination-invoices', 4);
                     },
                     error: function (err) {
                         console.error("Error loading dashboard data:", err);
+                    }
+                });
+            }
+
+            // ==========================================
+            // 2. GRAPH LOGIC (YAHAN ADD KIYA HAI)
+            // ==========================================
+            function updateChart(labels, values) {
+                const canvas = document.getElementById('paymentTrendsChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+
+                // Purane chart ko clear karna zaroori hai warna naya upar overlap hoga
+                if (myBillingChart) {
+                    myBillingChart.destroy();
+                }
+
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
+                gradient.addColorStop(1, 'rgba(0, 255, 157, 0)');
+
+                myBillingChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels, // Backend se aane wale mahine
+                        datasets: [{
+                            label: 'Payment Received',
+                            data: values, // Backend se aane wale amounts
+                            borderColor: '#00ff9d',
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#00ff9d',
+                            pointBorderColor: '#fff',
+                            pointRadius: 4,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                ticks: { color: '#00ff9d' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#00ff9d' }
+                            }
+                        }
                     }
                 });
             }
