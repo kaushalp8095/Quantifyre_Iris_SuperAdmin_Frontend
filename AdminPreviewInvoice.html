@@ -156,16 +156,7 @@
                             </tr>
                         </thead>
                         <tbody id="p-table-body">
-                            <tr>
-                                <td>Marketing Service</td>
-                                <td>₹ 25,000</td>
-                                <td>₹ 50,000</td>
-                            </tr>
-                            <tr>
-                                <td>Marketing Service</td>
-                                <td>₹ 15,000</td>
-                                <td>₹ 20,000</td>
-                            </tr>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -210,6 +201,17 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
     <script>
@@ -218,8 +220,7 @@
             const dataRaw = sessionStorage.getItem('pendingInvoicePreview');
 
             if (!dataRaw) {
-                alert("No preview data found!");
-                window.location.href = "AdminCreateInvoice.html";
+                showCustomAlert("Error", "No preview data found! Please fill the form again.", "error", "AdminCreateInvoice.html");
                 return;
             }
 
@@ -281,17 +282,44 @@
                 contentType: 'application/json',
                 data: JSON.stringify(invoiceData),
                 success: function (response) {
-                    alert("Invoice Saved Successfully!");
+                    showCustomAlert("Success!", "Your invoice has been created and saved.", "success", "AdminBilling.html");
                     sessionStorage.removeItem('pendingInvoicePreview');
-                    window.location.href = "AdminBilling.html";
+            
                 },
                 error: function (xhr) {
                     btn.text("Confirm & Save").prop('disabled', false);
-                    alert("Error: " + (xhr.responseJSON ? xhr.responseJSON.error : "Failed to save invoice"));
-                }
+                    const errorMsg = xhr.responseJSON ? xhr.responseJSON.error : "Something went wrong while saving.";
+                    showCustomAlert("Save Failed", errorMsg, "error");}
             });
         });
 
+
+        // --- Custom Alert Functions ---
+        function showCustomAlert(title, message, type, redirectUrl = null) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+
+            if (type === 'success') {
+                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+            } else {
+                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+            }
+
+            $('#customAlertOverlay').addClass('active');
+
+            $('.btn-alert-ok').off('click').on('click', function () {
+                closeCustomAlert();
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+
+        function closeCustomAlert() {
+            $('#customAlertOverlay').removeClass('active');
+        }
     </script>
 </body>
 
