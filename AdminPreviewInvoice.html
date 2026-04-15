@@ -217,11 +217,7 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
     <script>
-
-        // 1. GLOBAL VARIABLES (Taki poore page mein kahin bhi use ho sakein)
-        let invoiceDataObj = null;
-        let finalGrandTotal = 0;
-
+        
         $(document).ready(function () {
             // 1. SessionStorage se data nikaalein
             const dataRaw = sessionStorage.getItem('pendingInvoicePreview');
@@ -297,18 +293,18 @@
                     </div>
                 `);
             }
-
+            
             $('#customAlertOverlay').addClass('active');
 
             // WhatsApp Button Action
-            $('.btn-whatsapp').off('click').on('click', function () {
+            $('.btn-whatsapp').off('click').on('click', function() {
                 const msg = `Hello ${data.agencyName}, here is your Invoice ${data.invoiceNo} for ₹${grandTotal.toLocaleString('en-IN')}. Please check details on Quantifyre Iris.`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
                 closeSendOptions();
             });
 
             // Email Button Action
-            $('.btn-email').off('click').on('click', function () {
+            $('.btn-email').off('click').on('click', function() {
                 const subject = `Invoice ${data.invoiceNo} from Quantifyre Iris`;
                 const body = `Hello ${data.agencyName},\n\nYour invoice ${data.invoiceNo} for amount ₹${grandTotal.toLocaleString('en-IN')} has been generated.\n\nRegards,\nQuantifyre Iris`;
                 window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -320,7 +316,7 @@
 
         function closeSendOptions() {
             $('#customAlertOverlay').removeClass('active');
-            $('#send-options').remove();
+            $('#send-options').remove(); 
             $('.btn-alert-ok').show();
         }
 
