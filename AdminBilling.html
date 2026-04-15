@@ -118,39 +118,34 @@
             </div>
 
             <section class="billing-stats-grid">
-
                 <div class="billing-stat-card">
                     <img src="Images/TotalBill50x50.ico" alt="">
                     <div class="b-info">
                         <p>Total Billed</p>
-                        <h2></h2>
+                        <h2 id="stat-total-billed">₹0</h2>
                     </div>
                 </div>
-
                 <div class="billing-stat-card">
                     <img src="Images/Paid50x50.ico" alt="">
                     <div class="b-info">
                         <p>Paid</p>
-                        <h2></h2>
+                        <h2 id="stat-paid">₹0</h2>
                     </div>
                 </div>
-
                 <div class="billing-stat-card">
                     <img src="Images/Outstanding50x50.ico" alt="">
                     <div class="b-info">
                         <p>Outstanding</p>
-                        <h2></h2>
+                        <h2 id="stat-outstanding">₹0</h2>
                     </div>
                 </div>
-
                 <div class="billing-stat-card">
                     <img src="Images/Revenue50x50.ico" alt="">
                     <div class="b-info">
                         <p>This Month Revenue</p>
-                        <h2>₹0</h2>
+                        <h2 id="stat-monthly">₹0</h2>
                     </div>
                 </div>
-
             </section>
 
             <section class="sa-grid-row-1" style="margin-bottom: 25px;">
@@ -254,52 +249,52 @@
     <script src="Js/all.js"></script>
 
     <script>
-    $(document).ready(function () {
-        const adminId = localStorage.getItem("adminId");
-        let myBillingChart = null; // Chart instance handle karne ke liye global variable
+        $(document).ready(function () {
+            const adminId = localStorage.getItem("adminId");
+            let myBillingChart = null; // Chart instance handle karne ke liye global variable
 
-        // ==========================================
-        // 1. MAIN DASHBOARD LOAD FUNCTION
-        // ==========================================
-        function loadBillingDashboard() {
-            if (!adminId) {
-                console.error("Admin ID not found in localStorage");
-                return;
-            }
+            // ==========================================
+            // 1. MAIN DASHBOARD LOAD FUNCTION
+            // ==========================================
+            function loadBillingDashboard() {
+                if (!adminId) {
+                    console.error("Admin ID not found in localStorage");
+                    return;
+                }
 
-            $.ajax({
-                url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/dashboard`,
-                type: 'GET',
-                data: { adminId: adminId },
-                success: function (data) {
-                    console.log("API Response:", data);
+                $.ajax({
+                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/dashboard`,
+                    type: 'GET',
+                    data: { adminId: adminId },
+                    success: function (data) {
+                        console.log("API Response:", data);
 
-                    // --- A. KPI Cards Update ---
-                    $('.billing-stat-card:nth-child(1) h2').text('₹' + (data.totalBilled || 0).toLocaleString('en-IN'));
-                    $('.billing-stat-card:nth-child(2) h2').text('₹' + (data.paidAmount || 0).toLocaleString('en-IN'));
-                    $('.billing-stat-card:nth-child(3) h2').text('₹' + (data.outstanding || 0).toLocaleString('en-IN'));
-                    $('.billing-stat-card:nth-child(4) h2').text('₹' + (data.currentMonthRevenue || 0).toLocaleString('en-IN'));
+                        // --- A. KPI Cards Update ---
+                        $('#stat-total-billed').text('₹' + (data.totalBilled || 0).toLocaleString('en-IN'));
+                        $('#stat-paid').text('₹' + (data.paidAmount || 0).toLocaleString('en-IN'));
+                        $('#stat-outstanding').text('₹' + (data.outstanding || 0).toLocaleString('en-IN'));
+                        $('#stat-monthly').text('₹' + (data.currentMonthRevenue || 0).toLocaleString('en-IN'));
 
-                    // --- B. Dynamic Chart (Graph) Update ---
-                    if (data.chartData && data.chartData.length > 0) {
-                        const labels = data.chartData.map(item => item.month); // e.g. ['Jan', 'Feb']
-                        const values = data.chartData.map(item => item.total); // e.g. [5000, 15000]
-                        renderTrendsChart(labels, values);
-                    } else {
-                        // Agar data nahi hai toh empty graph dikhao
-                        renderTrendsChart(['No Data'], [0]);
-                    }
+                        // --- B. Dynamic Chart (Graph) Update ---
+                        if (data.chartData && data.chartData.length > 0) {
+                            const labels = data.chartData.map(item => item.month); // e.g. ['Jan', 'Feb']
+                            const values = data.chartData.map(item => item.total); // e.g. [5000, 15000]
+                            renderTrendsChart(labels, values);
+                        } else {
+                            // Agar data nahi hai toh empty graph dikhao
+                            renderTrendsChart(['No Data'], [0]);
+                        }
 
-                    // --- C. Table Update ---
-                    const tbody = $('#invoicesTable tbody');
-                    tbody.empty();
+                        // --- C. Table Update ---
+                        const tbody = $('#invoicesTable tbody');
+                        tbody.empty();
 
-                    if (data.invoices && data.invoices.length > 0) {
-                        data.invoices.forEach(inv => {
-                            const statusText = inv.status || 'Pending';
-                            const statusClass = (statusText.toLowerCase() === 'paid') ? 'st-active' : 'st-disabled';
+                        if (data.invoices && data.invoices.length > 0) {
+                            data.invoices.forEach(inv => {
+                                const statusText = inv.status || 'Pending';
+                                const statusClass = (statusText.toLowerCase() === 'paid') ? 'st-active' : 'st-disabled';
 
-                            tbody.append(`
+                                tbody.append(`
                                 <tr>
                                     <td>${inv.invoiceNo}</td>
                                     <td>${inv.agencyName}</td>
@@ -315,154 +310,158 @@
                                     </td>
                                 </tr>
                             `);
-                        });
-                    } else {
-                        tbody.append('<tr><td colspan="6" style="text-align:center; padding:20px;">No invoices found.</td></tr>');
+                            });
+                        } else {
+                            tbody.append('<tr><td colspan="6" style="text-align:center; padding:20px;">No invoices found.</td></tr>');
+                        }
+
+                        // Pagination re-initialize
+                        setupTablePagination('invoicesTable', 'pagination-invoices', 4);
+                    },
+                    error: function (err) {
+                        console.error("Dashboard failed to load:", err);
                     }
-
-                    // Pagination re-initialize
-                    setupTablePagination('invoicesTable', 'pagination-invoices', 4);
-                },
-                error: function (err) {
-                    console.error("Dashboard failed to load:", err);
-                }
-            });
-        }
-
-        // ==========================================
-        // 2. CHART RENDERING LOGIC
-        // ==========================================
-        function renderTrendsChart(labels, values) {
-            const canvas = document.getElementById('paymentTrendsChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-
-            // Purane chart instance ko destroy karna zaroori hai
-            if (myBillingChart) {
-                myBillingChart.destroy();
+                });
             }
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
-            gradient.addColorStop(1, 'rgba(0, 255, 157, 0)');
+            // ==========================================
+            // 2. CHART RENDERING LOGIC
+            // ==========================================
+            function renderTrendsChart(labels, values) {
+                const canvas = document.getElementById('paymentTrendsChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
 
-            myBillingChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Payment Received',
-                        data: values,
-                        borderColor: '#00ff9d',
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#00ff9d',
-                        pointBorderColor: '#fff',
-                        pointRadius: 4,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            ticks: { color: '#00ff9d' }
-                        },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { color: '#00ff9d' }
+                // Purane chart instance ko destroy karna zaroori hai
+                if (myBillingChart) {
+                    myBillingChart.destroy();
+                }
+
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
+                gradient.addColorStop(1, 'rgba(0, 255, 157, 0)');
+
+                myBillingChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Payment Received',
+                            data: values,
+                            borderColor: '#00ff9d',
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#00ff9d',
+                            pointBorderColor: '#fff',
+                            pointRadius: 4,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                ticks: { color: '#00ff9d' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#00ff9d' }
+                            }
                         }
                     }
-                }
-            });
-        }
-
-        // ==========================================
-        // 3. PAGINATION LOGIC
-        // ==========================================
-        function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
-            const table = document.getElementById(tableId);
-            const wrapper = document.getElementById(paginationWrapperId);
-            if (!table || !wrapper) return;
-
-            const tbody = table.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-            let currentPage = 1;
-
-            const pageNumbersContainer = wrapper.querySelector('.page-numbers');
-            const prevBtn = wrapper.querySelector('.prev-btn');
-            const nextBtn = wrapper.querySelector('.next-btn');
-
-            function render() {
-                const start = (currentPage - 1) * rowsPerPage;
-                const end = start + rowsPerPage;
-                rows.forEach((row, index) => {
-                    row.style.display = (index >= start && index < end) ? '' : 'none';
                 });
-
-                wrapper.querySelector('.start-row').innerText = totalRows === 0 ? 0 : start + 1;
-                wrapper.querySelector('.end-row').innerText = end > totalRows ? totalRows : end;
-                wrapper.querySelector('.total-rows').innerText = totalRows;
-
-                pageNumbersContainer.innerHTML = '';
-                for (let i = 1; i <= totalPages; i++) {
-                    const btn = document.createElement('button');
-                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                    btn.innerText = i;
-                    btn.onclick = (e) => { currentPage = i; render(); };
-                    pageNumbersContainer.appendChild(btn);
-                }
-                prevBtn.disabled = (currentPage === 1);
-                nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
+            }
+            function formatDate(dateStr) {
+                if (!dateStr) return "N/A";
+                return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
             }
 
-            prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; render(); } };
-            nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; render(); } };
-            render();
-        }
+            // ==========================================
+            // 3. PAGINATION LOGIC
+            // ==========================================
+            function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
+                const table = document.getElementById(tableId);
+                const wrapper = document.getElementById(paginationWrapperId);
+                if (!table || !wrapper) return;
 
-        // ==========================================
-        // 4. DELETE & HELPER LOGIC
-        // ==========================================
-        let invoiceToDelete = null;
-        window.handleDelete = function (id) {
-            invoiceToDelete = id;
-            $('#deleteModal').addClass('active');
-        };
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const totalRows = rows.length;
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+                let currentPage = 1;
 
-        window.confirmDelete = function () {
-            if (!invoiceToDelete) return;
-            $.ajax({
-                url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/delete/${invoiceToDelete}`,
-                type: 'DELETE',
-                success: function () {
-                    $('#deleteModal').removeClass('active');
-                    alert("Invoice deleted!");
-                    loadBillingDashboard();
+                const pageNumbersContainer = wrapper.querySelector('.page-numbers');
+                const prevBtn = wrapper.querySelector('.prev-btn');
+                const nextBtn = wrapper.querySelector('.next-btn');
+
+                function render() {
+                    const start = (currentPage - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+                    rows.forEach((row, index) => {
+                        row.style.display = (index >= start && index < end) ? '' : 'none';
+                    });
+
+                    wrapper.querySelector('.start-row').innerText = totalRows === 0 ? 0 : start + 1;
+                    wrapper.querySelector('.end-row').innerText = end > totalRows ? totalRows : end;
+                    wrapper.querySelector('.total-rows').innerText = totalRows;
+
+                    pageNumbersContainer.innerHTML = '';
+                    for (let i = 1; i <= totalPages; i++) {
+                        const btn = document.createElement('button');
+                        btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                        btn.innerText = i;
+                        btn.onclick = (e) => { currentPage = i; render(); };
+                        pageNumbersContainer.appendChild(btn);
+                    }
+                    prevBtn.disabled = (currentPage === 1);
+                    nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
                 }
-            });
-        };
 
-        function formatDate(dateString) {
-            if (!dateString) return "N/A";
-            return new Date(dateString).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; render(); } };
+                nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; render(); } };
+                render();
+            }
+
+            // ==========================================
+            // 4. DELETE & HELPER LOGIC
+            // ==========================================
+            let invoiceToDelete = null;
+            window.handleDelete = function (id) {
+                invoiceToDelete = id;
+                $('#deleteModal').addClass('active');
+            };
+
+            window.confirmDelete = function () {
+                if (!invoiceToDelete) return;
+                $.ajax({
+                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/delete/${invoiceToDelete}`,
+                    type: 'DELETE',
+                    success: function () {
+                        $('#deleteModal').removeClass('active');
+                        alert("Invoice deleted!");
+                        loadBillingDashboard();
+                    }
+                });
+            };
+
+            function formatDate(dateString) {
+                if (!dateString) return "N/A";
+                return new Date(dateString).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+
+            // Dashboard Initial Load
+            loadBillingDashboard();
+        });
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
         }
-
-        // Dashboard Initial Load
-        loadBillingDashboard();
-    });
-
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
-    }
-</script>
+    </script>
 </body>
 
 </html>
