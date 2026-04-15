@@ -159,6 +159,7 @@
                                     <label class="ci-label">Due Date</label>
                                     <input type="text" id="dueDate" class="ci-input ci-date-input"
                                         placeholder="Select Date">
+                                    <div id="error-due-date" class="error-msg">Please select a due date</div>    
                                 </div>
                             </div>
 
@@ -216,6 +217,7 @@
                                     <div class="calc-row">
                                         <span class="calc-label">Tax (%)</span>
                                         <input type="number" class="ci-input calc-input-small" placeholder="18">
+                                        <div id="error-tax" class="error-msg">Invalid Tax</div>
                                     </div>
 
                                     <div class="total-amount-row">
@@ -350,7 +352,7 @@
             // 7. CALCULATION LOGIC
             window.calculateInvoice = function () {
                 const rate = parseFloat($('input[placeholder="Rate"]').val()) || 0;
-                const taxPercent = parseFloat($('input[placeholder="18"]').val()) || 0;
+                const taxPercent = parseFloat($('#taxInput').val()) || 0;
 
                 // Sync Rate with Amount field
                 $('input[placeholder="Amount"]').val(rate);
@@ -379,9 +381,37 @@
                 dropdown.removeClass('active');
             };
 
+            // Validation Function
+function validateInvoiceForm() {
+    let isValid = true;
+    
+    // Reset errors
+    $('.error-msg').hide();
+
+    // 1. Due Date Validation
+    const dueDate = $('#dueDate').val();
+    if (!dueDate || dueDate.trim() === "") {
+        $('#error-due-date').text("Due Date is required").show();
+        isValid = false;
+    }
+
+    // 2. Tax Validation (Must be between 0 and 100)
+    const tax = parseFloat($('#taxInput').val());
+    if (isNaN(tax) || tax < 0 || tax > 100) {
+        $('#error-tax').text("Tax must be 0-100%").show();
+        isValid = false;
+    }
+
+    return isValid;
+}
+
             // 9. SAVE INVOICE (AJAX)
             $('.btn-submit').on('click', function (e) {
                 e.preventDefault();
+
+                if (!validateInvoiceForm()) {
+        return; // Agar validation fail hua toh aage mat badho
+    }
 
                 // Check if ID is present
                 const adminId = localStorage.getItem("adminId");
