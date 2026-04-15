@@ -217,7 +217,6 @@
                                     <div class="calc-row">
                                         <span class="calc-label">Tax (%)</span>
                                         <input type="number" class="ci-input calc-input-small" placeholder="18">
-                                        <div id="error-tax" class="error-msg">Invalid Tax</div>
                                     </div>
 
                                     <div class="total-amount-row">
@@ -403,13 +402,6 @@
                 const dueDate = $('#dueDate').val();
                 if (!dueDate || dueDate.trim() === "") {
                     $('#error-due-date').text("Due Date is required").show();
-                    isValid = false;
-                }
-
-                // 2. Tax Validation (Must be between 0 and 100)
-                const tax = parseFloat($('#taxInput').val());
-                if (isNaN(tax) || tax < 0 || tax > 100) {
-                    $('#error-tax').text("Tax must be 0-100%").show();
                     isValid = false;
                 }
 
