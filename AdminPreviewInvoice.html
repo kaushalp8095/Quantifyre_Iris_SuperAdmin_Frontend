@@ -22,25 +22,26 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li class="active"><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -70,7 +71,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -102,7 +104,7 @@
             <div class="page-header" style="justify-content: space-between; display: flex; align-items: center;">
                 <div class="title-text">
                     <div class="icon-square">
-                        <img src="Images/Billing50x50.ico" alt="" >
+                        <img src="Images/Billing50x50.ico" alt="">
                     </div>
                     <div>
                         <h1>Preview Invoice</h1>
@@ -115,27 +117,27 @@
             </div>
 
             <section class="invoice-paper">
-                
+
                 <div class="inv-top-header">
                     <div class="inv-brand-info">
                         <div class="inv-logo-box">
-                            <img src="Images/quantifirelogo.png" alt="Logo"> 
+                            <img src="Images/quantifirelogo.png" alt="Logo">
                         </div>
                         <h2 class="inv-company-name">Quantifire Iris</h2>
                     </div>
                     <div class="inv-meta-info">
-                        <div class="inv-meta-row">Invoice Number: <span class="inv-meta-val">INV-001</span></div>
-                        <div class="inv-meta-row">Issue Date: <span class="inv-meta-val">04-12-2025</span></div>
-                        <div class="inv-meta-row">Due Date: <span class="inv-meta-val">19-12-2025</span></div>
+                        <div class="inv-meta-row">Invoice Number: <span id="p-inv-no" class="inv-meta-val"></span></div>
+                        <div class="inv-meta-row">Issue Date: <span id="p-issue-date" class="inv-meta-val"></span></div>
+                        <div class="inv-meta-row">Due Date: <span id="p-due-date" class="inv-meta-val"></span></div>
                     </div>
                 </div>
 
                 <div class="inv-address-grid">
                     <div class="inv-address-box">
                         <span class="inv-box-title">Bill To</span>
-                        <span class="inv-addr-line">Client Name</span>
-                        <span class="inv-addr-line">Billing Address</span>
-                        <span class="inv-addr-line">Contact Person</span>
+                        <span id="p-agency-name" class="inv-addr-line" style="font-weight:bold;"></span>
+                        <span id="p-address" class="inv-addr-line"></span>
+                        <span id="p-contact" class="inv-addr-line"></span>
                     </div>
                     <div class="inv-address-box">
                         <span class="inv-box-title">From</span>
@@ -153,7 +155,7 @@
                                 <th>Amount</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="p-table-body">
                             <tr>
                                 <td>Marketing Service</td>
                                 <td>₹ 25,000</td>
@@ -171,21 +173,22 @@
                 <div class="inv-summary-section">
                     <div class="summary-row">
                         <span>Sub Total:</span>
-                        <span>₹ 70,000</span>
+                        <span id="p-subtotal">₹0.00</span>
                     </div>
                     <div class="summary-row">
-                        <span>Tax (15%):</span>
-                        <span>₹ 5,000</span>
+                        <span>Tax (<span id="p-tax-rate">0</span>%):</span>
+                        <span id="p-tax-amount">₹0.00</span>
                     </div>
                     <div class="grand-total-row">
                         <span>Grand Total:</span>
-                        <span style="color: #00ff9d;">₹ 75,000</span>
+                        <span id="p-grand-total" style="color: #00ff9d;">₹0.00</span>
                     </div>
                 </div>
 
                 <div class="preview-footer-actions">
-                    <a href="AdminEditInvoice.html" class="btn-submit btn" style="text-decoration: none;">Edit Invoice</a>
-                    <a href="#" class="btn btn-cancel" style="text-decoration: none;">Send Invoice</a>
+                    <a href="AdminEditInvoice.html" class="btn btn-cancel" style="text-decoration: none;">Edit
+                        Invoice</a>
+                    <button type="button" class="btn btn-submit">Create Invoice</button>
                 </div>
 
             </section>
@@ -208,6 +211,74 @@
     </div>
 
     <script src="Js/jquery-3.7.1.min.js"></script>
-    <script src="Js/all.js"></script> 
+    <script src="Js/all.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 1. SessionStorage se data nikaalein
+            const dataRaw = sessionStorage.getItem('pendingInvoicePreview');
+
+            if (!dataRaw) {
+                alert("No preview data found!");
+                window.location.href = "AdminCreateInvoice.html";
+                return;
+            }
+
+            const data = JSON.parse(dataRaw);
+
+            // 2. Header & Address Fill karein
+            $('#p-inv-no').text(data.invoiceNo);
+            $('#p-issue-date').text(formatDatePreview(data.issueDate));
+            $('#p-due-date').text(formatDatePreview(data.dueDate));
+            $('#p-agency-name').text(data.agencyName);
+            $('#p-address').text(data.billToAddress);
+            $('#p-contact').text(data.contactPerson);
+
+            // 3. Table Items (Calculation)
+            const subtotal = data.rate;
+            const taxAmt = (subtotal * data.taxPercent) / 100;
+            const grandTotal = subtotal + taxAmt;
+
+            $('#p-table-body').html(`
+        <tr>
+            <td>${data.description || (data.plan + " Subscription")}</td>
+            <td>₹${subtotal.toLocaleString('en-IN')}</td>
+            <td>₹${subtotal.toLocaleString('en-IN')}</td>
+        </tr>
+    `);
+
+            // 4. Summary Update
+            $('#p-subtotal').text('₹' + subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+            $('#p-tax-rate').text(data.taxPercent);
+            $('#p-tax-amount').text('₹' + taxAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+            $('#p-grand-total').text('₹' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+
+            // Helper: Date format (DD-MM-YYYY)
+            function formatDatePreview(dateStr) {
+                if (!dateStr) return "N/A";
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('en-GB').replace(/\//g, '-');
+            }
+        });
+
+
+        $('.btn-submit').last().text('Confirm & Save').on('click', function (e) {
+            e.preventDefault();
+            const data = JSON.parse(sessionStorage.getItem('pendingInvoicePreview'));
+
+            // Yahan wahi same AJAX call chalega jo Create page par tha
+            $.ajax({
+                url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function () {
+                    alert("Invoice Saved!");
+                    sessionStorage.removeItem('pendingInvoicePreview');
+                    window.location.href = "AdminBilling.html";
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>
