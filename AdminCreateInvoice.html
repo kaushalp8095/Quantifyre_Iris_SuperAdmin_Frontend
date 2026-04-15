@@ -236,6 +236,7 @@
                     </div>
 
                     <div class="form-footer-actions">
+                        <button type="button" class="btn-submit btn">Send Invoice</button>
                         <a href="AdminPreviewInvoice.html" class="btn-cancel btn"
                             style="text-decoration: none;text-align: center;">Preview</a>
                         <button type="button" class="btn-submit btn">Create Invoice</button>
@@ -461,7 +462,8 @@
                     },
                     error: function (xhr) {
                         btn.text("Create Invoice").prop('disabled', false);
-            showCustomAlert("Error", "Failed to save invoice. Please try again.", "error"); }
+                        showCustomAlert("Error", "Failed to save invoice. Please try again.", "error");
+                    }
                 });
             });
 
@@ -484,7 +486,7 @@
         $('.btn-cancel').on('click', function (e) {
             e.preventDefault();
 
-            
+
 
             const selectedAgencyId = $('#agencySearchSelect').val(); // 👈 Agency ID yahan se milegi
             const adminId = localStorage.getItem("adminId"); // 👈 Admin ID yahan se
