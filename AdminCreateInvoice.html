@@ -421,7 +421,6 @@
                 e.preventDefault();
 
                 if (!validateInvoiceForm()) {
-                    showCustomAlert("Validation Error", "Please fill all required fields correctly.", "error");
                     return; // Agar validation fail hua toh aage mat badho
                 }
 
@@ -431,7 +430,7 @@
                 const selectedAgencyName = $('#agencySearchSelect').find("option:selected").text();
 
                 if (!selectedAgencyId) {
-                    showCustomAlert("Input Required", "Please select an agency first!", "error");
+                    alert("Please select an agency first!");
                     return;
                 }
 
@@ -465,11 +464,12 @@
                     contentType: 'application/json',
                     data: JSON.stringify(invoiceData),
                     success: function (response) {
-                        showCustomAlert("Success!", "Invoice Saved Successfully!", "success", "AdminBilling.html");
+                        alert("Invoice Saved Successfully!");
+                        window.location.href = "AdminBilling.html";
                     },
                     error: function (xhr) {
-                        btn.text("Create Invoice").prop('disabled', false);
-            showCustomAlert("Error", "Failed to save invoice. Please try again.", "error"); }
+                        alert("Error: " + (xhr.responseJSON ? xhr.responseJSON.error : "Failed to save invoice"));
+                    }
                 });
             });
 
