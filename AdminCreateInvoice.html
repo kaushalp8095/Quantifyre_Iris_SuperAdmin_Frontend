@@ -492,17 +492,11 @@
         $('.btn-cancel').on('click', function (e) {
             e.preventDefault();
 
-            // Validation Check before Preview
-    if (!validateInvoiceForm()) {
-        showCustomAlert("Wait!", "Please select Due Date and Tax before preview.", "error");
-        return;
-    }
-
             const selectedAgencyId = $('#agencySearchSelect').val(); // 👈 Agency ID yahan se milegi
             const adminId = localStorage.getItem("adminId"); // 👈 Admin ID yahan se
 
             if (!selectedAgencyId) {
-                showCustomAlert("Required", "Please select an agency first!", "error");
+                alert("Please select an agency first!");
                 return;
             }
 
