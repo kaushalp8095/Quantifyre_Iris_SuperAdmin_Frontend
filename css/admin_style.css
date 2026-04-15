@@ -2564,3 +2564,10 @@ input {caret-color: white;}
 
 /* 4. Mobile Responsive Fixes for these exact elements */
 @media (max-width: 768px) { .ci-plan-group { margin-bottom: 15px !important; } .ci-agency-select-wrapper { width: 100% !important; } .ci-plan-dropdown .ci-plan-selected { width: 100% !important; } }
+
+/* =========================================================================
+                        Preview Invoice Send Button css
+   ========================================================================= */
+.btn-whatsapp:hover { background: #128C7E !important; transform: scale(1.05); transition: 0.3s; }
+.btn-email:hover { background: #c5221f !important; transform: scale(1.05); transition: 0.3s; }
+.btn-close-opt:hover { background: #333 !important; }
