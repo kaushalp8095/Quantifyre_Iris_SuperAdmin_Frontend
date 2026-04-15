@@ -159,7 +159,7 @@
                                     <label class="ci-label">Due Date</label>
                                     <input type="text" id="dueDate" class="ci-input ci-date-input"
                                         placeholder="Select Date">
-                                    <div id="error-due-date" class="error-msg">Please select a due date</div>    
+                                    <div id="error-due-date" class="error-msg">Please select a due date</div>
                                 </div>
                             </div>
 
@@ -259,6 +259,17 @@
                 <button class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Cancel</button>
                 <button class="btn-modal btn-modal-delete" onclick="confirmLogout()">Logout</button>
             </div>
+        </div>
+    </div>
+
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
         </div>
     </div>
 
@@ -382,36 +393,37 @@
             };
 
             // Validation Function
-function validateInvoiceForm() {
-    let isValid = true;
-    
-    // Reset errors
-    $('.error-msg').hide();
+            function validateInvoiceForm() {
+                let isValid = true;
 
-    // 1. Due Date Validation
-    const dueDate = $('#dueDate').val();
-    if (!dueDate || dueDate.trim() === "") {
-        $('#error-due-date').text("Due Date is required").show();
-        isValid = false;
-    }
+                // Reset errors
+                $('.error-msg').hide();
 
-    // 2. Tax Validation (Must be between 0 and 100)
-    const tax = parseFloat($('#taxInput').val());
-    if (isNaN(tax) || tax < 0 || tax > 100) {
-        $('#error-tax').text("Tax must be 0-100%").show();
-        isValid = false;
-    }
+                // 1. Due Date Validation
+                const dueDate = $('#dueDate').val();
+                if (!dueDate || dueDate.trim() === "") {
+                    $('#error-due-date').text("Due Date is required").show();
+                    isValid = false;
+                }
 
-    return isValid;
-}
+                // 2. Tax Validation (Must be between 0 and 100)
+                const tax = parseFloat($('#taxInput').val());
+                if (isNaN(tax) || tax < 0 || tax > 100) {
+                    $('#error-tax').text("Tax must be 0-100%").show();
+                    isValid = false;
+                }
+
+                return isValid;
+            }
 
             // 9. SAVE INVOICE (AJAX)
             $('.btn-submit').on('click', function (e) {
                 e.preventDefault();
 
                 if (!validateInvoiceForm()) {
-        return; // Agar validation fail hua toh aage mat badho
-    }
+                    showCustomAlert("Validation Error", "Please fill all required fields correctly.", "error");
+                    return; // Agar validation fail hua toh aage mat badho
+                }
 
                 // Check if ID is present
                 const adminId = localStorage.getItem("adminId");
@@ -419,7 +431,7 @@ function validateInvoiceForm() {
                 const selectedAgencyName = $('#agencySearchSelect').find("option:selected").text();
 
                 if (!selectedAgencyId) {
-                    alert("Please select an agency first!");
+                    showCustomAlert("Input Required", "Please select an agency first!", "error");
                     return;
                 }
 
@@ -453,12 +465,11 @@ function validateInvoiceForm() {
                     contentType: 'application/json',
                     data: JSON.stringify(invoiceData),
                     success: function (response) {
-                        alert("Invoice Saved Successfully!");
-                        window.location.href = "AdminBilling.html";
+                        showCustomAlert("Success!", "Invoice Saved Successfully!", "success", "AdminBilling.html");
                     },
                     error: function (xhr) {
-                        alert("Error: " + (xhr.responseJSON ? xhr.responseJSON.error : "Failed to save invoice"));
-                    }
+                        btn.text("Create Invoice").prop('disabled', false);
+            showCustomAlert("Error", "Failed to save invoice. Please try again.", "error"); }
                 });
             });
 
@@ -481,11 +492,13 @@ function validateInvoiceForm() {
         $('.btn-cancel').on('click', function (e) {
             e.preventDefault();
 
+            
+
             const selectedAgencyId = $('#agencySearchSelect').val(); // 👈 Agency ID yahan se milegi
             const adminId = localStorage.getItem("adminId"); // 👈 Admin ID yahan se
 
             if (!selectedAgencyId) {
-                alert("Please select an agency first!");
+                showCustomAlert("Required", "Please select an agency first!", "error");
                 return;
             }
 
@@ -509,6 +522,33 @@ function validateInvoiceForm() {
             sessionStorage.setItem('pendingInvoicePreview', JSON.stringify(previewData));
             window.location.href = "AdminPreviewInvoice.html";
         });
+
+        // --- Custom Alert Functions ---
+        function showCustomAlert(title, message, type, redirectUrl = null) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+
+            if (type === 'success') {
+                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+            } else {
+                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+            }
+
+            $('#customAlertOverlay').addClass('active');
+
+            $('.btn-alert-ok').off('click').on('click', function () {
+                closeCustomAlert();
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+
+        function closeCustomAlert() {
+            $('#customAlertOverlay').removeClass('active');
+        }
     </script>
 
 </body>
