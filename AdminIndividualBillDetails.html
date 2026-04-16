@@ -11,6 +11,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Js/admin-auth-guard.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        @media print {
+    /* Sidebar, Topbar aur Actions buttons ko chhupao */
+    .sidebar, .top-bar, .page-header, .bill-actions, .btn-back, .close-sidebar-btn {
+        display: none !important;
+    }
+    
+    /* Main content ki width full karo aur margin hatao */
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Glass card ka background print mein white/clean rakho */
+    .glass-card {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .bill-table th {
+        background: #f0f0f0 !important;
+        color: black !important;
+    }
+}
+    </style>
 </head>
 
 <body>
@@ -205,18 +234,30 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script> 
 
     <script>
 $(document).ready(function () {
-    let globalInvoiceData = null; // Data ko globally store karne ke liye
+    let globalInvoiceData = null;
 
     const urlParams = new URLSearchParams(window.location.search);
     const invoiceId = urlParams.get('id');
 
     if (!invoiceId) {
-        showCustomAlert("Error", "Invoice ID missing!", "error", "AdminBilling.html");
+        alert("Invoice ID missing!");
+        window.location.href = "AdminBilling.html";
         return;
     }
 
@@ -225,11 +266,11 @@ $(document).ready(function () {
             url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
             type: 'GET',
             success: function (data) {
-                globalInvoiceData = data; // Store data for PDF and Reminder
+                globalInvoiceData = data;
                 fillBillData(data);
             },
             error: function () {
-                showCustomAlert("Error", "Could not load invoice details.", "error");
+                alert("Could not load invoice details.");
             }
         });
     }
@@ -274,40 +315,48 @@ $(document).ready(function () {
     fetchBillDetails();
 
     // ==========================================
-    // 1. DOWNLOAD PDF LOGIC
+    // 1. DOWNLOAD PDF (Targeting specific div)
     // ==========================================
     $('#btnDownloadPDF').on('click', function () {
-        const element = document.querySelector('.main-content'); // Poore content ka PDF banayega
+        // Sirf dono glass-cards ko target karenge (Bill details aur Items)
+        const element = document.querySelector('.main-content'); 
+        
+        // Temporarily hide buttons for clean PDF
+        $('.bill-actions, .btn-back, .page-header').hide();
+
         const opt = {
-            margin: 10,
+            margin: [10, 10, 10, 10],
             filename: `Invoice_${globalInvoiceData.invoiceNo}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
+            html2canvas: { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        $(this).html('<i class="fa-solid fa-spinner fa-spin"></i> Generating...').prop('disabled', true);
+        $(this).html('<i class="fa-solid fa-spinner fa-spin"></i> Processing...').prop('disabled', true);
         
         html2pdf().set(opt).from(element).save().then(() => {
             $(this).html('<i class="fa-solid fa-download"></i> Download PDF').prop('disabled', false);
+            // Show buttons back
+            $('.bill-actions, .btn-back, .page-header').show();
         });
     });
 
     // ==========================================
-    // 2. PRINT LOGIC
+    // 2. PRINT
     // ==========================================
     $('#btnPrintBill').on('click', function () {
         window.print();
     });
 
     // ==========================================
-    // 3. SEND REMINDER LOGIC (WhatsApp/Email)
+    // 3. SEND REMINDER
     // ==========================================
-    $('#btnSendReminder').on('click', function (e) {
-        e.preventDefault();
+    $('#btnSendReminder').on('click', function () {
+        if(!globalInvoiceData) return;
 
         $('#alertTitle').text("Send Reminder");
-        $('#alertMessage').html(`Send a payment reminder for <b>${globalInvoiceData.invoiceNo}</b> to <b>${globalInvoiceData.agencyName}</b>?`);
+        $('#alertMessage').html(`Send payment reminder for <b>${globalInvoiceData.invoiceNo}</b>?`);
+        $('#alertIconBox').html('<i class="fa-solid fa-paper-plane"></i>').css('color', '#00ff9d');
         
         $('.btn-alert-ok').hide();
 
@@ -329,43 +378,30 @@ $(document).ready(function () {
         $('#customAlertOverlay').addClass('active');
     });
 
-    // Reminder Actions (Delegation)
+    // Event Delegation for dynamic buttons
     $(document).on('click', '#remWA', function() {
-        const msg = `Reminder: Hello ${globalInvoiceData.agencyName}, your invoice ${globalInvoiceData.invoiceNo} is pending. Please clear the dues by ${formatDate(globalInvoiceData.dueDate)}. Thank you!`;
+        const msg = `Reminder: Dear ${globalInvoiceData.agencyName}, your payment for Invoice ${globalInvoiceData.invoiceNo} is due on ${formatDate(globalInvoiceData.dueDate)}. Please ignore if already paid.`;
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-        closeRemOptions();
+        closeRemPop();
     });
 
     $(document).on('click', '#remMail', function() {
-        const subject = `Payment Reminder: ${globalInvoiceData.invoiceNo}`;
-        const body = `Dear ${globalInvoiceData.agencyName},\n\nThis is a friendly reminder that your payment for invoice ${globalInvoiceData.invoiceNo} is due on ${formatDate(globalInvoiceData.dueDate)}.\n\nPlease ignore if already paid.\n\nRegards,\nQuantifyre Iris Team`;
-        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        closeRemOptions();
+        const sub = `Payment Reminder: ${globalInvoiceData.invoiceNo}`;
+        const body = `Dear ${globalInvoiceData.agencyName},\n\nFriendly reminder regarding invoice ${globalInvoiceData.invoiceNo} due on ${formatDate(globalInvoiceData.dueDate)}.\n\nRegards,\nTeam Quantifyre`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+        closeRemPop();
     });
 
     $(document).on('click', '#btnCancelRem', function() {
-        closeRemOptions();
+        closeRemPop();
     });
 
-    function closeRemOptions() {
+    function closeRemPop() {
         $('#customAlertOverlay').removeClass('active');
         $('#send-options').remove();
         $('.btn-alert-ok').show();
     }
 });
-
-// Custom Alert Helper
-function showCustomAlert(title, message, type, redirectUrl = null) {
-    $('#alertTitle').text(title);
-    $('#alertMessage').text(message);
-    const icon = type === 'success' ? 'fa-check' : 'fa-triangle-exclamation';
-    $('#alertIconBox').html(`<i class="fa-solid ${icon}"></i>`).css('color', type === 'success' ? '#00ff9d' : '#ff4d4d');
-    $('#customAlertOverlay').addClass('active');
-    $('.btn-alert-ok').off('click').on('click', function () {
-        $('#customAlertOverlay').removeClass('active');
-        if (redirectUrl) window.location.href = redirectUrl;
-    });
-}
 </script>
 </body>
 </html>
