@@ -290,39 +290,50 @@
             "Enterprise": 0
         };
 
-        // 1. Initialize Pickers & Select2
+        // 1. DATE PICKERS SETUP
         const fpConfig = { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", theme: "dark" };
         const issuePicker = flatpickr("#issueDate", fpConfig);
         const duePicker = flatpickr("#dueDate", fpConfig);
 
+        // 2. SELECT2 INITIALIZATION (With Theme Fix)
         agencySelect.select2({
-            placeholder: "Searching Agencies...",
-            allowClear: true,
-            width: '100%'
+            placeholder: "Select an Agency",
+            width: '100%',
+            dropdownParent: $('.ci-agency-select-wrapper') // Taki dropdown glass card ke peeche na chhup jaye
         });
 
-        // 2. PEHLE SAARE AGENCIES LOAD KAREIN (Dropdown Bharne ke liye)
-        function fetchAllAgencies() {
+        // 3. FETCH & FILL LOGIC (Promise-based)
+        function initializePage() {
             const adminId = localStorage.getItem("adminId");
-            return $.ajax({
+
+            // Pehle Agencies Load karo
+            $.ajax({
                 url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/agencies/list',
                 type: 'GET',
-                data: { adminId: adminId }
+                data: { adminId: adminId },
+                success: function (agencies) {
+                    agencySelect.empty().append('<option></option>');
+                    agencies.forEach(a => {
+                        agencySelect.append(new Option(a.agencyName, a.id));
+                    });
+
+                    // Agencies load hone ke baad Invoice Details lao
+                    fetchInvoiceDetails();
+                }
             });
         }
 
-        // 3. LOAD INVOICE DATA (Existing Data lane ke liye)
-        function loadInvoiceData() {
+        function fetchInvoiceDetails() {
             $.ajax({
                 url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
                 type: 'GET',
                 success: function (data) {
                     currentInvoiceStatus = data.status || "Pending";
 
-                    // Pre-select Agency in Dropdown
+                    // Agency Select2 Sync (Value set karke trigger karna zaroori hai)
                     agencySelect.val(data.agencyId).trigger('change');
 
-                    // Form Fields Fill
+                    // Inputs Fill
                     $('#billToAddress').val(data.billToAddress);
                     $('#contactPerson').val(data.contactPerson);
                     $('input[readonly]').first().val(data.invoiceNo);
@@ -341,39 +352,28 @@
             });
         }
 
-        // --- SEQUENCE EXECUTION ---
-        // Pehle dropdown bharenge, phir data load karenge
-        fetchAllAgencies().done(function(data) {
-            agencySelect.empty().append('<option></option>');
-            if (data && data.length > 0) {
-                data.forEach(agency => {
-                    agencySelect.append(new Option(agency.agencyName, agency.id));
-                });
-            }
-            // Dropdown bhar gaya, ab Invoice data load karo
-            loadInvoiceData();
-        });
-
-        // 4. CALCULATION & SYNC
+        // 4. CALCULATION
         window.calculateInvoice = function () {
             const rate = parseFloat($('#itemRate').val()) || 0;
             const taxPercent = parseFloat($('#taxInput').val()) || 0;
+            
             $('.calc-input-small').first().val('₹' + rate.toLocaleString('en-IN'));
             const taxAmount = (rate * taxPercent) / 100;
             const total = rate + taxAmount;
+            
             $('.total-value').text('₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
             $('.error-msg').hide();
         };
 
         $(document).on('input', '#itemRate, #taxInput', calculateInvoice);
 
-        // 5. UPDATE ACTION
-        $('.btn-submit').on('click', function (e) {
+        // 5. UPDATE SUBMIT
+        $('.form-footer-actions .btn-submit').on('click', function (e) {
             e.preventDefault();
 
-            // Validation logic
-            if (!agencySelect.val() || !$('#billToAddress').val().trim() || !$('#itemRate').val()) {
-                showCustomAlert("Wait!", "Please fill all required fields.", "error");
+            // Simple Validation check
+            if (!agencySelect.val() || !$('#itemRate').val()) {
+                showCustomAlert("Input Required", "Please fill essential fields before updating.", "error");
                 return;
             }
 
@@ -387,7 +387,7 @@
                 invoiceNo: $('input[readonly]').first().val(),
                 plan: $('#planInput').val(),
                 rate: parseFloat($('#itemRate').val()),
-                taxPercent: parseFloat($('#taxInput').val()),
+                taxPercent: parseFloat($('#taxInput').val()) || 0,
                 issueDate: $('#issueDate').val(),
                 dueDate: $('#dueDate').val(),
                 notes: $('#notes').val(),
@@ -412,6 +412,7 @@
             });
         });
 
+        // UI HELPERS
         function updatePlanUI(planName) {
             $('#planDropdown .selected-text').text(planName).css('color', '#fff');
             $('#planInput').val(planName);
@@ -432,19 +433,20 @@
 
         window.toggleDropdown = function (id) {
             event.stopPropagation();
-            $('.custom-dropdown').not('#' + id).removeClass('active');
-            $('#' + id).toggleClass('active');
+            $('.custom-dropdown').removeClass('active');
+            $('#' + id).addClass('active');
         };
+
+        // Start initialization
+        initializePage();
     });
 
     function showCustomAlert(title, message, type, redirectUrl = null) {
         $('#alertTitle').text(title);
         $('#alertMessage').text(message);
-        if (type === 'success') {
-            $('#alertIconBox').html('<i class="fa-solid fa-check"></i>').css('color', '#00ff9d');
-        } else {
-            $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>').css('color', '#ff4d4d');
-        }
+        const icon = type === 'success' ? 'fa-check' : 'fa-triangle-exclamation';
+        const color = type === 'success' ? '#00ff9d' : '#ff4d4d';
+        $('#alertIconBox').html(`<i class="fa-solid ${icon}"></i>`).css('color', color);
         $('#customAlertOverlay').addClass('active');
         $('.btn-alert-ok').off('click').on('click', function () {
             $('#customAlertOverlay').removeClass('active');
