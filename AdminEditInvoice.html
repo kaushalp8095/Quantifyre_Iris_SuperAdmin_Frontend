@@ -268,92 +268,207 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="Js/flatpickr.js"></script>
     <script>
-        $(document).ready(function () {
-            // 1. FLATPIKR (DATE PICKER) SETUP
-            const fpConfig = {
-                dateFormat: "d M, Y",
-                altInput: true,
-                altFormat: "d M, Y",
-                allowInput: true,
-                theme: "dark"
-            };
+    $(document).ready(function () {
+        // 1. URL se Invoice ID nikalna
+        const urlParams = new URLSearchParams(window.location.search);
+        const invoiceId = urlParams.get('id');
+        let currentInvoiceStatus = "Pending"; 
 
-            const issuePicker = flatpickr("#issueDate", {
-                ...fpConfig,
-                onChange: function (selectedDates, dateStr) {
-                    duePicker.set('minDate', dateStr);
-                }
-            });
+        if (!invoiceId) {
+            showCustomAlert("Error", "Invoice ID missing!", "error", "AdminBilling.html");
+            return;
+        }
 
-            const duePicker = flatpickr("#dueDate", fpConfig);
+        // 2. PLAN RATES CONFIGURATION (Create page wala same logic)
+        const planRates = {
+            "Basic(Default)": 25000,
+            "Pro": 50000,
+            "Premium": 75000,
+            "Enterprise": 0
+        };
 
-            // 2. SELECT2 INITIALIZATION (AGENCY SEARCH)
-            const agencySelect = $('#agencySearchSelect');
-            agencySelect.select2({
-                placeholder: "Select an Agency",
-                allowClear: true,
-                width: '100%'
-            });
+        // 3. FLATPIKR (DATE PICKER) SETUP
+        const fpConfig = {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d M, Y",
+            theme: "dark"
+        };
+        const issuePicker = flatpickr("#issueDate", fpConfig);
+        const duePicker = flatpickr("#dueDate", fpConfig);
 
-           
-            // 3. API SE UNIQUE AGENCIES LOAD KARNA
-            function fetchAgenciesForInvoice() {
-                const currentAdminId = localStorage.getItem("adminId");
+        // 4. SELECT2 INITIALIZATION
+        $('#agencySearchSelect').select2({
+            placeholder: "Select an Agency",
+            width: '100%'
+        });
 
-                $.ajax({
-                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list',
-                    type: 'GET',
-                    data: { adminId: currentAdminId },
-                    success: function (data) {
-                        agencySelect.empty().append('<option></option>');
+        // 5. EXISTING DATA FETCH (Pre-fill)
+        function loadInvoiceData() {
+            $.ajax({
+                url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
+                type: 'GET',
+                success: function (data) {
+                    currentInvoiceStatus = data.status || "Pending";
 
-                        const agencySet = new Set();
-                        if (data && data.length > 0) {
-                            data.forEach(item => {
-                                const name = item.agencyName || item.agency_name;
-                                if (name) agencySet.add(name);
-                            });
-
-                            // Set se unique names dropdown mein daalein
-                            agencySet.forEach(agencyName => {
-                                agencySelect.append(new Option(agencyName, agencyName));
-                            });
-                        }
-                        agencySelect.trigger('change'); // UI Refresh
-                    },
-                    error: function () {
-                        console.error("Failed to load agencies");
+                    // Agency set karein
+                    if (data.agencyName) {
+                        const newOption = new Option(data.agencyName, data.agencyId, true, true);
+                        $('#agencySearchSelect').append(newOption).trigger('change');
                     }
-                });
-            }
-            fetchAgenciesForInvoice();
 
-            // 4. CUSTOM DROPDOWN (PLAN) TOGGLE LOGIC
-            window.toggleDropdown = function (id) {
-                event.stopPropagation();
-                $('.custom-dropdown').not('#' + id).removeClass('active');
-                $('#' + id).toggleClass('active');
-            };
-
-            // 5. PLAN SELECTION LOGIC
-            window.selectItem = function (dropdownId, text) {
-                let dropdown = $('#' + dropdownId);
-                dropdown.find('.selected-text').text(text).css('color', '#fff');
-
-                if (dropdownId === 'planDropdown') {
-                    $('#planInput').val(text);
+                    // Form Fields Fill karein
+                    $('#billToAddress').val(data.billToAddress);
+                    $('#contactPerson').val(data.contactPerson);
+                    $('input[value="INV-001"]').val(data.invoiceNo); // Invoice No display field
+                    
+                    issuePicker.setDate(data.issueDate);
+                    duePicker.setDate(data.dueDate);
+                    
+                    $('#itemDescription').val(data.plan + " Subscription Plan");
+                    $('#itemRate').val(data.rate);
+                    $('#taxInput').val(data.taxPercent);
+                    $('#notes').val(data.notes);
+                    
+                    updatePlanUI(data.plan);
+                    calculateInvoice();
+                },
+                error: function () {
+                    showCustomAlert("Error", "Failed to load invoice details.", "error");
                 }
-                dropdown.removeClass('active');
+            });
+        }
+
+        // 6. CALCULATION LOGIC
+        window.calculateInvoice = function () {
+            const rate = parseFloat($('#itemRate').val()) || 0;
+            const taxPercent = parseFloat($('#taxInput').val()) || 0;
+
+            // Sub-total UI sync
+            $('.calc-input-small').first().val('₹' + rate.toLocaleString('en-IN'));
+
+            const taxAmount = (rate * taxPercent) / 100;
+            const total = rate + taxAmount;
+
+            $('.total-value').text('₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+            
+            // Errors hide karein
+            if (rate > 0) $('#err-rate').hide();
+            if (taxPercent >= 0) $('#err-tax').hide();
+        };
+
+        $(document).on('input', '#itemRate, #taxInput', calculateInvoice);
+
+        // 7. PLAN SELECTION (Global trigger)
+        window.selectItem = function (dropdownId, text) {
+            let dropdown = $('#' + dropdownId);
+            dropdown.find('.selected-text').text(text).css('color', '#fff');
+
+            if (dropdownId === 'planDropdown') {
+                $('#planInput').val(text);
+                const rate = planRates[text] || 0;
+                $('#itemDescription').val(text + " Subscription Plan");
+                $('#itemRate').val(rate);
+                calculateInvoice(); // Rate badalte hi calculation trigger
+            }
+            dropdown.removeClass('active');
+        };
+
+        // 8. VALIDATION
+        function validateEditForm() {
+            let isValid = true;
+            $('.error-msg').hide();
+
+            if (!$('#agencySearchSelect').val()) { $('#err-agency').show(); isValid = false; }
+            if (!$('#billToAddress').val().trim()) { $('#err-address').show(); isValid = false; }
+            if (!$('#contactPerson').val().trim()) { $('#err-contact').show(); isValid = false; }
+            if (!$('#issueDate').val()) { $('#err-issue').show(); isValid = false; }
+            if (!$('#dueDate').val()) { $('#err-due').show(); isValid = false; }
+            
+            const rate = parseFloat($('#itemRate').val());
+            if (isNaN(rate) || rate <= 0) { $('#err-rate').show(); isValid = false; }
+            
+            const tax = parseFloat($('#taxInput').val());
+            if (isNaN(tax) || tax < 0 || tax > 100) { $('#err-tax').show(); isValid = false; }
+
+            return isValid;
+        }
+
+        // 9. UPDATE BUTTON ACTION
+        $('.btn-submit').on('click', function (e) {
+            e.preventDefault();
+
+            if (!validateEditForm()) {
+                showCustomAlert("Wait!", "Please fill all required fields correctly.", "error");
+                return;
+            }
+
+            const updatedData = {
+                id: invoiceId, 
+                adminId: localStorage.getItem("adminId"),
+                agencyId: $('#agencySearchSelect').val(),
+                agencyName: $('#agencySearchSelect option:selected').text(),
+                billToAddress: $('#billToAddress').val(),
+                contactPerson: $('#contactPerson').val(),
+                invoiceNo: $('input[readonly]').first().val(), 
+                plan: $('#planInput').val(),
+                rate: parseFloat($('#itemRate').val()),
+                taxPercent: parseFloat($('#taxInput').val()),
+                issueDate: $('#issueDate').val(),
+                dueDate: $('#dueDate').val(),
+                notes: $('#notes').val(),
+                status: currentInvoiceStatus
             };
 
-            // Click outside to close dropdowns
-            $(document).on('click', function (e) {
-                if (!$(e.target).closest('.custom-dropdown').length) {
-                    $('.custom-dropdown').removeClass('active');
+            const btn = $(this);
+            btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Updating...').prop('disabled', true);
+
+            $.ajax({
+                url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedData),
+                success: function () {
+                    showCustomAlert("Success!", "Invoice updated successfully!", "success", "AdminBilling.html");
+                },
+                error: function () {
+                    btn.text("Update Invoice").prop('disabled', false);
+                    showCustomAlert("Error", "Update failed. Please try again.", "error");
                 }
             });
         });
-    </script>
+
+        function updatePlanUI(planName) {
+            $('#planDropdown .selected-text').text(planName).css('color', '#fff');
+            $('#planInput').val(planName);
+        }
+
+        loadInvoiceData();
+    });
+
+    // Custom Alert Function
+    function showCustomAlert(title, message, type, redirectUrl = null) {
+        $('#alertTitle').text(title);
+        $('#alertMessage').text(message);
+        const iconBox = $('#alertIconBox');
+        if (type === 'success') {
+            iconBox.html('<i class="fa-solid fa-check"></i>').css('color', '#00ff9d');
+        } else {
+            iconBox.html('<i class="fa-solid fa-triangle-exclamation"></i>').css('color', '#ff4d4d');
+        }
+        $('#customAlertOverlay').addClass('active');
+        $('.btn-alert-ok').off('click').on('click', function () {
+            $('#customAlertOverlay').removeClass('active');
+            if (redirectUrl) window.location.href = redirectUrl;
+        });
+    }
+
+    window.toggleDropdown = function (id) {
+        event.stopPropagation();
+        $('.custom-dropdown').not('#' + id).removeClass('active');
+        $('#' + id).toggleClass('active');
+    };
+</script>
 </body>
 
 </html>
