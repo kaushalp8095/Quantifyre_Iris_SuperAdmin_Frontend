@@ -349,34 +349,71 @@ $(document).ready(function () {
     });
 
     // ==========================================
-    // 3. SEND REMINDER
-    // ==========================================
-    $('#btnSendReminder').on('click', function () {
-        if(!globalInvoiceData) return;
+// 3. SEND REMINDER (WhatsApp & Email Combined)
+// ==========================================
+$('#btnSendReminder').on('click', function () {
+    if(!globalInvoiceData) return;
 
-        $('#alertTitle').text("Send Reminder");
-        $('#alertMessage').html(`Send payment reminder for <b>${globalInvoiceData.invoiceNo}</b>?`);
-        $('#alertIconBox').html('<i class="fa-solid fa-paper-plane"></i>').css('color', '#00ff9d');
-        
-        $('.btn-alert-ok').hide();
+    $('#alertTitle').text("Send Reminder");
+    $('#alertMessage').html(`Choose reminder method for <b>${globalInvoiceData.invoiceNo}</b>:`);
+    $('#alertIconBox').html('<i class="fa-solid fa-paper-plane"></i>').css('color', '#00ff9d');
+    
+    $('.btn-alert-ok').hide();
 
-        if ($('#send-options').length === 0) {
-            $('.custom-alert-box').append(`
-                <div id="send-options" style="display:flex; flex-direction:column; gap:10px; margin-top:20px; width:100%;">
-                    <button id="remWA" type="button" style="background:#25D366; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
-                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Reminder
-                    </button>
-                    <button id="remMail" type="button" style="background:#EA4335; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
-                        <i class="fa-solid fa-envelope"></i> Email Reminder
-                    </button>
-                    <button id="btnCancelRem" type="button" style="background:transparent; color:#888; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
-                        Cancel
-                    </button>
-                </div>
-            `);
-        }
-        $('#customAlertOverlay').addClass('active');
-    });
+    if ($('#send-options').length === 0) {
+        $('.custom-alert-box').append(`
+            <div id="send-options" style="display:flex; flex-direction:column; gap:10px; margin-top:20px; width:100%;">
+                <button id="remWA" type="button" style="background:#25D366; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp Reminder
+                </button>
+                <button id="remMail" type="button" style="background:#EA4335; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
+                    <i class="fa-solid fa-envelope"></i> Email Reminder
+                </button>
+                <button id="btnCancelRem" type="button" style="background:transparent; color:#888; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
+                    Cancel
+                </button>
+            </div>
+        `);
+    }
+    $('#customAlertOverlay').addClass('active');
+});
+
+// --- WhatsApp Logic ---
+$(document).on('click', '#remWA', function() {
+    const msg = `Reminder: Dear ${globalInvoiceData.agencyName}, your payment for Invoice ${globalInvoiceData.invoiceNo} is due on ${formatDate(globalInvoiceData.dueDate)}. Please ignore if already paid.`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    closeRemPop();
+});
+
+// --- Email Logic (Fixed) ---
+$(document).on('click', '#remMail', function(e) {
+    e.preventDefault();
+    
+    const email = globalInvoiceData.agencyEmail || ""; 
+    const subject = encodeURIComponent(`Payment Reminder: ${globalInvoiceData.invoiceNo}`);
+    const bodyText = `Dear ${globalInvoiceData.agencyName},\n\nThis is a friendly reminder regarding Invoice ${globalInvoiceData.invoiceNo} due on ${formatDate(globalInvoiceData.dueDate)}.\n\nRegards,\nTeam Quantifyre`;
+    
+    const mailtoLink = `mailto:${email}?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+    
+    // Hidden Link Method (Sabse reliable)
+    const tempLink = document.createElement('a');
+    tempLink.href = mailtoLink;
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    document.body.removeChild(tempLink);
+
+    closeRemPop();
+});
+
+$(document).on('click', '#btnCancelRem', function() {
+    closeRemPop();
+});
+
+function closeRemPop() {
+    $('#customAlertOverlay').removeClass('active');
+    $('#send-options').remove();
+    $('.btn-alert-ok').show();
+}
 
     // Event Delegation for dynamic buttons
     $(document).on('click', '#remWA', function() {
