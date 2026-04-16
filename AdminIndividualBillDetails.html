@@ -106,7 +106,7 @@
                     </div>
                     <div>
                         <h1>Individual Bill Details</h1>
-                        <p>Invoice #INV-2025-001</p>
+                        <p id="top-invoice-no">Loading...</p>
                     </div>
                 </div>
                 <a href="AdminBilling.html" class="btn-back">
@@ -117,28 +117,29 @@
             <section class="glass-card mb-25" style="padding: 30px;">
                 <div class="bill-info-grid">
                     <div class="info-block">
-                        <h3>Agency Details</h3>
-                        <span class="client-name">Acme Corp</span>
-                        <p class="client-text">
-                            Address: Modhera Road,<br>
-                            Mehsana 384002
-                        </p>
-                    </div>
+    <h3>Agency Details</h3>
+    <span class="client-name" id="det-agency-name">---</span>
+    <p class="client-text" id="det-address">---</p>
+</div>
 
                     <div class="info-block right">
-                        <div class="info-row">
-                            <span class="meta-label">Invoice Info:</span>
-                            <span class="meta-value">#INV-2025-001</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="meta-label">Due:</span>
-                            <span class="meta-value">15/07/2025</span>
-                        </div>
-                        <div class="info-row" style="align-items: center; border-bottom: none;">
-                            <span class="meta-label">Status:</span>
-                            <span class="status-pill-large st-paid">Paid</span>
-                        </div>
-                    </div>
+    <div class="info-row">
+        <span class="meta-label">Invoice Info:</span>
+        <span class="meta-value" id="det-invoice-no">---</span>
+    </div>
+    <div class="info-row">
+        <span class="meta-label">Issue Date:</span>
+        <span class="meta-value" id="det-issue-date">---</span>
+    </div>
+    <div class="info-row">
+        <span class="meta-label">Due:</span>
+        <span class="meta-value" id="det-due-date">---</span>
+    </div>
+    <div class="info-row" style="align-items: center; border-bottom: none;">
+        <span class="meta-label">Status:</span>
+        <span id="det-status-pill">---</span>
+    </div>
+</div>
                 </div>
             </section>
 
@@ -154,35 +155,30 @@
                                 <th>Amount</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Web Development Project</td>
-                                <td>₹ 20,000</td>
-                                <td>₹ 50,000</td>
-                            </tr>
-                            <tr>
-                                <td>SEO Services</td>
-                                <td>₹ 15,000</td>
-                                <td>₹ 20,000</td>
+                        <tbody id="det-table-body">
+                           <tr>
+                                <td colspan="9" style="text-align:center; padding: 50px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Invoice...
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="bill-totals">
-                    <div class="total-row">
-                        <span class="lbl">Sub Total:</span>
-                        <span class="val">₹ 70,000</span>
-                    </div>
-                    <div class="total-row">
-                        <span class="lbl">Tax:</span>
-                        <span class="val">₹ 5,000</span>
-                    </div>
-                    <div class="total-row grand">
-                        <span class="lbl" style="color:#fff;">Grand Total:</span>
-                        <span class="val highlight">₹ 75,000</span>
-                    </div>
-                </div>
+    <div class="total-row">
+        <span class="lbl">Sub Total:</span>
+        <span class="val" id="det-subtotal">₹0.00</span>
+    </div>
+    <div class="total-row">
+        <span class="lbl" id="det-tax-label">Tax:</span>
+        <span class="val" id="det-tax-amount">₹0.00</span>
+    </div>
+    <div class="total-row grand">
+        <span class="lbl" style="color:#fff;">Grand Total:</span>
+        <span class="val highlight" id="det-grand-total">₹0.00</span>
+    </div>
+</div>
 
                 <div class="bill-actions">
                     <button class="btn-bill-action"><i class="fa-solid fa-download"></i> Download PDF</button>
@@ -210,5 +206,87 @@
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script> 
+
+    <script>
+    $(document).ready(function () {
+        // 1. URL se ID nikalna
+        const urlParams = new URLSearchParams(window.location.search);
+        const invoiceId = urlParams.get('id');
+
+        if (!invoiceId) {
+            alert("Invoice ID missing! Redirecting...");
+            window.location.href = "AdminBilling.html";
+            return;
+        }
+
+        // 2. Backend se data fetch karna
+        function fetchBillDetails() {
+            $.ajax({
+                url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
+                type: 'GET',
+                success: function (data) {
+                    fillBillData(data);
+                },
+                error: function (xhr) {
+                    console.error("Error fetching details:", xhr);
+                    alert("Could not load invoice details.");
+                }
+            });
+        }
+
+        // 3. Data ko HTML mein fill karna
+        function fillBillData(data) {
+            // Header & Agency
+            $('#top-invoice-no').text("Invoice " + data.invoiceNo);
+            $('#det-agency-name').text(data.agencyName);
+            $('#det-address').html(`Address: ${data.billToAddress}<br>Contact: ${data.contactPerson}`);
+
+            // Meta Info
+            $('#det-invoice-no').text(data.invoiceNo);
+            $('#det-issue-date').text(formatDate(data.issueDate));
+            $('#det-due-date').text(formatDate(data.dueDate));
+
+            // Status Pill Logic
+            const statusClass = data.status.toLowerCase() === 'paid' ? 'st-paid' : 'st-pending';
+            $('#det-status-pill').attr('class', `status-pill-large ${statusClass}`).text(data.status);
+
+            // Calculation Logic
+            const rate = data.rate || 0;
+            const taxPercent = data.taxPercent || 0;
+            const taxAmt = (rate * taxPercent) / 100;
+            const grandTotal = rate + taxAmt;
+
+            // Table Item (Aapka backend single plan data bhejta hai)
+            const tableHtml = `
+                <tr>
+                    <td>${data.plan} Subscription Plan<br><small style="color:#8b9c9c">${data.notes || ''}</small></td>
+                    <td>₹${rate.toLocaleString('en-IN')}</td>
+                    <td>₹${rate.toLocaleString('en-IN')}</td>
+                </tr>
+            `;
+            $('#det-table-body').html(tableHtml);
+
+            // Summary
+            $('#det-subtotal').text(`₹${rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+            $('#det-tax-label').text(`Tax (${taxPercent}%):`);
+            $('#det-tax-amount').text(`₹${taxAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+            $('#det-grand-total').text(`₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+        }
+
+        // Helper: Date format (DD/MM/YYYY)
+        function formatDate(dateStr) {
+            if (!dateStr) return "---";
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-GB'); // "15/07/2025"
+        }
+
+        // Function call
+        fetchBillDetails();
+    });
+
+    // Buttons actions (Basic Placeholders)
+    $('.fa-download').closest('button').click(function() { alert("Generating PDF..."); });
+    $('.fa-print').closest('button').click(function() { window.print(); });
+</script>
 </body>
 </html>
