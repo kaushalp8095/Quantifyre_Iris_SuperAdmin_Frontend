@@ -353,7 +353,38 @@
                 }
             });
         });
-    </script>
+
+        function updatePlanUI(planName) {
+            $('#planDropdown .selected-text').text(planName).css('color', '#fff');
+            $('#planInput').val(planName);
+        }
+
+        loadInvoiceData();
+    });
+
+    // Custom Alert Function
+    function showCustomAlert(title, message, type, redirectUrl = null) {
+        $('#alertTitle').text(title);
+        $('#alertMessage').text(message);
+        const iconBox = $('#alertIconBox');
+        if (type === 'success') {
+            iconBox.html('<i class="fa-solid fa-check"></i>').css('color', '#00ff9d');
+        } else {
+            iconBox.html('<i class="fa-solid fa-triangle-exclamation"></i>').css('color', '#ff4d4d');
+        }
+        $('#customAlertOverlay').addClass('active');
+        $('.btn-alert-ok').off('click').on('click', function () {
+            $('#customAlertOverlay').removeClass('active');
+            if (redirectUrl) window.location.href = redirectUrl;
+        });
+    }
+
+    window.toggleDropdown = function (id) {
+        event.stopPropagation();
+        $('.custom-dropdown').not('#' + id).removeClass('active');
+        $('#' + id).toggleClass('active');
+    };
+</script>
 </body>
 
 </html>
