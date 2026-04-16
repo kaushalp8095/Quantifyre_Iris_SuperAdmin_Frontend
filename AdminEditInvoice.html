@@ -354,14 +354,6 @@
             });
         });
 
-        function updatePlanUI(planName) {
-            $('#planDropdown .selected-text').text(planName).css('color', '#fff');
-            $('#planInput').val(planName);
-        }
-
-        loadInvoiceData();
-    });
-
     // Custom Alert Function
     function showCustomAlert(title, message, type, redirectUrl = null) {
         $('#alertTitle').text(title);
@@ -385,6 +377,7 @@
         $('#' + id).toggleClass('active');
     };
 </script>
+
 </body>
 
 </html>
