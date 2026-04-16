@@ -349,58 +349,50 @@ $(document).ready(function () {
     });
 
     // ==========================================
-// 3. SEND REMINDER (FIXED: User Gesture Error)
+// 3. SEND REMINDER (FIXED CLICK ISSUE)
 // ==========================================
-$('#btnSendReminder').on('click', function () {
+$('#btnSendReminder').on('click', function (e) {
+    e.preventDefault();
     if(!globalInvoiceData) return;
 
-    // Email Data taiyar karo
     const email = globalInvoiceData.agencyEmail || ""; 
     const subject = encodeURIComponent(`Payment Reminder: ${globalInvoiceData.invoiceNo}`);
     const bodyText = encodeURIComponent(`Dear ${globalInvoiceData.agencyName},\n\nThis is a friendly reminder regarding Invoice ${globalInvoiceData.invoiceNo} due on ${formatDate(globalInvoiceData.dueDate)}.\n\nRegards,\nTeam Quantifyre`);
-    
-    // WhatsApp Data taiyar karo
     const waMsg = encodeURIComponent(`Reminder: Dear ${globalInvoiceData.agencyName}, your payment for Invoice ${globalInvoiceData.invoiceNo} is due on ${formatDate(globalInvoiceData.dueDate)}. Please ignore if already paid.`);
 
-    // UI Update
     $('#alertTitle').text("Send Reminder");
-    $('#alertMessage').html(`Choose reminder method for <b>${globalInvoiceData.invoiceNo}</b>:`);
-    $('#alertIconBox').html('<i class="fa-solid fa-paper-plane"></i>').css('color', '#00ff9d');
+    $('#alertMessage').html(`Choose method for <b>${globalInvoiceData.invoiceNo}</b>:`);
     
     $('.btn-alert-ok').hide();
 
-    // Buttons inject karein (Direct <a> tags ke sath)
-    if ($('#send-options').length === 0) {
-        $('.custom-alert-box').append(`
-            <div id="send-options" style="display:flex; flex-direction:column; gap:10px; margin-top:20px; width:100%;">
-                
-                <a href="https://wa.me/?text=${waMsg}" target="_blank" style="text-decoration:none;">
-                    <button type="button" style="background:#25D366; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600; width:100%;">
-                        <i class="fa-brands fa-whatsapp"></i> WhatsApp Reminder
-                    </button>
-                </a>
+    // Pehle purane options saaf karo
+    $('#send-options').remove();
 
-                <a href="mailto:${email}?subject=${subject}&body=${bodyText}" style="text-decoration:none;">
-                    <button type="button" style="background:#EA4335; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600; width:100%;">
-                        <i class="fa-solid fa-envelope"></i> Email Reminder
-                    </button>
-                </a>
+    // Buttons inject karein - Style inline di hai taki CSS conflict na ho
+    $('.custom-alert-box').append(`
+        <div id="send-options" style="display:flex; flex-direction:column; gap:12px; margin-top:20px; width:100%; position:relative; z-index:9999;">
+            
+            <a href="https://wa.me/?text=${waMsg}" target="_blank" class="rem-opt-btn" style="text-decoration:none; background:#25D366; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp Reminder
+            </a>
 
-                <button id="btnCancelRem" type="button" style="background:transparent; color:#888; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
-                    Cancel
-                </button>
-            </div>
-        `);
-    }
+            <a href="mailto:${email}?subject=${subject}&body=${bodyText}" class="rem-opt-btn" style="text-decoration:none; background:#EA4335; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
+                <i class="fa-solid fa-envelope"></i> Email Reminder
+            </a>
+
+            <button id="btnCancelRem" type="button" style="background:rgba(255,255,255,0.1); color:#ccc; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
+                Cancel
+            </button>
+        </div>
+    `);
+
     $('#customAlertOverlay').addClass('active');
 });
 
-// Click handlers ko clean rakhein
-$(document).on('click', '#remWA, #remMail, #btnCancelRem', function() {
-    // Sirf popup band karne ke liye (Links apna kaam href se kar lenge)
+// Click Handler to close popup after clicking any option
+$(document).on('click', '.rem-opt-btn, #btnCancelRem', function() {
     $('#customAlertOverlay').removeClass('active');
-    $('#send-options').remove();
-    $('.btn-alert-ok').show();
+    setTimeout(() => { $('#send-options').remove(); $('.btn-alert-ok').show(); }, 300);
 });
 
     // Event Delegation for dynamic buttons
