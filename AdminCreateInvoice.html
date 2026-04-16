@@ -485,10 +485,7 @@
         $('.btn-cancel').on('click', function (e) {
             e.preventDefault();
 
-            if (!validateInvoiceForm()) {
-                    showCustomAlert("Validation Error", "Please fill all required fields correctly.", "error");
-                    return; // Agar validation fail hua toh aage mat badho
-                }
+
 
             const selectedAgencyId = $('#agencySearchSelect').val(); // 👈 Agency ID yahan se milegi
             const adminId = localStorage.getItem("adminId"); // 👈 Admin ID yahan se
