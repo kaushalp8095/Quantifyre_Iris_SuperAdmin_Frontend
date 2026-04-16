@@ -111,7 +111,8 @@
                     </div>
                     <div>
                         <h1>Edit Invoice</h1>
-                        <p>Modify billing details for Invoice #INV-001</p>
+                        <p>Modify billing details for Invoice <span id="dynamicInvoiceNo"
+                                style="font-weight: bold;"></span></p>
                     </div>
                 </div>
                 <a href="AdminPreviewInvoice.html" class="btn-back">
@@ -374,6 +375,10 @@
 
             // COMMON: Fields ko bharna
             function fillFields(data) {
+
+                if (data.invoiceNo) {
+                    $('#dynamicInvoiceNo').text(data.invoiceNo);
+                }
                 agencySelect.val(data.agencyId).trigger('change');
                 $('#billToAddress').val(data.billToAddress);
                 $('#contactPerson').val(data.contactPerson);
