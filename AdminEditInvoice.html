@@ -134,17 +134,18 @@
 
                             <div class="form-group" style="margin-top: 15px; margin-bottom: 15px;">
                                 <label class="ci-label">Bill To Address</label>
-                                <input type="text" class="ci-input" value="123 Business Park, Sector 5">
+                                <input type="text" id="billToAddress" class="ci-input"
+                                    value="123 Business Park, Sector 5">
                             </div>
 
                             <div class="form-group" style="margin-bottom: 15px;">
                                 <label class="ci-label">Contact Person</label>
-                                <input type="text" class="ci-input" value="Rahul Sharma">
+                                <input type="text" id="contactPerson" class="ci-input" value="Rahul Sharma">
                             </div>
 
                             <div class="form-group" style="margin-bottom: 15px;">
                                 <label class="ci-label">Invoice No.</label>
-                                <input type="text" class="ci-input" value="INV-001" readonly
+                                <input type="text" id="invoiceNoDisplay" class="ci-input" value="INV-001" readonly
                                     style="opacity: 0.7; cursor: not-allowed;">
                                 <span class="input-helper">Cannot change Invoice No</span>
                             </div>
@@ -204,8 +205,8 @@
                                 </div>
 
                                 <div class="item-row">
-                                    <input type="text" class="ci-input" value="Marketing Service">
-                                    <input type="number" class="ci-input" value="25000">
+                                    <input type="text" id="itemDescription" class="ci-input" value="Marketing Service">
+                                    <input type="number" id="itemRate" class="ci-input" value="25000">
                                     <input type="text" class="ci-input" value="50,000" readonly>
                                     <button type="button" class="btn-action-icon btn-remove"><i
                                             class="fa-solid fa-trash"></i></button>
@@ -220,7 +221,7 @@
 
                                     <div class="calc-row">
                                         <span class="calc-label">Tax (%)</span>
-                                        <input type="number" class="ci-input calc-input-small" value="15">
+                                        <input type="number" id="taxInput" class="ci-input calc-input-small" value="15">
                                     </div>
 
                                     <div class="total-amount-row">
@@ -235,13 +236,11 @@
 
                     <div class="form-group" style="margin-top: 7px;">
                         <label class="ci-label">Notes</label>
-                        <textarea class="ci-textarea">Payment due within 15 days of invoice date.</textarea>
+                        <textarea id="notes" class="ci-textarea">Payment due within 15 days of invoice date.</textarea>
                     </div>
 
                     <div class="form-footer-actions">
-                        <a href="AdminBilling.html" class="btn-submit btn"
-                            style="text-decoration: none;text-align: center;">Update
-                            Invoice</a>
+                        <button type="button" id="btnUpdateInvoice" class="btn-submit btn">Update Invoice</button>
                     </div>
                 </form>
             </section>
@@ -269,114 +268,108 @@
     <script src="Js/flatpickr.js"></script>
     <script>
         $(document).ready(function () {
-            // 1. FLATPIKR (DATE PICKER) SETUP
-            const fpConfig = {
-                dateFormat: "d M, Y",
-                altInput: true,
-                altFormat: "d M, Y",
-                allowInput: true,
-                theme: "dark"
-            };
+            // 1. URL se ID nikalna
+            const urlParams = new URLSearchParams(window.location.search);
+            const invoiceId = urlParams.get('id');
 
-            const issuePicker = flatpickr("#issueDate", {
-                ...fpConfig,
-                onChange: function (selectedDates, dateStr) {
-                    duePicker.set('minDate', dateStr);
-                }
-            });
+            if (!invoiceId) {
+                showCustomAlert("Error", "Invoice ID missing!", "error", "AdminBilling.html");
+                return;
+            }
 
+            // 2. FLATPIKR INITIALIZATION
+            const fpConfig = { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", theme: "dark" };
+            const issuePicker = flatpickr("#issueDate", fpConfig);
             const duePicker = flatpickr("#dueDate", fpConfig);
 
-            // 2. SELECT2 INITIALIZATION (AGENCY SEARCH)
-            const agencySelect = $('#agencySearchSelect');
-            agencySelect.select2({
-                placeholder: "Select an Agency",
-                allowClear: true,
-                width: '100%'
-            });
-
-           
-            // 3. API SE UNIQUE AGENCIES LOAD KARNA
-            function fetchAgenciesForInvoice() {
-                const currentAdminId = localStorage.getItem("adminId");
-
+            // 3. EXISTING DATA LOAD KARNA
+            function loadInvoiceData() {
                 $.ajax({
-                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list',
+                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
                     type: 'GET',
-                    data: { adminId: currentAdminId },
                     success: function (data) {
-                        agencySelect.empty().append('<option></option>');
+                        // Fields ko fill karein
+                        $('#agencySearchSelect').val(data.agencyId).trigger('change');
+                        $('#billToAddress').val(data.billToAddress);
+                        $('#contactPerson').val(data.contactPerson);
+                        $('#invoiceNoDisplay').val(data.invoiceNo);
+                        issuePicker.setDate(data.issueDate);
+                        duePicker.setDate(data.dueDate);
 
-                        const agencySet = new Set();
-                        if (data && data.length > 0) {
-                            data.forEach(item => {
-                                const name = item.agencyName || item.agency_name;
-                                if (name) agencySet.add(name);
-                            });
+                        // Item details
+                        $('#itemDescription').val(data.plan + " Subscription Plan");
+                        $('#itemRate').val(data.rate);
+                        $('#taxInput').val(data.taxPercent);
+                        $('#notes').val(data.notes);
 
-                            // Set se unique names dropdown mein daalein
-                            agencySet.forEach(agencyName => {
-                                agencySelect.append(new Option(agencyName, agencyName));
-                            });
-                        }
-                        agencySelect.trigger('change'); // UI Refresh
+                        // Dropdown text update
+                        selectItem('planDropdown', data.plan);
+
+                        // Total calculate karein
+                        calculateInvoice();
                     },
                     error: function () {
-                        console.error("Failed to load agencies");
+                        showCustomAlert("Error", "Failed to load invoice details", "error");
                     }
                 });
             }
-            fetchAgenciesForInvoice();
 
-            // 4. CUSTOM DROPDOWN (PLAN) TOGGLE LOGIC
-            window.toggleDropdown = function (id) {
-                event.stopPropagation();
-                $('.custom-dropdown').not('#' + id).removeClass('active');
-                $('#' + id).toggleClass('active');
+            // 4. CALCULATION LOGIC
+            window.calculateInvoice = function () {
+                const rate = parseFloat($('#itemRate').val()) || 0;
+                const taxPercent = parseFloat($('#taxInput').val()) || 0;
+                const taxAmount = (rate * taxPercent) / 100;
+                const total = rate + taxAmount;
+
+                $('.calc-input-small').first().val('₹' + rate.toLocaleString('en-IN'));
+                $('.total-value').text('₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
             };
 
-            // 5. PLAN SELECTION LOGIC
-            window.selectItem = function (dropdownId, text) {
-                let dropdown = $('#' + dropdownId);
-                dropdown.find('.selected-text').text(text).css('color', '#fff');
+            $(document).on('input', '#itemRate, #taxInput', calculateInvoice);
 
-                if (dropdownId === 'planDropdown') {
-                    $('#planInput').val(text);
-                }
-                dropdown.removeClass('active');
-            };
+            // 5. UPDATE INVOICE (SAVE CHANGES)
+            $('#btnUpdateInvoice').on('click', function (e) {
+                e.preventDefault();
 
-            // Click outside to close dropdowns
-            $(document).on('click', function (e) {
-                if (!$(e.target).closest('.custom-dropdown').length) {
-                    $('.custom-dropdown').removeClass('active');
-                }
+                const updatedData = {
+                    id: invoiceId, // Same ID rahegi update ke liye
+                    adminId: localStorage.getItem("adminId"),
+                    agencyId: $('#agencySearchSelect').val(),
+                    agencyName: $('#agencySearchSelect option:selected').text(),
+                    billToAddress: $('#billToAddress').val(),
+                    contactPerson: $('#contactPerson').val(),
+                    invoiceNo: $('#invoiceNoDisplay').val(),
+                    plan: $('#planInput').val(),
+                    rate: parseFloat($('#itemRate').val()),
+                    taxPercent: parseFloat($('#taxInput').val()),
+                    issueDate: $('#issueDate').val(),
+                    dueDate: $('#dueDate').val(),
+                    notes: $('#notes').val(),
+                    status: "Pending" // Update ke baad bhi pending ya status maintain karein
+                };
+
+                const btn = $(this);
+                btn.text("Updating...").prop('disabled', true);
+
+                $.ajax({
+                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add', // Backend same 'save' method handle karega (id match hone par update hota hai)
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedData),
+                    success: function () {
+                        showCustomAlert("Updated!", "Invoice updated successfully!", "success", "AdminBilling.html");
+                    },
+                    error: function () {
+                        btn.text("Update Invoice").prop('disabled', false);
+                        showCustomAlert("Error", "Update failed!", "error");
+                    }
+                });
             });
-        });
 
-    // Custom Alert Function
-    function showCustomAlert(title, message, type, redirectUrl = null) {
-        $('#alertTitle').text(title);
-        $('#alertMessage').text(message);
-        const iconBox = $('#alertIconBox');
-        if (type === 'success') {
-            iconBox.html('<i class="fa-solid fa-check"></i>').css('color', '#00ff9d');
-        } else {
-            iconBox.html('<i class="fa-solid fa-triangle-exclamation"></i>').css('color', '#ff4d4d');
-        }
-        $('#customAlertOverlay').addClass('active');
-        $('.btn-alert-ok').off('click').on('click', function () {
-            $('#customAlertOverlay').removeClass('active');
-            if (redirectUrl) window.location.href = redirectUrl;
+            // Pehle Load karein phir data bharein
+            loadInvoiceData();
         });
-    }
-
-    window.toggleDropdown = function (id) {
-        event.stopPropagation();
-        $('.custom-dropdown').not('#' + id).removeClass('active');
-        $('#' + id).toggleClass('active');
-    };
-</script>
+    </script>
 
 </body>
 
