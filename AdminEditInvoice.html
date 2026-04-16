@@ -278,206 +278,201 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="Js/flatpickr.js"></script>
     <script>
-    // 1. GLOBAL FUNCTIONS (Sabse upar taaki scope ka issue na ho)
-    function showCustomAlert(title, message, type, redirectUrl = null) {
-        $('#alertTitle').text(title);
-        $('#alertMessage').text(message);
-        const icon = type === 'success' ? 'fa-check' : 'fa-triangle-exclamation';
-        const color = type === 'success' ? '#00ff9d' : '#ff4d4d';
+        // 1. GLOBAL FUNCTIONS (Sabse upar taaki scope ka issue na ho)
+        function showCustomAlert(title, message, type, redirectUrl = null) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+            const icon = type === 'success' ? 'fa-check' : 'fa-triangle-exclamation';
+            const color = type === 'success' ? '#00ff9d' : '#ff4d4d';
 
-        $('#alertIconBox').html(`<i class="fa-solid ${icon}"></i>`).css('color', color);
-        $('#customAlertOverlay').addClass('active');
+            $('#alertIconBox').html(`<i class="fa-solid ${icon}"></i>`).css('color', color);
+            $('#customAlertOverlay').addClass('active');
 
-        $('.btn-alert-ok').off('click').on('click', function () {
-            $('#customAlertOverlay').removeClass('active');
-            if (redirectUrl) window.location.href = redirectUrl;
-        });
-    }
-
-    $(document).ready(function () {
-        const agencySelect = $('#agencySearchSelect');
-        const urlParams = new URLSearchParams(window.location.search);
-        const invoiceId = urlParams.get('id');
-        const mode = urlParams.get('mode'); // Preview se wapas aane ke liye mode
-        let currentInvoiceStatus = "Pending";
-
-        // CHECK: Agar na ID hai na Session mode, tabhi error dikhao
-        if (!invoiceId && mode !== 'session') {
-            showCustomAlert("Error", "Invoice ID missing!", "error", "AdminBilling.html");
-            return;
-        }
-
-        const planRates = {
-            "Basic(Default)": 25000,
-            "Pro": 50000,
-            "Premium": 75000,
-            "Enterprise": 0
-        };
-
-        // 2. INITIALIZE PLUGINS
-        const fpConfig = { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", theme: "dark" };
-        const issuePicker = flatpickr("#issueDate", fpConfig);
-        const duePicker = flatpickr("#dueDate", fpConfig);
-
-        agencySelect.select2({
-            placeholder: "Select an Agency",
-            width: '100%'
-        });
-
-        // 3. LOAD DATA SEQUENCE
-        function initializePage() {
-            const adminId = localStorage.getItem("adminId");
-            
-            // Step A: Load Agencies List (Hamesha chahiye)
-            $.ajax({
-                url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/agencies/list',
-                type: 'GET',
-                data: { adminId: adminId },
-                success: function (agencies) {
-                    agencySelect.empty().append('<option></option>');
-                    agencies.forEach(a => {
-                        agencySelect.append(new Option(a.agencyName, a.id));
-                    });
-
-                    // Step B: Agencies load hone ke baad decide karo kahan se data bharna hai
-                    if (mode === 'session') {
-                        loadFromSession();
-                    } else {
-                        fetchInvoiceDetailsFromServer();
-                    }
-                }
+            $('.btn-alert-ok').off('click').on('click', function () {
+                $('#customAlertOverlay').removeClass('active');
+                if (redirectUrl) window.location.href = redirectUrl;
             });
         }
 
-        // CASE 1: Server se data lana (Edit Flow)
-        function fetchInvoiceDetailsFromServer() {
-            $.ajax({
-                url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
-                type: 'GET',
-                success: function (data) {
-                    currentInvoiceStatus = data.status || "Pending";
-                    fillFields(data);
-                }
-            });
-        }
+        $(document).ready(function () {
+            const agencySelect = $('#agencySearchSelect');
+            const urlParams = new URLSearchParams(window.location.search);
+            const invoiceId = urlParams.get('id');
+            const mode = urlParams.get('mode'); // Preview se wapas aane ke liye mode
+            let currentInvoiceStatus = "Pending";
 
-        // CASE 2: Session se data lana (Preview to Edit Flow)
-        function loadFromSession() {
-            const sessionData = sessionStorage.getItem('pendingInvoicePreview');
-            if (sessionData) {
-                const data = JSON.parse(sessionData);
-                fillFields(data);
-            } else {
-                showCustomAlert("Error", "Session data expired!", "error", "AdminCreateInvoice.html");
-            }
-        }
-
-        // COMMON: Fields ko bharna
-        function fillFields(data) {
-            agencySelect.val(data.agencyId).trigger('change');
-            $('#billToAddress').val(data.billToAddress);
-            $('#contactPerson').val(data.contactPerson);
-            
-            // Agar naya invoice hai toh ID display mat karo, warna database wali ID dikhao
-            $('input[readonly]').first().val(data.invoiceNo || "");
-            
-            issuePicker.setDate(data.issueDate);
-            duePicker.setDate(data.dueDate);
-            
-            $('#itemDescription').val(data.description || (data.plan + " Subscription Plan"));
-            $('#itemRate').val(data.rate);
-            $('#taxInput').val(data.taxPercent);
-            $('#notes').val(data.notes);
-            
-            updatePlanUI(data.plan);
-            calculateInvoice();
-        }
-
-        // 4. CALCULATIONS
-        window.calculateInvoice = function () {
-            const rate = parseFloat($('#itemRate').val()) || 0;
-            const taxPercent = parseFloat($('#taxInput').val()) || 0;
-            $('.calc-input-small').first().val('₹' + rate.toLocaleString('en-IN'));
-            const total = rate + (rate * taxPercent / 100);
-            $('.total-value').text('₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
-        };
-
-        $(document).on('input', '#itemRate, #taxInput', calculateInvoice);
-
-        // 5. UPDATE ACTION
-        $('.form-footer-actions .btn-submit').on('click', function (e) {
-            e.preventDefault();
-            
-            // Simple Validation
-            if (!agencySelect.val() || !$('#billToAddress').val().trim()) {
-                showCustomAlert("Wait!", "Please fill all required fields.", "error");
+            // CHECK: Agar na ID hai na Session mode, tabhi error dikhao
+            if (!invoiceId && mode !== 'session') {
+                showCustomAlert("Error", "Invoice ID missing!", "error", "AdminBilling.html");
                 return;
             }
 
-            const updatedData = {
-                id: invoiceId || null, // Naye invoice ke liye null jayega backend ko
-                adminId: localStorage.getItem("adminId"),
-                agencyId: agencySelect.val(),
-                agencyName: agencySelect.find("option:selected").text(),
-                billToAddress: $('#billToAddress').val(),
-                contactPerson: $('#contactPerson').val(),
-                invoiceNo: $('input[readonly]').first().val(),
-                plan: $('#planInput').val(),
-                rate: parseFloat($('#itemRate').val()),
-                taxPercent: parseFloat($('#taxInput').val()) || 0,
-                issueDate: $('#issueDate').val(),
-                dueDate: $('#dueDate').val(),
-                notes: $('#notes').val(),
-                status: currentInvoiceStatus
+            const planRates = {
+                "Basic(Default)": 25000,
+                "Pro": 50000,
+                "Premium": 75000,
+                "Enterprise": 0
             };
 
-            const btn = $(this);
-            btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Processing...').prop('disabled', true);
+            // 2. INITIALIZE PLUGINS
+            const fpConfig = { dateFormat: "Y-m-d", altInput: true, altFormat: "d M, Y", theme: "dark" };
+            const issuePicker = flatpickr("#issueDate", fpConfig);
+            const duePicker = flatpickr("#dueDate", fpConfig);
 
-            $.ajax({
-                url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(updatedData),
-                success: function () {
-                    sessionStorage.removeItem('pendingInvoicePreview'); // Cleanup session
-                    showCustomAlert("Success!", "Invoice saved successfully!", "success", "AdminBilling.html");
-                },
-                error: function () {
-                    btn.text("Update Invoice").prop('disabled', false);
-                    showCustomAlert("Error", "Failed to save invoice.", "error");
-                }
+            agencySelect.select2({
+                placeholder: "Select an Agency",
+                width: '100%'
             });
-        });
 
-        function updatePlanUI(planName) {
-            if(!planName) return;
-            $('#planDropdown .selected-text').text(planName).css('color', '#fff');
-            $('#planInput').val(planName);
-        }
+            // 3. LOAD DATA SEQUENCE
+            function initializePage() {
+                const adminId = localStorage.getItem("adminId");
 
-        window.selectItem = function (dropdownId, text) {
-            let dropdown = $('#' + dropdownId);
-            dropdown.find('.selected-text').text(text).css('color', '#fff');
-            if (dropdownId === 'planDropdown') {
-                $('#planInput').val(text);
-                $('#itemDescription').val(text + " Subscription Plan");
-                $('#itemRate').val(planRates[text] || 0);
+                // Step A: Load Agencies List (Hamesha chahiye)
+                $.ajax({
+                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/agencies/list',
+                    type: 'GET',
+                    data: { adminId: adminId },
+                    success: function (agencies) {
+                        agencySelect.empty().append('<option></option>');
+                        agencies.forEach(a => {
+                            agencySelect.append(new Option(a.agencyName, a.id));
+                        });
+
+                        // Step B: Agencies load hone ke baad decide karo kahan se data bharna hai
+                        if (mode === 'session') {
+                            loadFromSession();
+                        } else {
+                            fetchInvoiceDetailsFromServer();
+                        }
+                    }
+                });
+            }
+
+            // CASE 1: Server se data lana (Edit Flow)
+            function fetchInvoiceDetailsFromServer() {
+                $.ajax({
+                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
+                    type: 'GET',
+                    success: function (data) {
+                        currentInvoiceStatus = data.status || "Pending";
+                        fillFields(data);
+                    }
+                });
+            }
+
+            // CASE 2: Session se data lana (Preview to Edit Flow)
+            function loadFromSession() {
+                const sessionData = sessionStorage.getItem('pendingInvoicePreview');
+                if (sessionData) {
+                    const data = JSON.parse(sessionData);
+                    fillFields(data);
+                } else {
+                    showCustomAlert("Error", "Session data expired!", "error", "AdminCreateInvoice.html");
+                }
+            }
+
+            // COMMON: Fields ko bharna
+            function fillFields(data) {
+                agencySelect.val(data.agencyId).trigger('change');
+                $('#billToAddress').val(data.billToAddress);
+                $('#contactPerson').val(data.contactPerson);
+
+                // Agar naya invoice hai toh ID display mat karo, warna database wali ID dikhao
+                $('input[readonly]').first().val(data.invoiceNo || "");
+
+                issuePicker.setDate(data.issueDate);
+                duePicker.setDate(data.dueDate);
+
+                $('#itemDescription').val(data.description || (data.plan + " Subscription Plan"));
+                $('#itemRate').val(data.rate);
+                $('#taxInput').val(data.taxPercent);
+                $('#notes').val(data.notes);
+
+                updatePlanUI(data.plan);
                 calculateInvoice();
             }
-            dropdown.removeClass('active');
-        };
 
-        window.toggleDropdown = function (id) {
-            event.stopPropagation();
-            $('.custom-dropdown').removeClass('active');
-            $('#' + id).addClass('active');
-        };
+            // 4. CALCULATIONS
+            window.calculateInvoice = function () {
+                const rate = parseFloat($('#itemRate').val()) || 0;
+                const taxPercent = parseFloat($('#taxInput').val()) || 0;
+                $('.calc-input-small').first().val('₹' + rate.toLocaleString('en-IN'));
+                const total = rate + (rate * taxPercent / 100);
+                $('.total-value').text('₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+            };
 
-        // Start initialization
-        initializePage();
-    });
-</script>
+            $(document).on('input', '#itemRate, #taxInput', calculateInvoice);
+
+            // 5. UPDATE ACTION (Go back to Preview instead of Dashboard)
+            $('.form-footer-actions .btn-submit').on('click', function (e) {
+                e.preventDefault();
+
+                // Validation Check
+                if (!agencySelect.val() || !$('#billToAddress').val().trim()) {
+                    showCustomAlert("Wait!", "Please fill all required fields.", "error");
+                    return;
+                }
+
+                // 1. Updated Data Object taiyar karo
+                const updatedPreviewData = {
+                    id: invoiceId || null, // Purani ID agar hai toh
+                    adminId: localStorage.getItem("adminId"),
+                    agencyId: agencySelect.val(),
+                    agencyName: agencySelect.find("option:selected").text(),
+                    billToAddress: $('#billToAddress').val(),
+                    contactPerson: $('#contactPerson').val(),
+                    invoiceNo: $('input[readonly]').first().val(),
+                    plan: $('#planInput').val(),
+                    description: $('#itemDescription').val(),
+                    rate: parseFloat($('#itemRate').val()),
+                    taxPercent: parseFloat($('#taxInput').val()) || 0,
+                    issueDate: $('#issueDate').val(),
+                    dueDate: $('#dueDate').val(),
+                    notes: $('#notes').val(),
+                    status: currentInvoiceStatus
+                };
+
+                // 2. Data ko wapas SessionStorage mein overwrite karo
+                sessionStorage.setItem('pendingInvoicePreview', JSON.stringify(updatedPreviewData));
+
+                // 3. Success Alert dikhao aur Preview page par bhej do
+                showCustomAlert(
+                    "Updated!",
+                    "Changes applied. Taking you back to preview.",
+                    "success",
+                    "AdminPreviewInvoice.html"
+                );
+            });
+
+            function updatePlanUI(planName) {
+                if (!planName) return;
+                $('#planDropdown .selected-text').text(planName).css('color', '#fff');
+                $('#planInput').val(planName);
+            }
+
+            window.selectItem = function (dropdownId, text) {
+                let dropdown = $('#' + dropdownId);
+                dropdown.find('.selected-text').text(text).css('color', '#fff');
+                if (dropdownId === 'planDropdown') {
+                    $('#planInput').val(text);
+                    $('#itemDescription').val(text + " Subscription Plan");
+                    $('#itemRate').val(planRates[text] || 0);
+                    calculateInvoice();
+                }
+                dropdown.removeClass('active');
+            };
+
+            window.toggleDropdown = function (id) {
+                event.stopPropagation();
+                $('.custom-dropdown').removeClass('active');
+                $('#' + id).addClass('active');
+            };
+
+            // Start initialization
+            initializePage();
+        });
+    </script>
 
 </body>
 
