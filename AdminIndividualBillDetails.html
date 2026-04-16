@@ -349,7 +349,7 @@ $(document).ready(function () {
     });
 
     // ==========================================
-// 3. SEND REMINDER (FIXED CLICK ISSUE)
+// 3. SEND REMINDER (FIXED: POPUP CLOSING BEFORE ACTION)
 // ==========================================
 $('#btnSendReminder').on('click', function (e) {
     e.preventDefault();
@@ -362,21 +362,18 @@ $('#btnSendReminder').on('click', function (e) {
 
     $('#alertTitle').text("Send Reminder");
     $('#alertMessage').html(`Choose method for <b>${globalInvoiceData.invoiceNo}</b>:`);
-    
     $('.btn-alert-ok').hide();
 
-    // Pehle purane options saaf karo
     $('#send-options').remove();
 
-    // Buttons inject karein - Style inline di hai taki CSS conflict na ho
     $('.custom-alert-box').append(`
-        <div id="send-options" style="display:flex; flex-direction:column; gap:12px; margin-top:20px; width:100%; position:relative; z-index:9999;">
+        <div id="send-options" style="display:flex; flex-direction:column; gap:12px; margin-top:20px; width:100%;">
             
-            <a href="https://wa.me/?text=${waMsg}" target="_blank" class="rem-opt-btn" style="text-decoration:none; background:#25D366; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
+            <a href="https://wa.me/?text=${waMsg}" target="_blank" class="action-trigger" style="text-decoration:none; background:#25D366; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
                 <i class="fa-brands fa-whatsapp"></i> WhatsApp Reminder
             </a>
 
-            <a href="mailto:${email}?subject=${subject}&body=${bodyText}" class="rem-opt-btn" style="text-decoration:none; background:#EA4335; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
+            <a href="mailto:${email}?subject=${subject}&body=${bodyText}" class="action-trigger" style="text-decoration:none; background:#EA4335; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
                 <i class="fa-solid fa-envelope"></i> Email Reminder
             </a>
 
@@ -389,10 +386,21 @@ $('#btnSendReminder').on('click', function (e) {
     $('#customAlertOverlay').addClass('active');
 });
 
-// Click Handler to close popup after clicking any option
-$(document).on('click', '.rem-opt-btn, #btnCancelRem', function() {
+// 🔥 FIX: Click hone par thoda intezar karo phir popup band karo
+$(document).on('click', '.action-trigger', function() {
+    // 500ms ka delay taaki browser mailto link ko launch kar sake
+    setTimeout(() => {
+        $('#customAlertOverlay').removeClass('active');
+        $('#send-options').remove();
+        $('.btn-alert-ok').show();
+    }, 800); 
+});
+
+// Cancel button turant band hona chahiye
+$(document).on('click', '#btnCancelRem', function() {
     $('#customAlertOverlay').removeClass('active');
-    setTimeout(() => { $('#send-options').remove(); $('.btn-alert-ok').show(); }, 300);
+    $('#send-options').remove();
+    $('.btn-alert-ok').show();
 });
 
     // Event Delegation for dynamic buttons
