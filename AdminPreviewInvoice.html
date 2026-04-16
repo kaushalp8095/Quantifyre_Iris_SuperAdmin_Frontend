@@ -317,17 +317,17 @@
                 });
             });
 
-            // EDIT BUTTON CLICK HANDLER
+            // EDIT BUTTON CLICK HANDLER (AdminPreviewInvoice.html)
             $('#btnEditInvoice').on('click', function (e) {
                 e.preventDefault();
 
-                // Hamare paas invoiceDataObj pehle se ready hai jo humne sessionStorage se nikala tha
                 if (invoiceDataObj && invoiceDataObj.id) {
-                    // Agar record DB mein pehle se hai (Edit flow)
+                    // CASE A: DB wala Invoice (Edit flow se aaye ho)
                     window.location.href = `AdminEditInvoice.html?id=${invoiceDataObj.id}`;
                 } else {
-                    // Agar record abhi sirf session mein hai (Create flow se preview)
-                    window.location.href = "AdminEditInvoice.html";
+                    // CASE B: Naya Invoice (Create flow se aaye ho)
+                    // Hum data already session mein 'pendingInvoicePreview' naam se save kar chuke hain
+                    window.location.href = "AdminEditInvoice.html?mode=session";
                 }
             });
 
