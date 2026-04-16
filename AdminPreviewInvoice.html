@@ -179,8 +179,7 @@
 
                 <div class="preview-footer-actions">
                     <button type="button" id="btnSendInvoice" class="btn-submit btn">Send Invoice</button>
-                    <a href="AdminEditInvoice.html" class="btn btn-cancel" style="text-decoration: none;">Edit
-                        Invoice</a>
+                    <button type="button" id="btnEditInvoice" class="btn btn-cancel">Edit Invoice</button>
                     <button type="button" id="btnFinalSave" class="btn btn-submit">Create Invoice</button>
                 </div>
 
@@ -217,34 +216,35 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
     <script>
-    // 1. GLOBAL VARIABLES (Taki poore page mein kahin bhi use ho sakein)
-    let invoiceDataObj = null;
-    let finalGrandTotal = 0;
+        // 1. GLOBAL VARIABLES (Taki poore page mein kahin bhi use ho sakein)
+        let invoiceDataObj = null;
+        let finalGrandTotal = 0;
 
-    $(document).ready(function () {
-        // 2. SessionStorage se data nikaalein
-        const dataRaw = sessionStorage.getItem('pendingInvoicePreview');
+        $(document).ready(function () {
 
-        if (!dataRaw) {
-            showCustomAlert("Error", "No preview data found!", "error", "AdminCreateInvoice.html");
-            return;
-        }
+            // 2. SessionStorage se data nikaalein
+            const dataRaw = sessionStorage.getItem('pendingInvoicePreview');
 
-        invoiceDataObj = JSON.parse(dataRaw);
+            if (!dataRaw) {
+                showCustomAlert("Error", "No preview data found!", "error", "AdminCreateInvoice.html");
+                return;
+            }
 
-        // UI Fill Logic
-        $('#p-inv-no').text(invoiceDataObj.invoiceNo);
-        $('#p-issue-date').text(formatDatePreview(invoiceDataObj.issueDate));
-        $('#p-due-date').text(formatDatePreview(invoiceDataObj.dueDate));
-        $('#p-agency-name').text(invoiceDataObj.agencyName);
-        $('#p-address').text(invoiceDataObj.billToAddress);
-        $('#p-contact').text(invoiceDataObj.contactPerson);
+            invoiceDataObj = JSON.parse(dataRaw);
 
-        const subtotal = invoiceDataObj.rate || 0;
-        const taxAmt = (subtotal * (invoiceDataObj.taxPercent || 0)) / 100;
-        finalGrandTotal = subtotal + taxAmt;
+            // UI Fill Logic
+            $('#p-inv-no').text(invoiceDataObj.invoiceNo);
+            $('#p-issue-date').text(formatDatePreview(invoiceDataObj.issueDate));
+            $('#p-due-date').text(formatDatePreview(invoiceDataObj.dueDate));
+            $('#p-agency-name').text(invoiceDataObj.agencyName);
+            $('#p-address').text(invoiceDataObj.billToAddress);
+            $('#p-contact').text(invoiceDataObj.contactPerson);
 
-        $('#p-table-body').html(`
+            const subtotal = invoiceDataObj.rate || 0;
+            const taxAmt = (subtotal * (invoiceDataObj.taxPercent || 0)) / 100;
+            finalGrandTotal = subtotal + taxAmt;
+
+            $('#p-table-body').html(`
             <tr>
                 <td>${invoiceDataObj.description || (invoiceDataObj.plan + " Subscription")}</td>
                 <td>₹${subtotal.toLocaleString('en-IN')}</td>
@@ -252,31 +252,31 @@
             </tr>
         `);
 
-        $('#p-subtotal').text('₹' + subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
-        $('#p-tax-rate').text(invoiceDataObj.taxPercent);
-        $('#p-tax-amount').text('₹' + taxAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
-        $('#p-grand-total').text('₹' + finalGrandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+            $('#p-subtotal').text('₹' + subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+            $('#p-tax-rate').text(invoiceDataObj.taxPercent);
+            $('#p-tax-amount').text('₹' + taxAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+            $('#p-grand-total').text('₹' + finalGrandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
 
-        function formatDatePreview(dateStr) {
-            if (!dateStr) return "N/A";
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('en-GB').replace(/\//g, '-');
-        }
+            function formatDatePreview(dateStr) {
+                if (!dateStr) return "N/A";
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('en-GB').replace(/\//g, '-');
+            }
 
-        // ==========================================
-        // SEND INVOICE POPUP OPEN
-        // ==========================================
-        $('#btnSendInvoice').on('click', function (e) {
-            e.preventDefault();
+            // ==========================================
+            // SEND INVOICE POPUP OPEN
+            // ==========================================
+            $('#btnSendInvoice').on('click', function (e) {
+                e.preventDefault();
 
-            $('#alertTitle').text("Send Invoice");
-            $('#alertMessage').html(`Choose how you want to send <b>${invoiceDataObj.invoiceNo}</b>:`);
-            $('#alertIconBox').html('<i class="fa-solid fa-paper-plane"></i>').css('color', '#00ff9d');
+                $('#alertTitle').text("Send Invoice");
+                $('#alertMessage').html(`Choose how you want to send <b>${invoiceDataObj.invoiceNo}</b>:`);
+                $('#alertIconBox').html('<i class="fa-solid fa-paper-plane"></i>').css('color', '#00ff9d');
 
-            $('.btn-alert-ok').hide();
+                $('.btn-alert-ok').hide();
 
-            if ($('#send-options').length === 0) {
-                $('.custom-alert-box').append(`
+                if ($('#send-options').length === 0) {
+                    $('.custom-alert-box').append(`
                     <div id="send-options" style="display:flex; flex-direction:column; gap:10px; margin-top:20px; width:100%;">
                         <button id="waSend" type="button" style="background:#25D366; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:600;">
                             <i class="fa-brands fa-whatsapp"></i> Send via WhatsApp
@@ -289,78 +289,93 @@
                         </button>
                     </div>
                 `);
-            }
-            $('#customAlertOverlay').addClass('active');
-        });
+                }
+                $('#customAlertOverlay').addClass('active');
+            });
 
-        // ==========================================
-        // FINAL SAVE (CREATE INVOICE)
-        // ==========================================
-        $('#btnFinalSave').on('click', function (e) {
-            e.preventDefault();
-            const btn = $(this);
-            btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Saving...').prop('disabled', true);
+            // ==========================================
+            // FINAL SAVE (CREATE INVOICE)
+            // ==========================================
+            $('#btnFinalSave').on('click', function (e) {
+                e.preventDefault();
+                const btn = $(this);
+                btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Saving...').prop('disabled', true);
 
-            $.ajax({
-                url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(invoiceDataObj),
-                success: function () {
-                    showCustomAlert("Success!", "Invoice Saved Successfully!", "success", "AdminBilling.html");
-                    sessionStorage.removeItem('pendingInvoicePreview');
-                },
-                error: function (xhr) {
-                    btn.text("Create Invoice").prop('disabled', false);
-                    showCustomAlert("Save Failed", "Could not connect to server.", "error");
+                $.ajax({
+                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(invoiceDataObj),
+                    success: function () {
+                        showCustomAlert("Success!", "Invoice Saved Successfully!", "success", "AdminBilling.html");
+                        sessionStorage.removeItem('pendingInvoicePreview');
+                    },
+                    error: function (xhr) {
+                        btn.text("Create Invoice").prop('disabled', false);
+                        showCustomAlert("Save Failed", "Could not connect to server.", "error");
+                    }
+                });
+            });
+
+            // EDIT BUTTON CLICK HANDLER
+            $('#btnEditInvoice').on('click', function (e) {
+                e.preventDefault();
+
+                // Hamare paas invoiceDataObj pehle se ready hai jo humne sessionStorage se nikala tha
+                if (invoiceDataObj && invoiceDataObj.id) {
+                    // Agar record DB mein pehle se hai (Edit flow)
+                    window.location.href = `AdminEditInvoice.html?id=${invoiceDataObj.id}`;
+                } else {
+                    // Agar record abhi sirf session mein hai (Create flow se preview)
+                    window.location.href = "AdminEditInvoice.html";
                 }
             });
+
         });
-    });
 
-    // ==========================================
-    // DYNAMIC BUTTON CLICK HANDLERS (Delegation)
-    // ==========================================
-    $(document).on('click', '#waSend', function() {
-        const msg = `Hello ${invoiceDataObj.agencyName}, here is your Invoice ${invoiceDataObj.invoiceNo} for ₹${finalGrandTotal.toLocaleString('en-IN')}.`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-        closeSendOptions();
-    });
+        // ==========================================
+        // DYNAMIC BUTTON CLICK HANDLERS (Delegation)
+        // ==========================================
+        $(document).on('click', '#waSend', function () {
+            const msg = `Hello ${invoiceDataObj.agencyName}, here is your Invoice ${invoiceDataObj.invoiceNo} for ₹${finalGrandTotal.toLocaleString('en-IN')}.`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            closeSendOptions();
+        });
 
-    $(document).on('click', '#mailSend', function() {
-        const subject = `Invoice ${invoiceDataObj.invoiceNo} - Quantifyre Iris`;
-        const body = `Hello ${invoiceDataObj.agencyName},\n\nYour invoice for ₹${finalGrandTotal.toLocaleString('en-IN')} is ready.\n\nTeam Quantifyre Iris`;
-        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        closeSendOptions();
-    });
+        $(document).on('click', '#mailSend', function () {
+            const subject = `Invoice ${invoiceDataObj.invoiceNo} - Quantifyre Iris`;
+            const body = `Hello ${invoiceDataObj.agencyName},\n\nYour invoice for ₹${finalGrandTotal.toLocaleString('en-IN')} is ready.\n\nTeam Quantifyre Iris`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            closeSendOptions();
+        });
 
-    $(document).on('click', '#btnCancelOpt', function() {
-        closeSendOptions();
-    });
+        $(document).on('click', '#btnCancelOpt', function () {
+            closeSendOptions();
+        });
 
-    function closeSendOptions() {
-        $('#customAlertOverlay').removeClass('active');
-        $('#send-options').remove();
-        $('.btn-alert-ok').show();
-    }
-
-    // Custom Alert Function (Global)
-    function showCustomAlert(title, message, type, redirectUrl = null) {
-        $('#alertTitle').text(title);
-        $('#alertMessage').text(message);
-        const iconBox = $('#alertIconBox');
-        if (type === 'success') {
-            iconBox.html('<i class="fa-solid fa-check"></i>').css('color', '#00ff9d');
-        } else {
-            iconBox.html('<i class="fa-solid fa-triangle-exclamation"></i>').css('color', '#ff4d4d');
-        }
-        $('#customAlertOverlay').addClass('active');
-        $('.btn-alert-ok').off('click').on('click', function () {
+        function closeSendOptions() {
             $('#customAlertOverlay').removeClass('active');
-            if (redirectUrl) window.location.href = redirectUrl;
-        });
-    }
-</script>
+            $('#send-options').remove();
+            $('.btn-alert-ok').show();
+        }
+
+        // Custom Alert Function (Global)
+        function showCustomAlert(title, message, type, redirectUrl = null) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+            const iconBox = $('#alertIconBox');
+            if (type === 'success') {
+                iconBox.html('<i class="fa-solid fa-check"></i>').css('color', '#00ff9d');
+            } else {
+                iconBox.html('<i class="fa-solid fa-triangle-exclamation"></i>').css('color', '#ff4d4d');
+            }
+            $('#customAlertOverlay').addClass('active');
+            $('.btn-alert-ok').off('click').on('click', function () {
+                $('#customAlertOverlay').removeClass('active');
+                if (redirectUrl) window.location.href = redirectUrl;
+            });
+        }
+    </script>
 </body>
 
 </html>
