@@ -1,7 +1,7 @@
 (function () {
     const path = window.location.pathname;
     const isLoginPage = path.toLowerCase().includes("superadminlogin.html");
-    
+
     const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
     const adminId = localStorage.getItem("adminId");
     const loginTime = localStorage.getItem("loginTime"); // Backend se aayi hui timestamp
@@ -40,29 +40,29 @@
 
     // 4. 🔴 BACKEND SESSION & STATUS CHECK
     // Har page load par backend se pucho ki "Main valid hoon ya nahi?"
-    fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`, { 
+    fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`, {
         priority: 'high',
         headers: { 'Cache-Control': 'no-cache' }
     })
-    .then(res => {
-        // Agar Backend 401 (Unauthorized) ya 404 bhej raha hai
-        if (res.status === 401 || res.status === 403) {
-            console.error("Backend Session Expired!");
-            throw new Error("UNAUTHORIZED");
-        }
-        if (!res.ok) throw new Error("SERVER_DOWN");
-        
-        sessionStorage.removeItem("eclipse_is_down");
-    })
-    .catch((err) => {
-        if (err.message === "UNAUTHORIZED") {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.replace("SuperAdminLogin.html?error=session_expired");
-        } else {
-            // Server down hai toh dashboard par warning ya redirect handle karein
-            console.error("Backend unreachable!");
-            sessionStorage.setItem("eclipse_is_down", "true");
-        }
-    });
+        .then(res => {
+            // Agar Backend 401 (Unauthorized) ya 404 bhej raha hai
+            if (res.status === 401 || res.status === 403) {
+                console.error("Backend Session Expired!");
+                throw new Error("UNAUTHORIZED");
+            }
+            if (!res.ok) throw new Error("SERVER_DOWN");
+
+            sessionStorage.removeItem("eclipse_is_down");
+        })
+        .catch((err) => {
+            if (err.message === "UNAUTHORIZED") {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.replace("SuperAdminLogin.html?error=session_expired");
+            } else {
+                // Server down hai toh dashboard par warning ya redirect handle karein
+                console.error("Backend unreachable!");
+                sessionStorage.setItem("eclipse_is_down", "true");
+            }
+        });
 })();
