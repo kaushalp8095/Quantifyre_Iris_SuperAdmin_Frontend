@@ -21,16 +21,14 @@ $.ajaxPrefilter(function (options) {
 
 // Isse apni "all.js" ya main script file mein paste karein
 $(document).ajaxError(function(event, jqXHR) {
-    // Status 0 matlab Eclipse band hai
-    if (jqXHR.status === 0) {
-        console.error("Backend Offline!");
-        // 🔴 Ek flag set karein taaki auth-guard ko pata chale ki server band hai
-        sessionStorage.setItem("eclipse_is_down", "true");
-        window.location.replace("SuperAdminLogin.html");
-    }
-
+    // Agar Backend 401 bhej raha hai (Cookie Expired or Invalid)
     if (jqXHR.status === 401) {
+        console.error("Session invalid or expired on server.");
         localStorage.clear();
+        sessionStorage.clear();
+        
+        // SweetAlert ya normal alert dikha kar redirect karein
+        alert("Your session has expired. Please login again.");
         window.location.replace("SuperAdminLogin.html");
     }
 });

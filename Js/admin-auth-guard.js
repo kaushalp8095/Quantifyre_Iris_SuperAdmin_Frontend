@@ -3,54 +3,66 @@
     const isLoginPage = path.toLowerCase().includes("superadminlogin.html");
     
     const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
-    const adminId = localStorage.getItem("adminId") || "1";
-    const loginTime = localStorage.getItem("loginTime");
+    const adminId = localStorage.getItem("adminId");
+    const loginTime = localStorage.getItem("loginTime"); // Backend se aayi hui timestamp
 
-    // 1. ⏰ Session Expiry Check
+    // 1. ⏰ FRONTEND SESSION EXPIRY (24 Hours Check)
     const ONE_DAY = 24 * 60 * 60 * 1000;
-    if (loginTime && (new Date().getTime() - parseInt(loginTime) > ONE_DAY)) {
-        localStorage.clear();
-        if (!isLoginPage) window.location.replace("SuperAdminLogin.html");
-        return;
+    if (isLoggedIn === "true" && loginTime) {
+        const currentTime = new Date().getTime();
+        const timeElapsed = currentTime - parseInt(loginTime);
+
+        if (timeElapsed > ONE_DAY) {
+            console.warn("Session Expired (Frontend)");
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.replace("SuperAdminLogin.html");
+            return;
+        }
     }
 
-    // 2. 🛡️ Loop Protection Flag
-    const isDown = sessionStorage.getItem("eclipse_is_down") === "true";
-
-    // 3. 🚀 Login Page Logic
+    // 2. 🛡️ LOGIN PAGE LOGIC
     if (isLoginPage) {
-        if (isLoggedIn === "true") {
-            if (isDown) return; // Server band hai toh yahi ruko
-
-            fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`)
-                .then(res => {
-                    if (res.ok) {
-                        sessionStorage.removeItem("eclipse_is_down");
-                        window.location.replace("AdminDashboard.html");
-                    }
-                })
-                .catch(() => sessionStorage.setItem("eclipse_is_down", "true"));
+        // Agar pehle se logged in hai toh dashboard bhej do
+        if (isLoggedIn === "true" && adminId) {
+            window.location.replace("AdminDashboard.html");
         }
         return;
     }
 
-    // 4. 🔒 Secure Page Check (DASHBOARD/AGENCIES PAR CHECK)
+    // 3. 🔒 SECURE PAGE PROTECTION
+    // Agar user logged in nahi hai toh login page par fenko
     if (isLoggedIn !== "true" || !adminId) {
+        localStorage.clear();
         window.location.replace("SuperAdminLogin.html");
         return;
     }
 
-    // 🔴 NEW: Agar user Dashboard/Agencies par hai, toh turant check karo Eclipse UP hai ya nahi
-    // Iske bina page khula reh jayega chahe Eclipse band ho
-    fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`, { priority: 'high' })
-        .then(res => {
-            if (!res.ok) throw new Error();
-            sessionStorage.removeItem("eclipse_is_down");
-        })
-        .catch(() => {
-            // 🚨 ECLIPSE BAND HAI! Turant bahar nikalo
-            console.error("Eclipse is STOPPED. Redirecting to Login...");
+    // 4. 🔴 BACKEND SESSION & STATUS CHECK
+    // Har page load par backend se pucho ki "Main valid hoon ya nahi?"
+    fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/settings/profile/${adminId}`, { 
+        priority: 'high',
+        headers: { 'Cache-Control': 'no-cache' }
+    })
+    .then(res => {
+        // Agar Backend 401 (Unauthorized) ya 404 bhej raha hai
+        if (res.status === 401 || res.status === 403) {
+            console.error("Backend Session Expired!");
+            throw new Error("UNAUTHORIZED");
+        }
+        if (!res.ok) throw new Error("SERVER_DOWN");
+        
+        sessionStorage.removeItem("eclipse_is_down");
+    })
+    .catch((err) => {
+        if (err.message === "UNAUTHORIZED") {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.replace("SuperAdminLogin.html?error=session_expired");
+        } else {
+            // Server down hai toh dashboard par warning ya redirect handle karein
+            console.error("Backend unreachable!");
             sessionStorage.setItem("eclipse_is_down", "true");
-            window.location.replace("SuperAdminLogin.html");
-        });
+        }
+    });
 })();

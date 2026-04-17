@@ -94,6 +94,7 @@
                 if (response.status === "success" || response.adminId) {
                     localStorage.setItem('isAdminLoggedIn', 'true');
                     localStorage.setItem('adminId', response.adminId); // 👈 Most Important
+                    localStorage.setItem('loginTime', new Date().getTime());
                     localStorage.setItem('adminName', response.name);
                     localStorage.setItem('adminEmail', response.email);
                     
