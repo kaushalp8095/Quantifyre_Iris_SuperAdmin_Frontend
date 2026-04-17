@@ -89,6 +89,9 @@
             url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/login',
             type: 'POST',
             contentType: 'application/json',
+            xhrFields: {
+                withCredentials: true
+            },
             data: JSON.stringify({ email: email, password: password }),
             success: function (response) {
                 if (response.status === "success" || response.adminId) {
