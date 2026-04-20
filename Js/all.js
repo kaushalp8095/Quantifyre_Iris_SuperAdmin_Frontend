@@ -4,7 +4,7 @@ $.ajaxPrefilter(function (options) {
     // Agar URL localhost se shuru ho raha hai ya relative path (/) hai
     if (options.url.startsWith("http://localhost:8080")) {
         options.url = options.url.replace("http://localhost:8080", liveBase);
-    } 
+    }
     else if (options.url.startsWith("/")) {
         // Agar aapne sirf "/api/..." likha hai, toh ye uske aage Render ka URL laga dega
         options.url = liveBase + options.url;
@@ -20,13 +20,13 @@ $.ajaxPrefilter(function (options) {
 
 
 // Isse apni "all.js" ya main script file mein paste karein
-$(document).ajaxError(function(event, jqXHR) {
+$(document).ajaxError(function (event, jqXHR) {
     // Agar Backend 401 bhej raha hai (Cookie Expired or Invalid)
     if (jqXHR.status === 401) {
         console.error("Session invalid or expired on server.");
         localStorage.clear();
         sessionStorage.clear();
-        
+
         // SweetAlert ya normal alert dikha kar redirect karein
         alert("Your session has expired. Please login again.");
         window.location.replace("SuperAdminLogin.html");
@@ -146,32 +146,34 @@ function closeLogoutModal() {
 }
 
 // ==========================================
-        // 🔴 NAYA LOGOUT LOGIC (API CALL KE SATH)
-        // ==========================================
-        function confirmLogout() {
-            const btn = $('.btn-modal-delete1, .btn-modal-delete'); 
-            btn.text('Logging out...').prop('disabled', true);
+// 🔴 NAYA LOGOUT LOGIC (API CALL KE SATH)
+// ==========================================
+function confirmLogout() {
+    const btn = $('.btn-modal-delete1, .btn-modal-delete');
+    btn.text('Logging out...').prop('disabled', true);
 
-            // Backend API ko call karo cookie expire karne ke liye
-            $.ajax({
-                url: "https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/logout",
-                type: "POST",
-                xhrFields: {
-                    withCredentials: true // 🔴 Ye line sabse zaroori hai cookie delete karne ke liye
-                },
-                success: function () {
-                    // Backend se cookie delete hone ke baad, Frontend ka kachra saaf karo
-                    localStorage.clear();
-                    window.location.replace("SuperAdminLogin.html");
-                },
-                error: function () {
-                    // Agar server se koi error bhi aaye, tab bhi user ko bahar nikal do (Safe Side)
-                    console.error("Logout API failed, but clearing local session.");
-                    localStorage.clear();
-                    window.location.replace("SuperAdminLogin.html");
-                }
-            });
+    // Backend API ko call karo cookie expire karne ke liye
+    $.ajax({
+        url: "https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/logout",
+        type: "POST",
+        xhrFields: {
+            withCredentials: true // 🔴 Ye line sabse zaroori hai cookie delete karne ke liye
+        },
+        success: function () {
+            // Backend se cookie delete hone ke baad, Frontend ka kachra saaf karo
+            localStorage.clear();
+            document.cookie = "isAdminLoggedIn=; path=/; max-age=0; SameSite=Lax";
+            window.location.replace("SuperAdminLogin.html");
+        },
+        error: function () {
+            // Agar server se koi error bhi aaye, tab bhi user ko bahar nikal do (Safe Side)
+            console.error("Logout API failed, but clearing local session.");
+            localStorage.clear();
+            document.cookie = "isAdminLoggedIn=; path=/; max-age=0; SameSite=Lax";
+            window.location.replace("SuperAdminLogin.html");
         }
+    });
+}
 
 document.addEventListener('click', function (event) {
     const modal = document.getElementById('logoutModal');
@@ -223,7 +225,7 @@ window.onclick = function (event) {
 // =========================================================
 // GLOBAL PROFILE SYNC LOGIC (Updated for Real-time Sync)
 // =========================================================
-$(document).ready(function() {
+$(document).ready(function () {
     const adminId = localStorage.getItem("adminId");
     if (!adminId) return;
 
@@ -244,7 +246,7 @@ $(document).ready(function() {
     const sName = localStorage.getItem("adminName");
     const sLogo = localStorage.getItem("adminLogo");
     const sEmail = localStorage.getItem("adminEmail");
-    
+
     if (sName) {
         updateUI(sName, sEmail, sLogo);
     }
@@ -267,7 +269,7 @@ $(document).ready(function() {
             localStorage.setItem("adminEmail", freshEmail);
             localStorage.setItem("adminLogo", freshLogo || "");
         },
-        error: function() {
+        error: function () {
             console.log("Profile Sync: Backend unreachable, using cached data.");
         }
     });
@@ -275,62 +277,62 @@ $(document).ready(function() {
 
 
 // ==========================================
-        // GLOBAL KEYBOARD SHORTCUTS (ENTER & ESCAPE KEYS)
-        // ==========================================
-        $(document).on('keydown', function (e) {
-            
-            // --- 1. ENTER KEY LOGIC (For OK / Submit / Confirm) ---
-            if (e.key === "Enter" || e.keyCode === 13) {
-                
-                // Agar Custom Alert (Success/Error) open hai
-                if ($('#customAlertOverlay').hasClass('active')) {
-                    e.preventDefault(); // Default form submit roke
-                    $('.btn-alert-ok').click(); // OK button click kare
-                }
-                
-                // Agar Logout Confirmation open hai
-                else if ($('#logoutModal').hasClass('active') || $('#logoutModal').css('display') === 'block') {
-                    e.preventDefault();
-                    confirmLogout(); 
-                }
+// GLOBAL KEYBOARD SHORTCUTS (ENTER & ESCAPE KEYS)
+// ==========================================
+$(document).on('keydown', function (e) {
 
-                // Agar Disconnect Confirmation open hai
-                else if ($('#disconnectConfirmOverlay').hasClass('active')) {
-                    e.preventDefault();
-                    $('#confirmDisconnectBtn').click(); 
-                }
+    // --- 1. ENTER KEY LOGIC (For OK / Submit / Confirm) ---
+    if (e.key === "Enter" || e.keyCode === 13) {
 
-                // Agar OTP box dikh raha hai aur user OTP type kar raha hai
-                else if ($('#otpVerificationBox').is(':visible') && $('#tfaOtpInput').is(':focus')) {
-                    e.preventDefault();
-                    $('#tfaVerifyBtn').click(); // OTP Verify button dabaye
-                }
-            }
+        // Agar Custom Alert (Success/Error) open hai
+        if ($('#customAlertOverlay').hasClass('active')) {
+            e.preventDefault(); // Default form submit roke
+            $('.btn-alert-ok').click(); // OK button click kare
+        }
 
-            // --- 2. ESCAPE (ESC) KEY LOGIC (For Cancel / Close) ---
-            if (e.key === "Escape" || e.keyCode === 27) {
-                
-                if ($('#customAlertOverlay').hasClass('active')) {
-                    closeCustomAlert();
-                }
-                if ($('#logoutModal').hasClass('active') || $('#logoutModal').css('display') === 'block') {
-                    closeLogoutModal();
-                }
-                if ($('#disconnectConfirmOverlay').hasClass('active')) {
-                    closeDisconnectModal();
-                }
-            }
-        });
+        // Agar Logout Confirmation open hai
+        else if ($('#logoutModal').hasClass('active') || $('#logoutModal').css('display') === 'block') {
+            e.preventDefault();
+            confirmLogout();
+        }
+
+        // Agar Disconnect Confirmation open hai
+        else if ($('#disconnectConfirmOverlay').hasClass('active')) {
+            e.preventDefault();
+            $('#confirmDisconnectBtn').click();
+        }
+
+        // Agar OTP box dikh raha hai aur user OTP type kar raha hai
+        else if ($('#otpVerificationBox').is(':visible') && $('#tfaOtpInput').is(':focus')) {
+            e.preventDefault();
+            $('#tfaVerifyBtn').click(); // OTP Verify button dabaye
+        }
+    }
+
+    // --- 2. ESCAPE (ESC) KEY LOGIC (For Cancel / Close) ---
+    if (e.key === "Escape" || e.keyCode === 27) {
+
+        if ($('#customAlertOverlay').hasClass('active')) {
+            closeCustomAlert();
+        }
+        if ($('#logoutModal').hasClass('active') || $('#logoutModal').css('display') === 'block') {
+            closeLogoutModal();
+        }
+        if ($('#disconnectConfirmOverlay').hasClass('active')) {
+            closeDisconnectModal();
+        }
+    }
+});
 
 
-        // =========================================================
+// =========================================================
 // 5. GLOBAL NOTIFICATIONS LOGIC (No UI Conflicts)
 // =========================================================
-$(document).ready(function() {
+$(document).ready(function () {
     const adminId = localStorage.getItem("adminId");
-    
+
     // Agar login nahi hai ya main page nahi hai toh aage mat bado
-    if(!adminId || $('.main-content').length === 0) return; 
+    if (!adminId || $('.main-content').length === 0) return;
 
     function loadGlobalNotifications() {
         $.ajax({
@@ -354,13 +356,13 @@ $(document).ready(function() {
                 }
 
                 // Top 5 notifications in dropdown
-                const top5 = res.notifications.slice(0, 5); 
+                const top5 = res.notifications.slice(0, 5);
                 top5.forEach(log => {
                     let iconClass = "info";
                     let iconHtml = '<i class="fa-solid fa-bell"></i>';
 
-                    if (log.type === "SUCCESS") { iconClass = "success"; iconHtml = '<i class="fa-solid fa-check"></i>'; } 
-                    else if (log.type === "INFO") { iconClass = "info"; iconHtml = '<i class="fa-solid fa-user-plus"></i>'; } 
+                    if (log.type === "SUCCESS") { iconClass = "success"; iconHtml = '<i class="fa-solid fa-check"></i>'; }
+                    else if (log.type === "INFO") { iconClass = "info"; iconHtml = '<i class="fa-solid fa-user-plus"></i>'; }
                     else if (log.type === "WARNING" || log.type === "ERROR") { iconClass = "warning"; iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>'; }
 
                     let readClass = log.read ? "" : "unread";
@@ -383,29 +385,29 @@ $(document).ready(function() {
     }
 
     // 3. Mark All as Read Logic (Dynamic binding to avoid conflicts)
-    $(document).on('click', '.mark-read, #markAllReadBtn', function(e) {
-    e.stopPropagation();
-    
-    $.ajax({
-        url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/top-notifications/mark-read/${adminId}`,
-        type: "POST",
-        success: function() {
-            // 1. Header ke dropdown se 'unread' class hatao
-            $('.notif-list .notif-item').removeClass('unread');
-            
-            // 2. Agar user "All Notifications" page par hai, toh wahan ki list se bhi hatao
-            $('.full-notif-item').removeClass('unread');
-            
-            // 3. Red badge (count) ko hide kar do
-            $('.notif-count').hide();
+    $(document).on('click', '.mark-read, #markAllReadBtn', function (e) {
+        e.stopPropagation();
 
-            // 4. Local array ko bhi update kar do taaki filter sahi chale
-            if (typeof allNotifications !== 'undefined') {
-                allNotifications.forEach(n => n.read = true);
+        $.ajax({
+            url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/top-notifications/mark-read/${adminId}`,
+            type: "POST",
+            success: function () {
+                // 1. Header ke dropdown se 'unread' class hatao
+                $('.notif-list .notif-item').removeClass('unread');
+
+                // 2. Agar user "All Notifications" page par hai, toh wahan ki list se bhi hatao
+                $('.full-notif-item').removeClass('unread');
+
+                // 3. Red badge (count) ko hide kar do
+                $('.notif-count').hide();
+
+                // 4. Local array ko bhi update kar do taaki filter sahi chale
+                if (typeof allNotifications !== 'undefined') {
+                    allNotifications.forEach(n => n.read = true);
+                }
             }
-        }
+        });
     });
-});
 
     // Run when page loads
     loadGlobalNotifications();
@@ -413,15 +415,15 @@ $(document).ready(function() {
 
 
 // --- Helper Function: Time Calculation ---
-    function timeAgo(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const seconds = Math.round((now - date) / 1000);
-        if (seconds < 60) return `${seconds}s ago`;
-        const minutes = Math.floor(seconds / 60);
-        if (minutes < 60) return `${minutes}m ago`;
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours}h ago`;
-        const days = Math.floor(hours / 24);
-        return `${days}d ago`;
-    }
+function timeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.round((now - date) / 1000);
+    if (seconds < 60) return `${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+}
