@@ -260,157 +260,183 @@
 
     <script>
         $(document).ready(function () {
-    let globalInvoiceData = null;
+            let globalInvoiceData = null;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const invoiceId = urlParams.get('id');
+            const urlParams = new URLSearchParams(window.location.search);
+            const invoiceId = urlParams.get('id');
 
-    if (!invoiceId) {
-        alert("Invoice ID missing!");
-        window.location.href = "AdminBilling.html";
-        return;
-    }
-
-    function fetchBillDetails() {
-        $.ajax({
-            url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
-            type: 'GET',
-            success: function (data) {
-                globalInvoiceData = data;
-                fillBillData(data);
-                console.log("Invoice Data Loaded:", data); // Check karein email yahan aa raha hai ya nahi
-            },
-            error: function () {
-                alert("Could not load invoice details.");
+            if (!invoiceId) {
+                alert("Invoice ID missing!");
+                window.location.href = "AdminBilling.html";
+                return;
             }
-        });
-    }
 
-    function fillBillData(data) {
-        $('#top-invoice-no').text("Invoice " + data.invoiceNo);
-        $('#det-agency-name').text(data.agencyName);
-        $('#det-address').html(`Address: ${data.billToAddress}<br>Contact: ${data.contactPerson}`);
-        $('#det-invoice-no').text(data.invoiceNo);
-        $('#det-issue-date').text(formatDate(data.issueDate));
-        $('#det-due-date').text(formatDate(data.dueDate));
+            function fetchBillDetails() {
+                $.ajax({
+                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
+                    type: 'GET',
+                    success: function (data) {
+                        globalInvoiceData = data;
+                        fillBillData(data);
+                    },
+                    error: function () {
+                        alert("Could not load invoice details.");
+                    }
+                });
+            }
 
-        const statusClass = data.status.toLowerCase() === 'paid' ? 'st-paid' : 'st-pending';
-        $('#det-status-pill').attr('class', `status-pill-large ${statusClass}`).text(data.status);
+            function fillBillData(data) {
+                $('#top-invoice-no').text("Invoice " + data.invoiceNo);
+                $('#det-agency-name').text(data.agencyName);
+                $('#det-address').html(`Address: ${data.billToAddress}<br>Contact: ${data.contactPerson}`);
+                $('#det-invoice-no').text(data.invoiceNo);
+                $('#det-issue-date').text(formatDate(data.issueDate));
+                $('#det-due-date').text(formatDate(data.dueDate));
 
-        const rate = data.rate || 0;
-        const taxPercent = data.taxPercent || 0;
-        const taxAmt = (rate * taxPercent) / 100;
-        const grandTotal = rate + taxAmt;
+                const statusClass = data.status.toLowerCase() === 'paid' ? 'st-paid' : 'st-pending';
+                $('#det-status-pill').attr('class', `status-pill-large ${statusClass}`).text(data.status);
 
-        const tableHtml = `
+                const rate = data.rate || 0;
+                const taxPercent = data.taxPercent || 0;
+                const taxAmt = (rate * taxPercent) / 100;
+                const grandTotal = rate + taxAmt;
+
+                const tableHtml = `
             <tr>
                 <td>${data.plan} Subscription Plan<br><small style="color:#8b9c9c">${data.notes || ''}</small></td>
                 <td>₹${rate.toLocaleString('en-IN')}</td>
                 <td>₹${rate.toLocaleString('en-IN')}</td>
             </tr>
         `;
-        $('#det-table-body').html(tableHtml);
+                $('#det-table-body').html(tableHtml);
 
-        $('#det-subtotal').text(`₹${rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
-        $('#det-tax-label').text(`Tax (${taxPercent}%):`);
-        $('#det-tax-amount').text(`₹${taxAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
-        $('#det-grand-total').text(`₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
-    }
+                $('#det-subtotal').text(`₹${rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+                $('#det-tax-label').text(`Tax (${taxPercent}%):`);
+                $('#det-tax-amount').text(`₹${taxAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+                $('#det-grand-total').text(`₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+            }
 
-    function formatDate(dateStr) {
-        if (!dateStr) return "---";
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB'); 
-    }
+            function formatDate(dateStr) {
+                if (!dateStr) return "---";
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('en-GB');
+            }
 
-    fetchBillDetails();
+            fetchBillDetails();
 
-    // PRINT
-    $('#btnPrintBill').on('click', function () {
-        window.print();
-    });
+            // ==========================================
+            // 1. DOWNLOAD PDF (Targeting specific div)
+            // ==========================================
+            $('#btnDownloadPDF').on('click', function () {
+                // Sirf dono glass-cards ko target karenge (Bill details aur Items)
+                const element = document.querySelector('.main-content');
 
-    // DOWNLOAD PDF
-    $('#btnDownloadPDF').on('click', function () {
-        const element = document.querySelector('.main-content'); 
-        $('.bill-actions, .btn-back, .page-header').hide();
+                // Temporarily hide buttons for clean PDF
+                $('.bill-actions, .btn-back, .page-header').hide();
 
-        const opt = {
-            margin: [10, 10, 10, 10],
-            filename: `Invoice_${globalInvoiceData.invoiceNo}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
+                const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: `Invoice_${globalInvoiceData.invoiceNo}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
 
-        $(this).html('<i class="fa-solid fa-spinner fa-spin"></i> Processing...').prop('disabled', true);
-        
-        html2pdf().set(opt).from(element).save().then(() => {
-            $(this).html('<i class="fa-solid fa-download"></i> Download PDF').prop('disabled', false);
-            $('.bill-actions, .btn-back, .page-header').show();
+                $(this).html('<i class="fa-solid fa-spinner fa-spin"></i> Processing...').prop('disabled', true);
+
+                html2pdf().set(opt).from(element).save().then(() => {
+                    $(this).html('<i class="fa-solid fa-download"></i> Download PDF').prop('disabled', false);
+                    // Show buttons back
+                    $('.bill-actions, .btn-back, .page-header').show();
+                });
+            });
+
+            // ==========================================
+            // 2. PRINT
+            // ==========================================
+            $('#btnPrintBill').on('click', function () {
+                window.print();
+            });
+
+            // ==========================================
+            // 3. SEND REMINDER (FIXED: POPUP CLOSING BEFORE ACTION)
+            // ==========================================
+            $('#btnSendReminder').on('click', function (e) {
+                e.preventDefault();
+                if (!globalInvoiceData) return;
+
+                const email = globalInvoiceData.agencyEmail || "";
+                const subject = encodeURIComponent(`Payment Reminder: ${globalInvoiceData.invoiceNo}`);
+                const bodyText = encodeURIComponent(`Dear ${globalInvoiceData.agencyName},\n\nThis is a friendly reminder regarding Invoice ${globalInvoiceData.invoiceNo} due on ${formatDate(globalInvoiceData.dueDate)}.\n\nRegards,\nTeam Quantifyre`);
+                const waMsg = encodeURIComponent(`Reminder: Dear ${globalInvoiceData.agencyName}, your payment for Invoice ${globalInvoiceData.invoiceNo} is due on ${formatDate(globalInvoiceData.dueDate)}. Please ignore if already paid.`);
+
+                $('#alertTitle').text("Send Reminder");
+                $('#alertMessage').html(`Choose method for <b>${globalInvoiceData.invoiceNo}</b>:`);
+                $('.btn-alert-ok').hide();
+
+                $('#send-options').remove();
+
+                $('.custom-alert-box').append(`
+              <div id="send-options" style="display:flex; flex-direction:column; gap:12px; margin-top:20px; width:100%;">
+            
+            <a href="https://wa.me/?text=${waMsg}" target="_blank" class="action-trigger" style="text-decoration:none; background:#25D366; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp Reminder
+            </a>
+
+            <a href="mailto:${email}?subject=${subject}&body=${bodyText}" class="action-trigger" style="text-decoration:none; background:#EA4335; color:white; padding:14px; border-radius:8px; text-align:center; font-weight:600; display:block;">
+                <i class="fa-solid fa-envelope"></i> Email Reminder
+            </a>
+
+            <button id="btnCancelRem" type="button" style="background:rgba(255,255,255,0.1); color:#ccc; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
+                Cancel
+            </button>
+           </div>
+          `);
+
+                $('#customAlertOverlay').addClass('active');
+            });
+
+            // 🔥 FIX: Click hone par thoda intezar karo phir popup band karo
+            $(document).on('click', '.action-trigger', function () {
+                // 500ms ka delay taaki browser mailto link ko launch kar sake
+                setTimeout(() => {
+                    $('#customAlertOverlay').removeClass('active');
+                    $('#send-options').remove();
+                    $('.btn-alert-ok').show();
+                }, 800);
+            });
+
+            // Cancel button turant band hona chahiye
+            $(document).on('click', '#btnCancelRem', function () {
+                $('#customAlertOverlay').removeClass('active');
+                $('#send-options').remove();
+                $('.btn-alert-ok').show();
+            });
+
+            // Event Delegation for dynamic buttons
+            $(document).on('click', '#remWA', function () {
+                const msg = `Reminder: Dear ${globalInvoiceData.agencyName}, your payment for Invoice ${globalInvoiceData.invoiceNo} is due on ${formatDate(globalInvoiceData.dueDate)}. Please ignore if already paid.`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+                closeRemPop();
+            });
+
+            $(document).on('click', '#remMail', function () {
+                const sub = `Payment Reminder: ${globalInvoiceData.invoiceNo}`;
+                const body = `Dear ${globalInvoiceData.agencyName},\n\nFriendly reminder regarding invoice ${globalInvoiceData.invoiceNo} due on ${formatDate(globalInvoiceData.dueDate)}.\n\nRegards,\nTeam Quantifyre`;
+                window.location.href = `mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+                closeRemPop();
+            });
+
+            $(document).on('click', '#btnCancelRem', function () {
+                closeRemPop();
+            });
+
+            function closeRemPop() {
+                $('#customAlertOverlay').removeClass('active');
+                $('#send-options').remove();
+                $('.btn-alert-ok').show();
+            }
         });
-    });
-
-    // ==========================================
-    // SEND REMINDER (FIXED LOGIC)
-    // ==========================================
-    $('#btnSendReminder').on('click', function (e) {
-        e.preventDefault();
-        if(!globalInvoiceData) return;
-
-        $('#alertTitle').text("Send Reminder");
-        $('#alertMessage').html(`Choose reminder method for <b>${globalInvoiceData.invoiceNo}</b>:`);
-        $('.btn-alert-ok').hide();
-        $('#send-options').remove();
-
-        $('.custom-alert-box').append(`
-            <div id="send-options" style="display:flex; flex-direction:column; gap:12px; margin-top:20px; width:100%;">
-                <button id="remWA" type="button" style="background:#25D366; color:white; border:none; padding:14px; border-radius:8px; cursor:pointer; font-weight:600;">
-                    <i class="fa-brands fa-whatsapp"></i> WhatsApp Reminder
-                </button>
-                <button id="remMail" type="button" style="background:#EA4335; color:white; border:none; padding:14px; border-radius:8px; cursor:pointer; font-weight:600;">
-                    <i class="fa-solid fa-envelope"></i> Email Reminder
-                </button>
-                <button id="btnCancelRem" type="button" style="background:rgba(255,255,255,0.1); color:#ccc; border:1px solid #444; padding:10px; border-radius:8px; cursor:pointer; margin-top:5px;">
-                    Cancel
-                </button>
-            </div>
-        `);
-        $('#customAlertOverlay').addClass('active');
-    });
-
-    // WhatsApp Click
-    $(document).on('click', '#remWA', function() {
-        const msg = `Reminder: Dear ${globalInvoiceData.agencyName}, your payment for Invoice ${globalInvoiceData.invoiceNo} is due on ${formatDate(globalInvoiceData.dueDate)}. Please ignore if already paid.`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-        closeRemPop();
-    });
-
-    // Email Click (Stable mailto trigger)
-    $(document).on('click', '#remMail', function() {
-        const email = globalInvoiceData.agencyEmail || ""; // 👈 Agar ye khali hai toh email client nahi khulega
-        const subject = encodeURIComponent(`Payment Reminder: ${globalInvoiceData.invoiceNo}`);
-        const body = encodeURIComponent(`Dear ${globalInvoiceData.agencyName},\n\nFriendly reminder regarding invoice ${globalInvoiceData.invoiceNo} due on ${formatDate(globalInvoiceData.dueDate)}.\n\nRegards,\nTeam Quantifyre`);
-        
-        // Browser gesture fix: Hidden Link trick
-        const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
-        const tempLink = document.createElement('a');
-        tempLink.href = mailtoUrl;
-        tempLink.click();
-        
-        closeRemPop();
-    });
-
-    $(document).on('click', '#btnCancelRem', function() {
-        closeRemPop();
-    });
-
-    function closeRemPop() {
-        $('#customAlertOverlay').removeClass('active');
-        $('#send-options').remove();
-        $('.btn-alert-ok').show();
-    }
-});
     </script>
 </body>
 
