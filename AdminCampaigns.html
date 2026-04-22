@@ -389,7 +389,7 @@
 
             try {
                 // Backend ko batana padega ki kis admin ka data chahiye
-                const response = await fetch(`https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/campaigns/list?adminId=${currentAdminId}`);
+                const response = await fetch(`https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/campaigns/list?adminId=${currentAdminId}`);
 
                 if (!response.ok) throw new Error("Backend connection failed!");
 
