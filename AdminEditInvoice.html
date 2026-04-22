@@ -331,7 +331,7 @@
 
                 // Step A: Load Agencies List (Hamesha chahiye)
                 $.ajax({
-                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/agencies/list',
+                    url: 'https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/agencies/list',
                     type: 'GET',
                     data: { adminId: adminId },
                     success: function (agencies) {
@@ -353,7 +353,7 @@
             // CASE 1: Server se data lana (Edit Flow)
             function fetchInvoiceDetailsFromServer() {
                 $.ajax({
-                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/details/${invoiceId}`,
+                    url: `https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/invoices/details/${invoiceId}`,
                     type: 'GET',
                     success: function (data) {
                         currentInvoiceStatus = data.status || "Pending";
