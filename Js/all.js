@@ -1,5 +1,5 @@
 $.ajaxPrefilter(function (options) {
-    var liveBase = "https://quantifyre-iris-superadmin-backend.onrender.com";
+    var liveBase = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
 
     // Agar URL localhost se shuru ho raha hai ya relative path (/) hai
     if (options.url.startsWith("http://localhost:8080")) {
@@ -154,7 +154,7 @@ function confirmLogout() {
 
     // Backend API ko call karo cookie expire karne ke liye
     $.ajax({
-        url: "https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/logout",
+        url: "https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/logout",
         type: "POST",
         xhrFields: {
             withCredentials: true // 🔴 Ye line sabse zaroori hai cookie delete karne ke liye
@@ -336,7 +336,7 @@ $(document).ready(function () {
 
     function loadGlobalNotifications() {
         $.ajax({
-            url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/top-notifications/get/${adminId}`,
+            url: `https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/top-notifications/get/${adminId}`,
             type: "GET",
             success: function (res) {
                 // 1. Update Bell Icon Count
@@ -389,7 +389,7 @@ $(document).ready(function () {
         e.stopPropagation();
 
         $.ajax({
-            url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/top-notifications/mark-read/${adminId}`,
+            url: `https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/top-notifications/mark-read/${adminId}`,
             type: "POST",
             success: function () {
                 // 1. Header ke dropdown se 'unread' class hatao
