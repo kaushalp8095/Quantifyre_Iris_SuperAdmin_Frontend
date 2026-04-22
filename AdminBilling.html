@@ -258,7 +258,7 @@
                 }
 
                 $.ajax({
-                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/dashboard`,
+                    url: `https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/invoices/dashboard`,
                     type: 'GET',
                     data: { adminId: adminId },
                     success: function (data) {
@@ -434,7 +434,7 @@
             window.confirmDelete = function () {
                 if (!invoiceToDelete) return;
                 $.ajax({
-                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/delete/${invoiceToDelete}`,
+                    url: `https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/invoices/delete/${invoiceToDelete}`,
                     type: 'DELETE',
                     success: function () {
                         $('#deleteModal').removeClass('active');
