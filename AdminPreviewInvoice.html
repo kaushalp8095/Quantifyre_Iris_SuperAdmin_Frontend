@@ -302,7 +302,7 @@
                 btn.html('<i class="fa-solid fa-spinner fa-spin"></i> Saving...').prop('disabled', true);
 
                 $.ajax({
-                    url: 'https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/invoices/add',
+                    url: 'http://localhost:8080/api/admin/invoices/add',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(invoiceDataObj),

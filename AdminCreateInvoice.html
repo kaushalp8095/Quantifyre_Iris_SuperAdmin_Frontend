@@ -324,7 +324,7 @@
             function fetchAgenciesForInvoice() {
                 const currentAdminId = localStorage.getItem("adminId");
                 $.ajax({
-                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/agencies/list',
+                    url: 'http://localhost:8080/api/admin/agencies/list',
                     type: 'GET',
                     data: { adminId: currentAdminId },
                     success: function (data) {
@@ -345,7 +345,7 @@
                 if (!selectedAgencyId) return;
 
                 $.ajax({
-                    url: `https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/agencies/details/${selectedAgencyId}`,
+                    url: `http://localhost:8080/api/admin/agencies/details/${selectedAgencyId}`,
                     type: 'GET',
                     success: function (agency) {
                         $('input[placeholder="Enter billing address"]').val(agency.address || '');
@@ -452,7 +452,7 @@
                 btn.text("Processing...").prop('disabled', true);
 
                 $.ajax({
-                    url: 'https://quantifyre-iris-superadmin-backend.onrender.com/api/admin/invoices/add',
+                    url: 'http://localhost:8080/api/admin/invoices/add',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(invoiceData),
