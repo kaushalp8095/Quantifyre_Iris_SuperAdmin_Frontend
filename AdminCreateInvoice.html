@@ -278,6 +278,21 @@
     <script src="Js/flatpickr.js"></script>
     <script>
         $(document).ready(function () {
+
+            function fetchNextInvoiceNumber() {
+                $.ajax({
+                    url: 'http://localhost:8080/api/admin/invoices/next-no', // Tumhara naya endpoint
+                    type: 'GET',
+                    success: function (nextNo) {
+                        $('#invoiceNo').val(nextNo); // Backend se aaya hua sahi number set kar diya
+                    },
+                    error: function () {
+                        console.error("Invoice number fetch failed");
+                    }
+                });
+            }
+
+
             const agencySelect = $('#agencySearchSelect');
 
             // 1. PLAN RATES CONFIGURATION
@@ -334,7 +349,12 @@
             // 6. AGENCY CHANGE - AUTO FILL LOGIC
             agencySelect.on('change', function () {
                 const selectedAgencyId = $(this).val();
-                if (!selectedAgencyId) return;
+                if (!selectedAgencyId) {
+                    $('#invoiceNo').val(''); // Agar agency hatayi toh field clear kar do
+                    return;
+                }
+
+                fetchNextInvoiceNumber();
 
                 $.ajax({
                     url: `http://localhost:8080/api/admin/agencies/details/${selectedAgencyId}`,
@@ -534,6 +554,7 @@
         function closeCustomAlert() {
             $('#customAlertOverlay').removeClass('active');
         }
+
     </script>
 
 </body>
