@@ -305,14 +305,6 @@
             });
             const duePicker = flatpickr("#dueDate", fpConfig);
 
-            // 3. AUTO-GENERATE INVOICE NUMBER (On Load)
-            function generateInvoiceNumber() {
-                const randomNum = Math.floor(1000 + Math.random() * 9000);
-                const invNo = "#INV-" + new Date().getFullYear() + "-" + randomNum;
-                $('#invoiceNo').val(invNo);
-            }
-            generateInvoiceNumber();
-
             // 4. SELECT2 INITIALIZATION
             agencySelect.select2({
                 placeholder: "Select an Agency",
