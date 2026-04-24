@@ -22,25 +22,26 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li class="active"><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -52,7 +53,7 @@
 
         <main class="main-content">
 
-             <header class="top-bar">
+            <header class="top-bar">
                 <div class="menu-toggle" id="sidebarToggle"><img src="Images/Slide.ico"></div>
                 <div class="top-profile-actions" style="position: relative;">
 
@@ -70,7 +71,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -131,55 +133,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Super Admin</td>
-                                <td class="td-desc">Full System Access</td>
-                                <td>1</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditRole.html" class="btn-icon btn-edit"
-                                            style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Agency Manager</td>
-                                <td class="td-desc">Manage Agency Operations</td>
-                                <td>7</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditRole.html" class="btn-icon btn-edit"
-                                            style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Client Viewer</td>
-                                <td class="td-desc">View client reports only</td>
-                                <td>21</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditRole.html" class="btn-icon btn-edit"
-                                            style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Client</td>
-                                <td class="td-desc">Reports only</td>
-                                <td>5</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditRole.html" class="btn-icon btn-edit"
-                                            style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
+                                <td colspan="8" style="text-align:center; padding: 50px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Admin Roles...
                                 </td>
                             </tr>
                         </tbody>
@@ -206,8 +161,9 @@
 
             <div class="roles-header-container"
                 style=" border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;margin-top: 10px;">
-                
-                <a href="AdminCreateAgencyRole.html" class="btn-create" style="margin-left: auto;margin-top: 10px;">Create Agency Role</a>
+
+                <a href="AdminCreateAgencyRole.html" class="btn-create"
+                    style="margin-left: auto;margin-top: 10px;">Create Agency Role</a>
             </div>
 
             <section class="roles-table-card">
@@ -224,54 +180,10 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Agency Admin</td>
-                                <td class="td-desc">Full access to agency dashboard</td>
-                                <td>15</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditAgencyRole.html" class="btn-icon btn-edit" style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
+                                <td colspan="8" style="text-align:center; padding: 50px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Agency Roles...
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Campaign Manager</td>
-                                <td class="td-desc">Edit/Manage campaigns only</td>
-                                <td>42</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditAgencyRole.html" class="btn-icon btn-edit" style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Campaign Manager</td>
-                                <td class="td-desc">Edit/Manage campaigns only</td>
-                                <td>42</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditAgencyRole.html" class="btn-icon btn-edit" style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Campaign Manager</td>
-                                <td class="td-desc">Edit/Manage campaigns only</td>
-                                <td>42</td>
-                                <td>
-                                    <div class="action-cell">
-                                        <a href="AdminEditAgencyRole.html" class="btn-icon btn-edit" style="text-decoration: none;"><i class="fa-solid fa-pen"></i></a>
-                                        <div class="btn-icon btn-delete" onclick="openDeleteModal()"><i
-                                                class="fa-regular fa-trash-can"></i></div>
-                                    </div>
-                                </td>
-                            </tr>
-
                         </tbody>
                     </table>
                 </div>
@@ -338,19 +250,19 @@ PURA script block copy karo aur paste karo
 =====================================================
 -->
 
-<script>
-    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
-    const adminId = localStorage.getItem("adminId");
+    <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
 
-    let roleToDeleteId = null; // Delete ke liye role ID store karega
+        let roleToDeleteId = null; // Delete ke liye role ID store karega
 
-    // ==========================================
-    // HELPER: Row banana (reuse hoga dono tables me)
-    // ==========================================
-    function createRoleRow(role, isAgency = false) {
-        const editUrl = `AdminEditRole.html?roleId=${role.id}&type=${isAgency ? 'AGENCY' : 'ADMIN'}`;
-        const permSummary = getPermissionSummary(role.permissions);
-        return `
+        // ==========================================
+        // HELPER: Row banana (reuse hoga dono tables me)
+        // ==========================================
+        function createRoleRow(role, isAgency = false) {
+            const editUrl = `AdminEditRole.html?roleId=${role.id}&type=${isAgency ? 'AGENCY' : 'ADMIN'}`;
+            const permSummary = getPermissionSummary(role.permissions);
+            return `
             <tr>
                 <td>${role.roleName || '-'}</td>
                 <td class="td-desc">${permSummary}</td>
@@ -366,125 +278,125 @@ PURA script block copy karo aur paste karo
                     </div>
                 </td>
             </tr>`;
-    }
-
-    // Permission JSON se ek short description banana
-    function getPermissionSummary(permissionsJson) {
-        if (!permissionsJson) return 'No permissions set';
-        try {
-            const perms = JSON.parse(permissionsJson);
-            const modules = Object.keys(perms).filter(mod => {
-                const p = perms[mod];
-                return p.read || p.write || p.delete;
-            });
-            if (modules.length === 0) return 'No permissions set';
-            const names = modules.map(m => m.charAt(0).toUpperCase() + m.slice(1));
-            return names.join(', ') + ' access';
-        } catch (e) {
-            return 'Custom permissions';
         }
-    }
 
-    // ==========================================
-    // 1. LOAD ADMIN ROLES TABLE
-    // ==========================================
-    function loadAdminRoles() {
-        if (!adminId) return;
-        $.ajax({
-            url: `${BASE_URL}/api/admin/roles/list`,
-            type: 'GET',
-            data: { adminId: adminId, type: 'ADMIN' },
-            success: function(roles) {
-                const tbody = $('#roleTable tbody');
-                tbody.empty();
-                if (!roles || roles.length === 0) {
-                    tbody.html('<tr><td colspan="4" style="text-align:center; color:#8b9c9c; padding:20px;">No admin roles found. <a href="AdminCreateRole.html">Create one</a></td></tr>');
-                    return;
-                }
-                roles.forEach(role => {
-                    tbody.append(createRoleRow(role, false));
+        // Permission JSON se ek short description banana
+        function getPermissionSummary(permissionsJson) {
+            if (!permissionsJson) return 'No permissions set';
+            try {
+                const perms = JSON.parse(permissionsJson);
+                const modules = Object.keys(perms).filter(mod => {
+                    const p = perms[mod];
+                    return p.read || p.write || p.delete;
                 });
-                // Re-init pagination with real data
-                setupTablePagination('roleTable', 'pagination-role', 4);
-            },
-            error: function(err) {
-                console.error("Admin Roles Load Error:", err);
-                $('#roleTable tbody').html('<tr><td colspan="4" style="text-align:center; color:#e74c3c; padding:20px;">Failed to load roles.</td></tr>');
+                if (modules.length === 0) return 'No permissions set';
+                const names = modules.map(m => m.charAt(0).toUpperCase() + m.slice(1));
+                return names.join(', ') + ' access';
+            } catch (e) {
+                return 'Custom permissions';
             }
-        });
-    }
+        }
 
-    // ==========================================
-    // 2. LOAD AGENCY ROLES TABLE
-    // ==========================================
-    function loadAgencyRoles() {
-        if (!adminId) return;
-        $.ajax({
-            url: `${BASE_URL}/api/admin/roles/list`,
-            type: 'GET',
-            data: { adminId: adminId, type: 'AGENCY' },
-            success: function(roles) {
-                const tbody = $('#agencyRoleTable tbody');
-                tbody.empty();
-                if (!roles || roles.length === 0) {
-                    tbody.html('<tr><td colspan="4" style="text-align:center; color:#8b9c9c; padding:20px;">No agency roles found. <a href="AdminCreateAgencyRole.html">Create one</a></td></tr>');
-                    return;
+        // ==========================================
+        // 1. LOAD ADMIN ROLES TABLE
+        // ==========================================
+        function loadAdminRoles() {
+            if (!adminId) return;
+            $.ajax({
+                url: `${BASE_URL}/api/admin/roles/list`,
+                type: 'GET',
+                data: { adminId: adminId, type: 'ADMIN' },
+                success: function (roles) {
+                    const tbody = $('#roleTable tbody');
+                    tbody.empty();
+                    if (!roles || roles.length === 0) {
+                        tbody.html('<tr><td colspan="4" style="text-align:center; color:#8b9c9c; padding:20px;">No admin roles found. <a href="AdminCreateRole.html">Create one</a></td></tr>');
+                        return;
+                    }
+                    roles.forEach(role => {
+                        tbody.append(createRoleRow(role, false));
+                    });
+                    // Re-init pagination with real data
+                    setupTablePagination('roleTable', 'pagination-role', 4);
+                },
+                error: function (err) {
+                    console.error("Admin Roles Load Error:", err);
+                    $('#roleTable tbody').html('<tr><td colspan="4" style="text-align:center; color:#e74c3c; padding:20px;">Failed to load roles.</td></tr>');
                 }
-                roles.forEach(role => {
-                    tbody.append(createRoleRow(role, true));
-                });
-                setupTablePagination('agencyRoleTable', 'pagination-agency-role', 4);
-            },
-            error: function(err) {
-                console.error("Agency Roles Load Error:", err);
-                $('#agencyRoleTable tbody').html('<tr><td colspan="4" style="text-align:center; color:#e74c3c; padding:20px;">Failed to load roles.</td></tr>');
-            }
+            });
+        }
+
+        // ==========================================
+        // 2. LOAD AGENCY ROLES TABLE
+        // ==========================================
+        function loadAgencyRoles() {
+            if (!adminId) return;
+            $.ajax({
+                url: `${BASE_URL}/api/admin/roles/list`,
+                type: 'GET',
+                data: { adminId: adminId, type: 'AGENCY' },
+                success: function (roles) {
+                    const tbody = $('#agencyRoleTable tbody');
+                    tbody.empty();
+                    if (!roles || roles.length === 0) {
+                        tbody.html('<tr><td colspan="4" style="text-align:center; color:#8b9c9c; padding:20px;">No agency roles found. <a href="AdminCreateAgencyRole.html">Create one</a></td></tr>');
+                        return;
+                    }
+                    roles.forEach(role => {
+                        tbody.append(createRoleRow(role, true));
+                    });
+                    setupTablePagination('agencyRoleTable', 'pagination-agency-role', 4);
+                },
+                error: function (err) {
+                    console.error("Agency Roles Load Error:", err);
+                    $('#agencyRoleTable tbody').html('<tr><td colspan="4" style="text-align:center; color:#e74c3c; padding:20px;">Failed to load roles.</td></tr>');
+                }
+            });
+        }
+
+        // ==========================================
+        // 3. DELETE MODAL OPEN (role ID store karo)
+        // ==========================================
+        function openDeleteModal(roleId) {
+            roleToDeleteId = roleId;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            roleToDeleteId = null;
+        }
+
+        // ==========================================
+        // 4. CONFIRM DELETE
+        // ==========================================
+        function confirmDelete() {
+            if (!roleToDeleteId) return;
+            $.ajax({
+                url: `${BASE_URL}/api/admin/roles/delete/${roleToDeleteId}`,
+                type: 'DELETE',
+                success: function () {
+                    closeModal('deleteModal');
+                    showCustomAlert("Role deleted successfully!");
+                    loadAdminRoles();
+                    loadAgencyRoles();
+                },
+                error: function (err) {
+                    closeModal('deleteModal');
+                    console.error("Delete Error:", err);
+                    showCustomAlert("Failed to delete role. Please try again.");
+                }
+            });
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
+            loadAdminRoles();
+            loadAgencyRoles();
         });
-    }
-
-    // ==========================================
-    // 3. DELETE MODAL OPEN (role ID store karo)
-    // ==========================================
-    function openDeleteModal(roleId) {
-        roleToDeleteId = roleId;
-        document.getElementById('deleteModal').classList.add('active');
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('active');
-        roleToDeleteId = null;
-    }
-
-    // ==========================================
-    // 4. CONFIRM DELETE
-    // ==========================================
-    function confirmDelete() {
-        if (!roleToDeleteId) return;
-        $.ajax({
-            url: `${BASE_URL}/api/admin/roles/delete/${roleToDeleteId}`,
-            type: 'DELETE',
-            success: function() {
-                closeModal('deleteModal');
-                showCustomAlert("Role deleted successfully!");
-                loadAdminRoles();
-                loadAgencyRoles();
-            },
-            error: function(err) {
-                closeModal('deleteModal');
-                console.error("Delete Error:", err);
-                showCustomAlert("Failed to delete role. Please try again.");
-            }
-        });
-    }
-
-    // ==========================================
-    // INIT
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', function() {
-        loadAdminRoles();
-        loadAgencyRoles();
-    });
-</script>
+    </script>
 
 
     <script>
