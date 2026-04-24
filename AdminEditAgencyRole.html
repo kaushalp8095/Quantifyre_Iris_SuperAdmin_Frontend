@@ -113,6 +113,13 @@
 
             <section class="role-form-card">
                 <form>
+
+                     <div style="width: 220px;">
+                            <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
+                                <option></option>
+                            </select>
+                        </div>
+
                     <label class="role-label">Role Name</label>
                     <input type="text" class="role-input" value="Super Admin">
 
@@ -231,5 +238,195 @@
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script> 
+
+    <!-- 
+=====================================================
+FILE: AdminEditRole.html
+KAHAN LAGAO: </body> ke upar wale <script src="Js/all.js"></script> ke BAAD
+
+PEHLE HTML me update karo:
+  Input:  <input type="text" id="roleName" class="role-input">
+  Textarea: <textarea id="roleDescription" class="role-textarea"></textarea>
+  Button: <button type="button" id="updateRoleBtn" class="btn btn-submit">Update Role</button>
+
+  Admin Role Checkboxes:
+  Dashboard:     name="dashboard_read"      name="dashboard_write"      name="dashboard_delete"
+  Agency:        name="agency_read"         name="agency_write"         name="agency_delete"
+  Billing:       name="billing_read"        name="billing_write"        name="billing_delete"
+  SystemSetting: name="systemsetting_read"  name="systemsetting_write"  name="systemsetting_delete"
+  Reports:       name="reports_read"        name="reports_write"        name="reports_delete"
+
+  Agency Role ke liye "Agency" ki jagah "Client" hoga:
+  Client:        name="client_read"         name="client_write"         name="client_delete"
+  
+  NOTE: Edit page Admin aur Agency dono roles edit karta hai.
+        URL me ?roleId=X&type=ADMIN ya ?roleId=X&type=AGENCY aata hai
+=====================================================
+-->
+
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId = localStorage.getItem("adminId");
+
+    // URL se roleId aur type nikalo
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleId = urlParams.get('roleId');
+    const roleType = urlParams.get('type') || 'ADMIN'; // default ADMIN
+
+    // ==========================================
+    // PERMISSIONS SET KARO (load ke baad)
+    // ==========================================
+    function applyPermissions(permissionsJson) {
+        if (!permissionsJson) return;
+        try {
+            const perms = JSON.parse(permissionsJson);
+            Object.keys(perms).forEach(mod => {
+                const p = perms[mod];
+                const readEl   = document.querySelector(`input[name="${mod}_read"]`);
+                const writeEl  = document.querySelector(`input[name="${mod}_write"]`);
+                const deleteEl = document.querySelector(`input[name="${mod}_delete"]`);
+                if (readEl)   readEl.checked   = p.read   || false;
+                if (writeEl)  writeEl.checked  = p.write  || false;
+                if (deleteEl) deleteEl.checked = p.delete || false;
+            });
+        } catch(e) {
+            console.error("Permission parse error:", e);
+        }
+    }
+
+    // ==========================================
+    // PERMISSIONS COLLECT KARO (save ke time)
+    // ==========================================
+    function collectPermissions() {
+        // Admin ke modules alag, Agency ke alag
+        const adminModules  = ['dashboard', 'agency', 'billing', 'systemsetting', 'reports'];
+        const agencyModules = ['dashboard', 'client', 'billing', 'systemsetting', 'reports'];
+        const modules = (roleType === 'AGENCY') ? agencyModules : adminModules;
+
+        const permissions = {};
+        modules.forEach(mod => {
+            permissions[mod] = {
+                read:   document.querySelector(`input[name="${mod}_read"]`)?.checked   || false,
+                write:  document.querySelector(`input[name="${mod}_write"]`)?.checked  || false,
+                delete: document.querySelector(`input[name="${mod}_delete"]`)?.checked || false
+            };
+        });
+        return permissions;
+    }
+
+    // ==========================================
+    // LOAD ROLE DATA
+    // ==========================================
+    function loadRoleDetails() {
+        if (!roleId) {
+            showCustomAlert("Invalid role. Redirecting...");
+            setTimeout(() => window.location.href = "AdminRoles.html", 1200);
+            return;
+        }
+
+        $.ajax({
+            url: `${BASE_URL}/api/admin/roles/details/${roleId}`,
+            type: 'GET',
+            success: function(role) {
+                // Form me data bharo
+                const nameEl = document.getElementById('roleName');
+                const descEl = document.getElementById('roleDescription');
+                if (nameEl) nameEl.value = role.roleName || '';
+                if (descEl) descEl.value = role.description || '';
+
+                // Permissions checkboxes set karo
+                applyPermissions(role.permissions);
+            },
+            error: function(err) {
+                console.error("Load Role Error:", err);
+                showCustomAlert("Failed to load role details.");
+            }
+        });
+    }
+
+    // ==========================================
+    // UPDATE ROLE
+    // ==========================================
+    function updateRole() {
+        const roleName = document.getElementById('roleName')?.value?.trim();
+        const description = document.getElementById('roleDescription')?.value?.trim();
+
+        if (!roleName) {
+            showCustomAlert("Role name cannot be empty.");
+            return;
+        }
+
+        const permissions = collectPermissions();
+        const payload = {
+            adminId: parseInt(adminId),
+            roleType: roleType,
+            roleName: roleName,
+            description: description || "",
+            permissions: JSON.stringify(permissions)
+        };
+
+        const updateBtn = document.getElementById('updateRoleBtn');
+        if (updateBtn) {
+            updateBtn.disabled = true;
+            updateBtn.textContent = "Updating...";
+        }
+
+        $.ajax({
+            url: `${BASE_URL}/api/admin/roles/update/${roleId}`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function(res) {
+                showCustomAlert("Role Updated Successfully!");
+                setTimeout(() => {
+                    window.location.href = "AdminRoles.html";
+                }, 1200);
+            },
+            error: function(err) {
+                const msg = err.responseJSON?.error || "Failed to update role.";
+                showCustomAlert(msg);
+                if (updateBtn) {
+                    updateBtn.disabled = false;
+                    updateBtn.textContent = "Update Role";
+                }
+            }
+        });
+    }
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
+        loadRoleDetails();
+
+        const updateBtn = document.getElementById('updateRoleBtn');
+        if (updateBtn) {
+            updateBtn.addEventListener('click', updateRole);
+        }
+    });
+
+    $(document).ready(function () {
+
+            // 🔴 1. Initialize Agency Select2
+            $('#agencySearchSelect').select2({
+                placeholder: "Search Agency",
+                allowClear: true,
+                width: '100%'
+            }).on('change', function () {
+                applyFilters();
+            });
+
+            // 🔴 3. Status filter click hone par bhi applyFilters chale
+            $('#statusFilter .dropdown-item').on('click', function () {
+                const selectedValue = $(this).text();
+                $('#statusFilter .dropdown-selected span').text(selectedValue);
+                $('#statusFilter').removeClass('active');
+                applyFilters();
+            });
+
+        });
+
+</script>
+
 </body>
 </html>

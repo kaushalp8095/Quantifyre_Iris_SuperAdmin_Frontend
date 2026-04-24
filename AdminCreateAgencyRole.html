@@ -115,15 +115,22 @@
 
             <section class="role-form-card">
                 <form>
-                    <div class="ar-form-group">
-                        <label class="role-label">Role Name</label>
-                    <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name">
+                    <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 20px;">
 
-                     <label class="role-label">Role Name</label>
-                    <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name">
+                        <div style="width: 250px;">
+                            <label class="role-label" style="display: block; margin-bottom: 8px;">Select Agency</label>
+                            <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
+                                <option></option>
+                            </select>
+                        </div>
+
+                        <div style="flex: 1;">
+                            <label class="role-label" style="display: block; margin-bottom: 8px;">Role Name</label>
+                            <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name"
+                                style="width: 100%; margin-bottom: 0;">
+                        </div>
 
                     </div>
-                   
                     <label class="role-label">Description</label>
                     <textarea class="role-textarea" id="roleDescription"
                         placeholder="Enter role description..."></textarea>
@@ -330,6 +337,27 @@ PEHLE HTML me update karo:
                     }
                 });
             });
+        });
+
+        $(document).ready(function () {
+
+            // 🔴 1. Initialize Agency Select2
+            $('#agencySearchSelect').select2({
+                placeholder: "Search Agency",
+                allowClear: true,
+                width: '100%'
+            }).on('change', function () {
+                applyFilters();
+            });
+
+            // 🔴 3. Status filter click hone par bhi applyFilters chale
+            $('#statusFilter .dropdown-item').on('click', function () {
+                const selectedValue = $(this).text();
+                $('#statusFilter .dropdown-selected span').text(selectedValue);
+                $('#statusFilter').removeClass('active');
+                applyFilters();
+            });
+
         });
     </script>
 
