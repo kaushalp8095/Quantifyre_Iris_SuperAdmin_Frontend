@@ -22,25 +22,26 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li class="active"><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -70,7 +71,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -117,10 +119,11 @@
                     <input type="text" id="roleName" class="role-input" value="Super Admin">
 
                     <label class="role-label">Description</label>
-                    <textarea class="role-textarea" id="roleDescription" >Update the Super Admin role settings to maintain complete control over all modules, users, and system configurations while ensuring permissions align with organizational requirements.</textarea>
+                    <textarea class="role-textarea"
+                        id="roleDescription">Update the Super Admin role settings to maintain complete control over all modules, users, and system configurations while ensuring permissions align with organizational requirements.</textarea>
 
                     <label class="perm-section-label">Permissions</label>
-                    
+
                     <div class="permissions-grid">
 
                         <span class="perm-module-name">Dashboard</span>
@@ -230,174 +233,115 @@
     </div>
 
     <script src="Js/jquery-3.7.1.min.js"></script>
-    <script src="Js/all.js"></script> 
+    <script src="Js/all.js"></script>
 
-    <!-- 
-=====================================================
-FILE: AdminEditRole.html
-KAHAN LAGAO: </body> ke upar wale <script src="Js/all.js"></script> ke BAAD
+    <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
+        const roleId = new URLSearchParams(window.location.search).get('roleId');
 
-PEHLE HTML me update karo:
-  Input:  <input type="text" id="roleName" class="role-input">
-  Textarea: <textarea id="roleDescription" class="role-textarea"></textarea>
-  Button: <button type="button" id="updateRoleBtn" class="btn btn-submit">Update Role</button>
+        // ==========================================
+        // 1. PERMISSIONS APPLY
+        // ==========================================
+        function applyPermissions(permissionsJson) {
+            if (!permissionsJson) return;
+            try {
+                const perms = JSON.parse(permissionsJson);
+                Object.keys(perms).forEach(mod => {
+                    const p = perms[mod];
+                    document.querySelectorAll(`input[name="${mod}_read"]`).forEach(el => el.checked = p.read || false);
+                    document.querySelectorAll(`input[name="${mod}_write"]`).forEach(el => el.checked = p.write || false);
+                    document.querySelectorAll(`input[name="${mod}_delete"]`).forEach(el => el.checked = p.delete || false);
+                });
+            } catch (e) { console.error("Permission parse error:", e); }
+        }
 
-  Admin Role Checkboxes:
-  Dashboard:     name="dashboard_read"      name="dashboard_write"      name="dashboard_delete"
-  Agency:        name="agency_read"         name="agency_write"         name="agency_delete"
-  Billing:       name="billing_read"        name="billing_write"        name="billing_delete"
-  SystemSetting: name="systemsetting_read"  name="systemsetting_write"  name="systemsetting_delete"
-  Reports:       name="reports_read"        name="reports_write"        name="reports_delete"
-
-  Agency Role ke liye "Agency" ki jagah "Client" hoga:
-  Client:        name="client_read"         name="client_write"         name="client_delete"
-  
-  NOTE: Edit page Admin aur Agency dono roles edit karta hai.
-        URL me ?roleId=X&type=ADMIN ya ?roleId=X&type=AGENCY aata hai
-=====================================================
--->
-
-<script>
-    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
-    const adminId = localStorage.getItem("adminId");
-
-    // URL se roleId aur type nikalo
-    const urlParams = new URLSearchParams(window.location.search);
-    const roleId = urlParams.get('roleId');
-    const roleType = urlParams.get('type') || 'ADMIN'; // default ADMIN
-
-    // ==========================================
-    // PERMISSIONS SET KARO (load ke baad)
-    // ==========================================
-    function applyPermissions(permissionsJson) {
-        if (!permissionsJson) return;
-        try {
-            const perms = JSON.parse(permissionsJson);
-            Object.keys(perms).forEach(mod => {
-                const p = perms[mod];
-                const readEl   = document.querySelector(`input[name="${mod}_read"]`);
-                const writeEl  = document.querySelector(`input[name="${mod}_write"]`);
-                const deleteEl = document.querySelector(`input[name="${mod}_delete"]`);
-                if (readEl)   readEl.checked   = p.read   || false;
-                if (writeEl)  writeEl.checked  = p.write  || false;
-                if (deleteEl) deleteEl.checked = p.delete || false;
+        // ==========================================
+        // 2. PERMISSIONS COLLECT (Admin modules)
+        // ==========================================
+        function collectPermissions() {
+            const modules = ['dashboard', 'agency', 'billing', 'systemsetting', 'reports'];
+            const permissions = {};
+            modules.forEach(mod => {
+                permissions[mod] = {
+                    read: document.querySelector(`input[name="${mod}_read"]`)?.checked || false,
+                    write: document.querySelector(`input[name="${mod}_write"]`)?.checked || false,
+                    delete: document.querySelector(`input[name="${mod}_delete"]`)?.checked || false
+                };
             });
-        } catch(e) {
-            console.error("Permission parse error:", e);
+            return permissions;
         }
-    }
 
-    // ==========================================
-    // PERMISSIONS COLLECT KARO (save ke time)
-    // ==========================================
-    function collectPermissions() {
-        // Admin ke modules alag, Agency ke alag
-        const adminModules  = ['dashboard', 'agency', 'billing', 'systemsetting', 'reports'];
-        const agencyModules = ['dashboard', 'client', 'billing', 'systemsetting', 'reports'];
-        const modules = (roleType === 'AGENCY') ? agencyModules : adminModules;
+        // ==========================================
+        // 3. LOAD ROLE DETAILS
+        // ==========================================
+        function loadRoleDetails() {
+            if (!roleId) {
+                showCustomAlert("Invalid role. Redirecting...");
+                setTimeout(() => window.location.href = "AdminRoles.html", 1200);
+                return;
+            }
+            $.ajax({
+                url: `${BASE_URL}/api/admin/roles/details/${roleId}`,
+                type: 'GET',
+                success: function (role) {
+                    const nameEl = document.getElementById('roleName');
+                    const descEl = document.getElementById('roleDescription');
+                    if (nameEl) nameEl.value = role.roleName || '';
+                    if (descEl) descEl.value = role.description || '';
+                    applyPermissions(role.permissions);
+                },
+                error: function () { showCustomAlert("Failed to load role details."); }
+            });
+        }
 
-        const permissions = {};
-        modules.forEach(mod => {
-            permissions[mod] = {
-                read:   document.querySelector(`input[name="${mod}_read"]`)?.checked   || false,
-                write:  document.querySelector(`input[name="${mod}_write"]`)?.checked  || false,
-                delete: document.querySelector(`input[name="${mod}_delete"]`)?.checked || false
+        // ==========================================
+        // 4. UPDATE ROLE
+        // ==========================================
+        function updateRole() {
+            const roleName = document.getElementById('roleName')?.value?.trim();
+            const description = document.getElementById('roleDescription')?.value?.trim();
+
+            if (!roleName) { showCustomAlert("Role name cannot be empty."); return; }
+
+            const payload = {
+                adminId: parseInt(adminId),
+                roleType: "ADMIN",
+                roleName: roleName,
+                description: description || "",
+                permissions: JSON.stringify(collectPermissions())
             };
-        });
-        return permissions;
-    }
 
-    // ==========================================
-    // LOAD ROLE DATA
-    // ==========================================
-    function loadRoleDetails() {
-        if (!roleId) {
-            showCustomAlert("Invalid role. Redirecting...");
-            setTimeout(() => window.location.href = "AdminRoles.html", 1200);
-            return;
-        }
+            const updateBtn = document.getElementById('updateRoleBtn');
+            if (updateBtn) { updateBtn.disabled = true; updateBtn.textContent = "Updating..."; }
 
-        $.ajax({
-            url: `${BASE_URL}/api/admin/roles/details/${roleId}`,
-            type: 'GET',
-            success: function(role) {
-                // Form me data bharo
-                const nameEl = document.getElementById('roleName');
-                const descEl = document.getElementById('roleDescription');
-                if (nameEl) nameEl.value = role.roleName || '';
-                if (descEl) descEl.value = role.description || '';
-
-                // Permissions checkboxes set karo
-                applyPermissions(role.permissions);
-            },
-            error: function(err) {
-                console.error("Load Role Error:", err);
-                showCustomAlert("Failed to load role details.");
-            }
-        });
-    }
-
-    // ==========================================
-    // UPDATE ROLE
-    // ==========================================
-    function updateRole() {
-        const roleName = document.getElementById('roleName')?.value?.trim();
-        const description = document.getElementById('roleDescription')?.value?.trim();
-
-        if (!roleName) {
-            showCustomAlert("Role name cannot be empty.");
-            return;
-        }
-
-        const permissions = collectPermissions();
-        const payload = {
-            adminId: parseInt(adminId),
-            roleType: roleType,
-            roleName: roleName,
-            description: description || "",
-            permissions: JSON.stringify(permissions)
-        };
-
-        const updateBtn = document.getElementById('updateRoleBtn');
-        if (updateBtn) {
-            updateBtn.disabled = true;
-            updateBtn.textContent = "Updating...";
-        }
-
-        $.ajax({
-            url: `${BASE_URL}/api/admin/roles/update/${roleId}`,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(payload),
-            success: function(res) {
-                showCustomAlert("Role Updated Successfully!");
-                setTimeout(() => {
-                    window.location.href = "AdminRoles.html";
-                }, 1200);
-            },
-            error: function(err) {
-                const msg = err.responseJSON?.error || "Failed to update role.";
-                showCustomAlert(msg);
-                if (updateBtn) {
-                    updateBtn.disabled = false;
-                    updateBtn.textContent = "Update Role";
+            $.ajax({
+                url: `${BASE_URL}/api/admin/roles/update/${roleId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function () {
+                    showCustomAlert("Role Updated Successfully!");
+                    setTimeout(() => { window.location.href = "AdminRoles.html"; }, 1200);
+                },
+                error: function (err) {
+                    const msg = err.responseJSON?.error || "Failed to update role.";
+                    showCustomAlert(msg);
+                    if (updateBtn) { updateBtn.disabled = false; updateBtn.textContent = "Update Role"; }
                 }
-            }
-        });
-    }
-
-    // ==========================================
-    // INIT
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', function() {
-        loadRoleDetails();
-
-        const updateBtn = document.getElementById('updateRoleBtn');
-        if (updateBtn) {
-            updateBtn.addEventListener('click', updateRole);
+            });
         }
-    });
-</script>
+
+        // ==========================================
+        // 5. INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
+            loadRoleDetails();
+            const updateBtn = document.getElementById('updateRoleBtn');
+            if (updateBtn) updateBtn.addEventListener('click', updateRole);
+        });
+    </script>
 
 </body>
+
 </html>

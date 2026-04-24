@@ -241,26 +241,18 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
-
-    <!-- 
-=====================================================
-FILE: AdminRoles.html
-KAHAN LAGAO: </body> ke upar wale <script src="Js/all.js"></script> ke BAAD
-PURA script block copy karo aur paste karo
-=====================================================
--->
-
     <script>
         const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
         const adminId = localStorage.getItem("adminId");
 
-        let roleToDeleteId = null; // Delete ke liye role ID store karega
+        let roleToDeleteId = null;
 
-        // ==========================================
-        // HELPER: Row banana (reuse hoga dono tables me)
-        // ==========================================
         function createRoleRow(role, isAgency = false) {
-            const editUrl = `AdminEditRole.html?roleId=${role.id}&type=${isAgency ? 'AGENCY' : 'ADMIN'}`;
+            // ✅ Alag pages — ADMIN ke liye AdminEditRole.html, AGENCY ke liye AdminEditAgencyRole.html
+            const editUrl = isAgency
+                ? `AdminEditAgencyRole.html?roleId=${role.id}`
+                : `AdminEditRole.html?roleId=${role.id}`;
+
             const permSummary = getPermissionSummary(role.permissions);
             return `
             <tr>
@@ -280,7 +272,6 @@ PURA script block copy karo aur paste karo
             </tr>`;
         }
 
-        // Permission JSON se ek short description banana
         function getPermissionSummary(permissionsJson) {
             if (!permissionsJson) return 'No permissions set';
             try {
@@ -290,16 +281,12 @@ PURA script block copy karo aur paste karo
                     return p.read || p.write || p.delete;
                 });
                 if (modules.length === 0) return 'No permissions set';
-                const names = modules.map(m => m.charAt(0).toUpperCase() + m.slice(1));
-                return names.join(', ') + ' access';
+                return modules.map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(', ') + ' access';
             } catch (e) {
                 return 'Custom permissions';
             }
         }
 
-        // ==========================================
-        // 1. LOAD ADMIN ROLES TABLE
-        // ==========================================
         function loadAdminRoles() {
             if (!adminId) return;
             $.ajax({
@@ -313,22 +300,15 @@ PURA script block copy karo aur paste karo
                         tbody.html('<tr><td colspan="4" style="text-align:center; color:#8b9c9c; padding:20px;">No admin roles found. <a href="AdminCreateRole.html">Create one</a></td></tr>');
                         return;
                     }
-                    roles.forEach(role => {
-                        tbody.append(createRoleRow(role, false));
-                    });
-                    // Re-init pagination with real data
+                    roles.forEach(role => tbody.append(createRoleRow(role, false)));
                     setupTablePagination('roleTable', 'pagination-role', 4);
                 },
-                error: function (err) {
-                    console.error("Admin Roles Load Error:", err);
+                error: function () {
                     $('#roleTable tbody').html('<tr><td colspan="4" style="text-align:center; color:#e74c3c; padding:20px;">Failed to load roles.</td></tr>');
                 }
             });
         }
 
-        // ==========================================
-        // 2. LOAD AGENCY ROLES TABLE
-        // ==========================================
         function loadAgencyRoles() {
             if (!adminId) return;
             $.ajax({
@@ -342,21 +322,15 @@ PURA script block copy karo aur paste karo
                         tbody.html('<tr><td colspan="4" style="text-align:center; color:#8b9c9c; padding:20px;">No agency roles found. <a href="AdminCreateAgencyRole.html">Create one</a></td></tr>');
                         return;
                     }
-                    roles.forEach(role => {
-                        tbody.append(createRoleRow(role, true));
-                    });
+                    roles.forEach(role => tbody.append(createRoleRow(role, true)));
                     setupTablePagination('agencyRoleTable', 'pagination-agency-role', 4);
                 },
-                error: function (err) {
-                    console.error("Agency Roles Load Error:", err);
+                error: function () {
                     $('#agencyRoleTable tbody').html('<tr><td colspan="4" style="text-align:center; color:#e74c3c; padding:20px;">Failed to load roles.</td></tr>');
                 }
             });
         }
 
-        // ==========================================
-        // 3. DELETE MODAL OPEN (role ID store karo)
-        // ==========================================
         function openDeleteModal(roleId) {
             roleToDeleteId = roleId;
             document.getElementById('deleteModal').classList.add('active');
@@ -367,9 +341,6 @@ PURA script block copy karo aur paste karo
             roleToDeleteId = null;
         }
 
-        // ==========================================
-        // 4. CONFIRM DELETE
-        // ==========================================
         function confirmDelete() {
             if (!roleToDeleteId) return;
             $.ajax({
@@ -381,102 +352,18 @@ PURA script block copy karo aur paste karo
                     loadAdminRoles();
                     loadAgencyRoles();
                 },
-                error: function (err) {
+                error: function () {
                     closeModal('deleteModal');
-                    console.error("Delete Error:", err);
                     showCustomAlert("Failed to delete role. Please try again.");
                 }
             });
         }
 
-        // ==========================================
-        // INIT
-        // ==========================================
         document.addEventListener('DOMContentLoaded', function () {
             loadAdminRoles();
             loadAgencyRoles();
         });
     </script>
-
-
-    <script>
-        // Ye function vahi hai jo aapne bheja tha, bas isme hum 'event' prevent kar rahe hain taaki scroll na ho
-        function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
-            const table = document.getElementById(tableId);
-            const wrapper = document.getElementById(paginationWrapperId);
-
-            if (!table || !wrapper) return;
-
-            const tbody = table.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-            let currentPage = 1;
-
-            const pageNumbersContainer = wrapper.querySelector('.page-numbers');
-            const prevBtn = wrapper.querySelector('.prev-btn');
-            const nextBtn = wrapper.querySelector('.next-btn');
-            const startRowSpan = wrapper.querySelector('.start-row');
-            const endRowSpan = wrapper.querySelector('.end-row');
-            const totalRowsSpan = wrapper.querySelector('.total-rows');
-
-            function render() {
-                const start = (currentPage - 1) * rowsPerPage;
-                const end = start + rowsPerPage;
-
-                rows.forEach((row, index) => {
-                    row.style.display = (index >= start && index < end) ? '' : 'none';
-                });
-
-                // Stats update
-                startRowSpan.innerText = totalRows === 0 ? 0 : start + 1;
-                endRowSpan.innerText = end > totalRows ? totalRows : end;
-                totalRowsSpan.innerText = totalRows;
-
-                // Generate numbers
-                pageNumbersContainer.innerHTML = '';
-                for (let i = 1; i <= totalPages; i++) {
-                    const btn = document.createElement('button');
-                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                    btn.innerText = i;
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        currentPage = i;
-                        render();
-                    };
-                    pageNumbersContainer.appendChild(btn);
-                }
-
-                // Buttons state
-                prevBtn.disabled = (currentPage === 1);
-                nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
-                prevBtn.style.opacity = prevBtn.disabled ? "0.4" : "1";
-                nextBtn.style.opacity = nextBtn.disabled ? "0.4" : "1";
-            }
-
-            prevBtn.onclick = (e) => {
-                e.preventDefault();
-                if (currentPage > 1) { currentPage--; render(); }
-            };
-
-            nextBtn.onclick = (e) => {
-                e.preventDefault();
-                if (currentPage < totalPages) { currentPage++; render(); }
-            };
-
-            render();
-        }
-
-        // --- SABSE ZAROORI PART ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Table 1: Admin Roles (Independent)
-            setupTablePagination('roleTable', 'pagination-role', 4);
-
-            // Table 2: Agency Roles (Independent)
-            setupTablePagination('agencyRoleTable', 'pagination-agency-role', 4);
-        });
-    </script>
-
 </body>
 
 </html>

@@ -254,117 +254,95 @@
     <script src="Js/all.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <!-- 
-=====================================================
-FILE: AdminCreateAgencyRole.html
-KAHAN LAGAO: </body> ke upar wale <script src="Js/all.js"></script> ke BAAD
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId = localStorage.getItem("adminId");
 
-PEHLE HTML me update karo:
-  Button: <button type="button" id="createAgencyRoleBtn" class="btn-submit btn">Create Role</button>
-  Input:  <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name">
-  Textarea: <textarea id="roleDescription" class="role-textarea" ...></textarea>
-  
-  Agency Role ke Checkboxes me naam:
-  Dashboard:     name="dashboard_read"      name="dashboard_write"      name="dashboard_delete"
-  Client:        name="client_read"         name="client_write"         name="client_delete"
-  Billing:       name="billing_read"        name="billing_write"        name="billing_delete"
-  SystemSetting: name="systemsetting_read"  name="systemsetting_write"  name="systemsetting_delete"
-  Reports:       name="reports_read"        name="reports_write"        name="reports_delete"
-=====================================================
--->
-
-    <script>
-        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
-        const adminId = localStorage.getItem("adminId");
-
-        // ==========================================
-        // AGENCY ROLE PERMISSIONS COLLECT
-        // ==========================================
-        function collectAgencyPermissions() {
-            const modules = ['dashboard', 'client', 'billing', 'systemsetting', 'reports'];
-            const permissions = {};
-            modules.forEach(mod => {
-                permissions[mod] = {
-                    read: document.querySelector(`input[name="${mod}_read"]`)?.checked || false,
-                    write: document.querySelector(`input[name="${mod}_write"]`)?.checked || false,
-                    delete: document.querySelector(`input[name="${mod}_delete"]`)?.checked || false
-                };
-            });
-            return permissions;
-        }
-
-        // ==========================================
-        // CREATE AGENCY ROLE - API CALL
-        // ==========================================
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const createBtn = document.getElementById('createAgencyRoleBtn');
-            if (!createBtn) return;
-
-            createBtn.addEventListener('click', function () {
-                const roleName = document.getElementById('roleName')?.value?.trim();
-                const description = document.getElementById('roleDescription')?.value?.trim();
-
-                if (!roleName) {
-                    showCustomAlert("Please enter a role name.");
-                    return;
-                }
-
-                const permissions = collectAgencyPermissions();
-                const payload = {
-                    adminId: parseInt(adminId),
-                    roleType: "AGENCY",
-                    roleName: roleName,
-                    description: description || "",
-                    permissions: JSON.stringify(permissions),
-                    userCount: 0
-                };
-
-                createBtn.disabled = true;
-                createBtn.textContent = "Creating...";
-
-                $.ajax({
-                    url: `${BASE_URL}/api/admin/roles/add`,
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function (res) {
-                        showCustomAlert("Agency Role Created Successfully!");
-                        setTimeout(() => {
-                            window.location.href = "AdminRoles.html";
-                        }, 1200);
-                    },
-                    error: function (err) {
-                        const msg = err.responseJSON?.error || "Failed to create role.";
-                        showCustomAlert(msg);
-                        createBtn.disabled = false;
-                        createBtn.textContent = "Create Role";
-                    }
+    // 1. AGENCY DROPDOWN LOAD
+    function loadAgenciesDropdown(selectedId = null) {
+        $.ajax({
+            url: `${BASE_URL}/api/admin/agencies/list`,
+            type: 'GET',
+            data: { adminId: adminId },
+            success: function (agencies) {
+                const select = $('#agencySearchSelect');
+                select.empty().append('<option></option>');
+                if (!agencies || agencies.length === 0) return;
+                agencies.forEach(a => {
+                    const opt = new Option(a.agencyName, a.id, false, a.id == selectedId);
+                    select.append(opt);
                 });
+                select.trigger('change');
+            },
+            error: function (err) {
+                console.error("Agency list load error:", err);
+            }
+        });
+    }
+
+    // 2. PERMISSIONS COLLECT
+    function collectAgencyPermissions() {
+        const modules = ['dashboard', 'client', 'billing', 'systemsetting', 'reports'];
+        const permissions = {};
+        modules.forEach(mod => {
+            permissions[mod] = {
+                read:   document.querySelector(`input[name="${mod}_read"]`)?.checked   || false,
+                write:  document.querySelector(`input[name="${mod}_write"]`)?.checked  || false,
+                delete: document.querySelector(`input[name="${mod}_delete"]`)?.checked || false
+            };
+        });
+        return permissions;
+    }
+
+    // 3. INIT
+    document.addEventListener('DOMContentLoaded', function () {
+
+        $('#agencySearchSelect').select2({ placeholder: "Search Agency", allowClear: true, width: '100%' });
+        loadAgenciesDropdown();
+
+        const createBtn = document.getElementById('createAgencyRoleBtn');
+        if (!createBtn) return;
+
+        createBtn.addEventListener('click', function () {
+            const roleName    = document.getElementById('roleName')?.value?.trim();
+            const description = document.getElementById('roleDescription')?.value?.trim();
+            const agencyId    = $('#agencySearchSelect').val();
+
+            if (!agencyId) { showCustomAlert("Please select an agency."); return; }
+            if (!roleName)  { showCustomAlert("Please enter a role name."); return; }
+
+            const payload = {
+                adminId:     parseInt(adminId),
+                agencyId:    parseInt(agencyId),
+                roleType:    "AGENCY",
+                roleName:    roleName,
+                description: description || "",
+                permissions: JSON.stringify(collectAgencyPermissions()),
+                userCount:   0
+            };
+
+            createBtn.disabled = true;
+            createBtn.textContent = "Creating...";
+
+            $.ajax({
+                url: `${BASE_URL}/api/admin/roles/add`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function () {
+                    showCustomAlert("Agency Role Created Successfully!");
+                    setTimeout(() => { window.location.href = "AdminRoles.html"; }, 1200);
+                },
+                error: function (err) {
+                    const msg = err.responseJSON?.error || "Failed to create role.";
+                    showCustomAlert(msg);
+                    createBtn.disabled = false;
+                    createBtn.textContent = "Create Role";
+                }
             });
         });
-
-        $(document).ready(function () {
-
-            // 🔴 1. Initialize Agency Select2
-            $('#agencySearchSelect').select2({
-                placeholder: "Search Agency",
-                allowClear: true,
-                width: '100%'
-            }).on('change', function () {
-                applyFilters();
-            });
-
-            // 🔴 3. Status filter click hone par bhi applyFilters chale
-            $('#statusFilter .dropdown-item').on('click', function () {
-                const selectedValue = $(this).text();
-                $('#statusFilter .dropdown-selected span').text(selectedValue);
-                $('#statusFilter').removeClass('active');
-                applyFilters();
-            });
-
-        });
-    </script>
+    });
+</script>
 
 </body>
 
