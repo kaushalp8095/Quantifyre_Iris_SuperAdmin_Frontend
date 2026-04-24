@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="css/fontstyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Js/admin-auth-guard.js"></script>
+    <style>
+        .select2-container--default .select2-selection--single{height: 48px !important;}
+    </style>
 </head>
 
 <body>
@@ -60,7 +63,7 @@
                     <div class="notification-wrapper" style="position: relative;">
                         <div class="icon-btn notification" onclick="toggleNotification(event)">
                             <img src="Images/Notifications.ico">
-                            <span class="notif-count">3</span>
+                            <span class="notif-count"></span>
                         </div>
                         <div class="notif-dropdown" id="notifDropdown">
                             <div class="notif-header">
@@ -117,15 +120,15 @@
 
                      <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 20px;">
 
-                        <div style="width: 250px;">
-                            <label class="role-label" style="display: block; margin-bottom: 8px;">Select Agency</label>
+                        <div style="width: 350px;">
+                            <label class="role-label">Select Agency</label>
                             <select id="agencySearchSelect" class="search-input-field" style="width: 100%;">
                                 <option></option>
                             </select>
                         </div>
 
                         <div style="flex: 1;">
-                            <label class="role-label" style="display: block; margin-bottom: 8px;">Role Name</label>
+                            <label class="role-label">Role Name</label>
                             <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name"
                                 style="width: 100%; margin-bottom: 0;">
                         </div>
