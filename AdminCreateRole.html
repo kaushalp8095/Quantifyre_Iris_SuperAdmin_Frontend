@@ -115,10 +115,11 @@
             <section class="role-form-card">
                 <form>
                     <label class="role-label">Role Name</label>
-                    <input type="text" class="role-input" placeholder="Enter your Role name">
+                    <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name">
 
                     <label class="role-label">Description</label>
-                    <textarea class="role-textarea" placeholder="Enter role description..."></textarea>
+                    <textarea class="role-textarea" id="roleDescription"
+                        placeholder="Enter role description..."></textarea>
 
                     <label class="perm-section-label">Permissions</label>
 
@@ -126,89 +127,88 @@
 
                         <span class="perm-module-name">Dashboard</span>
                         <div class="mobile-cb-row">
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Read</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Write</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Delete</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="dashboard_read"><span class="cb-label">Read</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="dashboard_write"><span class="cb-label">Write</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="dashboard_delete"><span class="cb-label">Delete</span></label>
                         </div>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Read</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Write</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Delete</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="dashboard_read"><span class="cb-label">Read</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="dashboard_write"><span class="cb-label">Write</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="dashboard_delete"><span class="cb-label">Delete</span></label>
 
                         <span class="perm-module-name">Agency</span>
                         <div class="mobile-cb-row">
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox" checked><span
-                                    class="cb-label">Read</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox" checked><span
-                                    class="cb-label">Write</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Delete</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="agency_read" checked><span class="cb-label">Read</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="agency_write" checked><span class="cb-label">Write</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="agency_delete"><span class="cb-label">Delete</span></label>
                         </div>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Read</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Write</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Delete</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="agency_read"><span class="cb-label">Read</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="agency_write"><span class="cb-label">Write</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="agency_delete"><span class="cb-label">Delete</span></label>
 
                         <span class="perm-module-name">Billing</span>
                         <div class="mobile-cb-row">
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Read</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Write</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Delete</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="billing_read"><span class="cb-label">Read</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="billing_write"><span class="cb-label">Write</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="billing_delete"><span class="cb-label">Delete</span></label>
                         </div>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Read</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Write</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Delete</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="billing_read"><span class="cb-label">Read</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="billing_write"><span class="cb-label">Write</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="billing_delete"><span class="cb-label">Delete</span></label>
 
                         <span class="perm-module-name">System Setting</span>
                         <div class="mobile-cb-row">
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Read</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Write</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Delete</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="systemsetting_read"><span class="cb-label">Read</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="systemsetting_write"><span class="cb-label">Write</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="systemsetting_delete"><span class="cb-label">Delete</span></label>
                         </div>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Read</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Write</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Delete</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="systemsetting_read"><span class="cb-label">Read</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="systemsetting_write"><span class="cb-label">Write</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="systemsetting_delete"><span class="cb-label">Delete</span></label>
 
                         <span class="perm-module-name">Reports</span>
                         <div class="mobile-cb-row">
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Read</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Write</span></label>
-                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                    class="cb-label">Delete</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="reports_read"><span class="cb-label">Read</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="reports_write"><span class="cb-label">Write</span></label>
+                            <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                    name="reports_delete"><span class="cb-label">Delete</span></label>
                         </div>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Read</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Write</span></label>
-                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"><span
-                                class="cb-label">Delete</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="reports_read"><span class="cb-label">Read</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="reports_write"><span class="cb-label">Write</span></label>
+                        <label class="checkbox-wrapper"><input type="checkbox" class="custom-checkbox"
+                                name="reports_delete"><span class="cb-label">Delete</span></label>
 
                     </div>
 
                     <div class="form-footer">
-                        <a href="AdminRoles.html" class="btn-submit btn"
-                            style="text-decoration: none;text-align: center;">Create Role</a>
+                        <button type="button" id="createRoleBtn" class="btn-submit btn">Create Role</button>
                         <a href="AdminRoles.html" class="btn btn-cancel"
                             style="text-decoration: none;text-align: center;" onclick="history.back()">Cancel</a>
                     </div>
@@ -234,6 +234,104 @@
     </div>
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
+
+    <!-- 
+=====================================================
+FILE: AdminCreateRole.html
+KAHAN LAGAO: </body> ke upar wale <script src="Js/all.js"></script> ke BAAD
+
+PEHLE: Form ke buttons ko update karo:
+  <a href="AdminRoles.html"> wali "Create Role" button ko hata ke
+  <button type="button" id="createRoleBtn" class="btn-submit btn">Create Role</button>  
+  
+  Input field me ID add karo:
+  <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name">
+  <textarea id="roleDescription" class="role-textarea" placeholder="Enter role description..."></textarea>
+  
+  Har checkbox me name attribute add karo (niche dekho)
+=====================================================
+
+PERMISSIONS CHECKBOXES me naam add karo — example:
+Dashboard:  name="dashboard_read" name="dashboard_write" name="dashboard_delete"
+Agency:     name="agency_read"    name="agency_write"    name="agency_delete"
+Billing:    name="billing_read"   name="billing_write"   name="billing_delete"
+SystemSetting: name="systemsetting_read" name="systemsetting_write" name="systemsetting_delete"
+Reports:    name="reports_read"   name="reports_write"   name="reports_delete"
+=====================================================
+-->
+
+    <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
+
+        // ==========================================
+        // PERMISSIONS COLLECT KARO CHECKBOXES SE
+        // ==========================================
+        function collectPermissions() {
+            const modules = ['dashboard', 'agency', 'billing', 'systemsetting', 'reports'];
+            const permissions = {};
+            modules.forEach(mod => {
+                permissions[mod] = {
+                    read: document.querySelector(`input[name="${mod}_read"]`)?.checked || false,
+                    write: document.querySelector(`input[name="${mod}_write"]`)?.checked || false,
+                    delete: document.querySelector(`input[name="${mod}_delete"]`)?.checked || false
+                };
+            });
+            return permissions;
+        }
+
+        // ==========================================
+        // CREATE ROLE - API CALL
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const createBtn = document.getElementById('createRoleBtn');
+            if (!createBtn) return;
+
+            createBtn.addEventListener('click', function () {
+                const roleName = document.getElementById('roleName')?.value?.trim();
+                const description = document.getElementById('roleDescription')?.value?.trim();
+
+                if (!roleName) {
+                    showCustomAlert("Please enter a role name.");
+                    return;
+                }
+
+                const permissions = collectPermissions();
+                const payload = {
+                    adminId: parseInt(adminId),
+                    roleType: "ADMIN",
+                    roleName: roleName,
+                    description: description || "",
+                    permissions: JSON.stringify(permissions),
+                    userCount: 0
+                };
+
+                createBtn.disabled = true;
+                createBtn.textContent = "Creating...";
+
+                $.ajax({
+                    url: `${BASE_URL}/api/admin/roles/add`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function (res) {
+                        showCustomAlert("Role Created Successfully!");
+                        setTimeout(() => {
+                            window.location.href = "AdminRoles.html";
+                        }, 1200);
+                    },
+                    error: function (err) {
+                        const msg = err.responseJSON?.error || "Failed to create role.";
+                        showCustomAlert(msg);
+                        createBtn.disabled = false;
+                        createBtn.textContent = "Create Role";
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
