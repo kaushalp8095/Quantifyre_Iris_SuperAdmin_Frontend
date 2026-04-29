@@ -113,7 +113,7 @@
                 <div class="lh-actions">
                     <div class="log-search">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="Search Logs...">
+                        <input type="text" id="logSearchInput" placeholder="Search Logs...">
                     </div>
 
                     <div class="date-range-wrapper" id="dateRangeWrapper">
@@ -257,6 +257,175 @@
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
+
+     <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
+
+        let selectedDateRange = null;   // "TODAY" / "YESTERDAY" / "LAST_7" etc.
+        let customStart = null;   // CUSTOM ke liye
+        let customEnd = null;
+
+        // ==========================================
+        // 1. FORMAT DATE (LocalDateTime → readable)
+        // ==========================================
+        function formatDateTime(isoString) {
+            if (!isoString) return '-';
+            const d = new Date(isoString);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            let hours = d.getHours();
+            const mins = String(d.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            return `${day}/${month}/${year} ${hours}:${mins} ${ampm}`;
+        }
+
+        // ==========================================
+        // 2. STATUS PILL
+        // ==========================================
+        function statusPill(status) {
+            const cls = (status === 'SUCCESS') ? 'st-success' : 'st-failed';
+            const lbl = (status === 'SUCCESS') ? 'Success' : 'Failed';
+            return `<span class="status-pill ${cls}">${lbl}</span>`;
+        }
+
+        // ==========================================
+        // 3. RENDER TABLE
+        // ==========================================
+        function renderTable(logs) {
+            const tbody = $('#activitylogTable tbody');
+            tbody.empty();
+
+            if (!logs || logs.length === 0) {
+                tbody.html(`<tr><td colspan="6" style="text-align:center; color:#8b9c9c; padding:30px;">
+                No activity logs found.</td></tr>`);
+                // Reset pagination
+                setupTablePagination('activitylogTable', 'pagination-activitylog', 8);
+                return;
+            }
+
+            logs.forEach(log => {
+                tbody.append(`
+                <tr>
+                    <td>${formatDateTime(log.logTime)}</td>
+                    <td>${log.userName || '-'}</td>
+                    <td>${log.action || '-'}</td>
+                    <td>${log.module || '-'}</td>
+                    <td>${log.ipAddress || '-'}</td>
+                    <td style="text-align:center;">${statusPill(log.status)}</td>
+                </tr>
+            `);
+            });
+
+            setupTablePagination('activitylogTable', 'pagination-activitylog', 8);
+        }
+
+        // ==========================================
+        // 4. LOAD LOGS (search + date filter)
+        // ==========================================
+        function loadLogs() {
+            const search = document.getElementById('logSearchInput')?.value?.trim() || '';
+
+            // Agar koi filter nahi to /list use karo, warna /search
+            const hasFilter = search || selectedDateRange;
+
+            const params = { adminId: adminId };
+
+            if (hasFilter) {
+                if (search) params.search = search;
+                if (selectedDateRange) params.dateRange = selectedDateRange;
+                if (selectedDateRange === 'CUSTOM') {
+                    if (customStart) params.customStart = customStart;
+                    if (customEnd) params.customEnd = customEnd;
+                }
+            }
+
+            const endpoint = hasFilter ? '/api/admin/activity-logs/search' : '/api/admin/activity-logs/list';
+
+            // Loading state
+            $('#activitylogTable tbody').html(`<tr><td colspan="6" style="text-align:center; padding:30px;">
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>`);
+
+            $.ajax({
+                url: `${BASE_URL}${endpoint}`,
+                type: 'GET',
+                data: params,
+                success: function (logs) {
+                    renderTable(logs);
+                },
+                error: function (err) {
+                    console.error("Activity Logs Load Error:", err);
+                    $('#activitylogTable tbody').html(`<tr><td colspan="6" style="text-align:center; 
+                    color:#e74c3c; padding:30px;">Failed to load logs. Please try again.</td></tr>`);
+                }
+            });
+        }
+
+        // ==========================================
+        // 5. DATE RANGE SELECT (existing selectDate replace karo)
+        // ==========================================
+        function selectDate(text) {
+            document.getElementById('selectedRangeText').innerText = text;
+            const wrapper = document.getElementById('dateRangeWrapper');
+            const chevron = document.getElementById('dateChevron');
+            wrapper.classList.remove('active');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+            // Map text → API param
+            const map = {
+                'Today': 'TODAY',
+                'Yesterday': 'YESTERDAY',
+                'Last 7 Days': 'LAST_7',
+                'Last 30 Days': 'LAST_30',
+                'This Month': 'THIS_MONTH',
+                'Custom Range': 'CUSTOM'
+            };
+
+            selectedDateRange = map[text] || null;
+
+            if (selectedDateRange === 'CUSTOM') {
+                // Custom range ke liye prompt (simple approach)
+                customStart = prompt("Start Date (YYYY-MM-DD):", "2025-07-01");
+                customEnd = prompt("End Date (YYYY-MM-DD):", "2025-07-31");
+                if (!customStart || !customEnd) {
+                    selectedDateRange = null;
+                    document.getElementById('selectedRangeText').innerText = 'Data Range';
+                    return;
+                }
+            } else {
+                customStart = null;
+                customEnd = null;
+            }
+
+            loadLogs();
+        }
+
+        // ==========================================
+        // 6. SEARCH — debounce 400ms
+        // ==========================================
+        let searchTimer = null;
+        function onSearchInput() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => { loadLogs(); }, 400);
+        }
+
+        // ==========================================
+        // 7. INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Search input listener
+            const searchEl = document.getElementById('logSearchInput');
+            if (searchEl) {
+                searchEl.addEventListener('input', onSearchInput);
+            }
+
+            // First load
+            loadLogs();
+        });
+    </script>
 
     <script>
         // --- Dropdown Logic ---
