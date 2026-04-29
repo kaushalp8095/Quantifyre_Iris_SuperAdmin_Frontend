@@ -397,6 +397,88 @@
         }
 
     </script>
+
+    <script>
+        // ---- Universal Pagination Logic ---- //
+        
+        // Ek hi function dono tables (aur kisi bhi naye table) ko handle kar lega
+        function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
+            const table = document.getElementById(tableId);
+            const wrapper = document.getElementById(paginationWrapperId);
+
+            if (!table || !wrapper) return;
+
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            let currentPage = 1;
+
+            const pageNumbersContainer = wrapper.querySelector('.page-numbers');
+            const prevBtn = wrapper.querySelector('.prev-btn');
+            const nextBtn = wrapper.querySelector('.next-btn');
+            const startRowSpan = wrapper.querySelector('.start-row');
+            const endRowSpan = wrapper.querySelector('.end-row');
+            const totalRowsSpan = wrapper.querySelector('.total-rows');
+
+            function render() {
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                rows.forEach((row, index) => {
+                    row.style.display = (index >= start && index < end) ? '' : 'none';
+                });
+
+                startRowSpan.innerText = totalRows === 0 ? 0 : start + 1;
+                endRowSpan.innerText = end > totalRows ? totalRows : end;
+                totalRowsSpan.innerText = totalRows;
+
+                pageNumbersContainer.innerHTML = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                    btn.innerText = i;
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        currentPage = i;
+                        render();
+                    };
+                    pageNumbersContainer.appendChild(btn);
+                }
+
+                prevBtn.disabled = (currentPage === 1);
+                nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
+
+                prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+                nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
+            }
+
+            prevBtn.onclick = (e) => {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    render();
+                }
+            };
+
+            nextBtn.onclick = (e) => {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    render();
+                }
+            };
+
+            // Pehli baar render call karo
+            render();
+        }
+
+        // ❌ YAHAN SE DOMContentLoaded HATA DIYA GAYA HAI ❌
+        // Kyunki hum is function ko API load hone ke baad (AJAX success) me pehle hi call kar rahe hain:
+        // -> loadAdminRoles() ke andar: setupTablePagination('roleTable', 'pagination-role', 4);
+        // -> loadAgencyRoles() ke andar: setupTablePagination('agencyRoleTable', 'pagination-agency-role', 4);
+
+    </script>
 </body>
 
 </html>
