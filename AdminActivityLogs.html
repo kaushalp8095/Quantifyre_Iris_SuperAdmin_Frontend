@@ -153,6 +153,12 @@
                         </thead>
                         <tbody>
                             
+                            <tr>
+                                <td colspan="8" style="text-align:center; padding: 50px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Activity Logs...
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -161,8 +167,8 @@
             </section>
             <div class="pagination-wrapper" id="pagination-activitylog">
                 <div class="pagination-info">
-                    Showing <span class="start-row">1</span> to <span class="end-row">4</span> of <span
-                        class="total-rows">1250</span> entries
+                    Showing <span class="start-row">0</span> to <span class="end-row">0</span> of <span
+                        class="total-rows">0</span> entries
                 </div>
                 <div class="pagination-controls">
                     <button class="page-btn prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
@@ -280,10 +286,6 @@
             }
 
             const endpoint = hasFilter ? '/api/admin/activity-logs/search' : '/api/admin/activity-logs/list';
-
-            // Loading state
-            $('#activitylogTable tbody').html(`<tr><td colspan="6" style="text-align:center; padding:30px;">
-            <i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>`);
 
             $.ajax({
                 url: `${BASE_URL}${endpoint}`,
