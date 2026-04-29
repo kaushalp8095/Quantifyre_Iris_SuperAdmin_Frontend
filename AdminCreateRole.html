@@ -232,33 +232,20 @@
             </div>
         </div>
     </div>
+
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
-
-    <!-- 
-=====================================================
-FILE: AdminCreateRole.html
-KAHAN LAGAO: </body> ke upar wale <script src="Js/all.js"></script> ke BAAD
-
-PEHLE: Form ke buttons ko update karo:
-  <a href="AdminRoles.html"> wali "Create Role" button ko hata ke
-  <button type="button" id="createRoleBtn" class="btn-submit btn">Create Role</button>  
-  
-  Input field me ID add karo:
-  <input type="text" id="roleName" class="role-input" placeholder="Enter your Role name">
-  <textarea id="roleDescription" class="role-textarea" placeholder="Enter role description..."></textarea>
-  
-  Har checkbox me name attribute add karo (niche dekho)
-=====================================================
-
-PERMISSIONS CHECKBOXES me naam add karo — example:
-Dashboard:  name="dashboard_read" name="dashboard_write" name="dashboard_delete"
-Agency:     name="agency_read"    name="agency_write"    name="agency_delete"
-Billing:    name="billing_read"   name="billing_write"   name="billing_delete"
-SystemSetting: name="systemsetting_read" name="systemsetting_write" name="systemsetting_delete"
-Reports:    name="reports_read"   name="reports_write"   name="reports_delete"
-=====================================================
--->
 
     <script>
         const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
@@ -330,6 +317,26 @@ Reports:    name="reports_read"   name="reports_write"   name="reports_delete"
                 });
             });
         });
+
+        function showCustomAlert(title, message, type, redirectUrl = null) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+
+            if (type === 'success') {
+                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+            } else {
+                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+            }
+
+            $('#customAlertOverlay').addClass('active');
+
+            $('.btn-alert-ok').off('click').on('click', function () {
+                closeCustomAlert();
+                if (redirectUrl) window.location.href = redirectUrl;
+            });
+        }
     </script>
 
 </body>

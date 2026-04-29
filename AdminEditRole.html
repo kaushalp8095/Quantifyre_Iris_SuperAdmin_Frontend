@@ -116,11 +116,11 @@
             <section class="role-form-card">
                 <form>
                     <label class="role-label">Role Name</label>
-                    <input type="text" id="roleName" class="role-input" value="Super Admin">
+                    <input type="text" id="roleName" class="role-input">
 
                     <label class="role-label">Description</label>
                     <textarea class="role-textarea"
-                        id="roleDescription">Update the Super Admin role settings to maintain complete control over all modules, users, and system configurations while ensuring permissions align with organizational requirements.</textarea>
+                        id="roleDescription"></textarea>
 
                     <label class="perm-section-label">Permissions</label>
 
@@ -232,6 +232,17 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
@@ -340,6 +351,27 @@
             const updateBtn = document.getElementById('updateRoleBtn');
             if (updateBtn) updateBtn.addEventListener('click', updateRole);
         });
+
+        function showCustomAlert(title, message, type, redirectUrl = null) {
+            $('#alertTitle').text(title);
+            $('#alertMessage').text(message);
+
+            if (type === 'success') {
+                $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+                $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+            } else {
+                $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+                $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+            }
+
+            $('#customAlertOverlay').addClass('active');
+
+            $('.btn-alert-ok').off('click').on('click', function () {
+                closeCustomAlert();
+                if (redirectUrl) window.location.href = redirectUrl;
+            });
+        }
+
     </script>
 
 </body>
