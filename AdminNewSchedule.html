@@ -12,11 +12,38 @@
     <link rel="stylesheet" href="css/datestyle.css">
     <script src="Js/admin-auth-guard.js"></script>
     <style>
-.date-wrapper { position: relative; display: flex; align-items: center; }
-.date-wrapper i.fa-clock { position: absolute; right: 15px; pointer-events: none; font-size: 1.1rem; }
-.flatpickr-calendar.hasTime.noCalendar { background: transparent !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important; border-radius: 8px !important; margin-left: -16px; }
-.flatpickr-time .flatpickr-time-separator, .flatpickr-time .flatpickr-am-pm { color: #fff !important; }
-.flatpickr-time input:hover, .flatpickr-time .flatpickr-am-pm:hover { background: rgba(0, 255, 157, 0.2) !important; border-radius: 5px; }
+        .date-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .date-wrapper i.fa-clock {
+            position: absolute;
+            right: 15px;
+            pointer-events: none;
+            font-size: 1.1rem;
+        }
+
+        .flatpickr-calendar.hasTime.noCalendar {
+            background: transparent !important;
+            backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            border-radius: 8px !important;
+            margin-left: -16px;
+        }
+
+        .flatpickr-time .flatpickr-time-separator,
+        .flatpickr-time .flatpickr-am-pm {
+            color: #fff !important;
+        }
+
+        .flatpickr-time input:hover,
+        .flatpickr-time .flatpickr-am-pm:hover {
+            background: rgba(0, 255, 157, 0.2) !important;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -30,25 +57,27 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
-                    <li class="active"><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
+                    <li class="active"><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a>
+                    </li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
                     <li><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -77,7 +106,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -185,7 +215,8 @@
                                 <div class="sch-email-chip">
                                     agency@email.com <i class="fa-solid fa-xmark sch-close-chip"></i>
                                 </div>
-                                <input type="text" id="emailChipsContainer" class="sch-chip-input" placeholder="Add email addresses...">
+                                <input type="text" id="emailChipsContainer" class="sch-chip-input"
+                                    placeholder="Add email addresses...">
                             </div>
                         </div>
                     </div>
@@ -229,100 +260,125 @@
     <script src="Js/flatpickr.js"></script>
     <script src="Js/all.js"></script>
 
-<script>
-    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
-    const adminId  = localStorage.getItem("adminId");
+    <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
 
-    // ==========================================
-    // EMAIL CHIPS — collect all emails
-    // ==========================================
-    function collectEmails() {
-        const chips = document.querySelectorAll('.sch-email-chip');
-        const emails = [];
-        chips.forEach(chip => {
-            const text = chip.textContent.replace('×','').trim();
-            if (text && text.includes('@')) emails.push(text);
-        });
-        // Also check chip input
-        const input = document.querySelector('.sch-chip-input');
-        if (input && input.value.trim().includes('@')) {
-            emails.push(input.value.trim());
-        }
-        return emails.join(',');
-    }
-
-    // ==========================================
-    // ADD EMAIL CHIP ON ENTER
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', function () {
-        const chipInput = document.querySelector('.sch-chip-input');
-        if (chipInput) {
-            chipInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    const email = this.value.trim().replace(',','');
-                    if (!email.includes('@')) return;
-
-                    const chip = document.createElement('div');
-                    chip.className = 'sch-email-chip';
-                    chip.innerHTML = `${email} <i class="fa-solid fa-xmark sch-close-chip" onclick="this.parentElement.remove()"></i>`;
-                    this.parentElement.insertBefore(chip, this);
-                    this.value = '';
-                }
+        // ==========================================
+        // EMAIL CHIPS — collect all emails
+        // ==========================================
+        function collectEmails() {
+            const chips = document.querySelectorAll('.sch-email-chip');
+            const emails = [];
+            chips.forEach(chip => {
+                const text = chip.textContent.replace('×', '').trim();
+                if (text && text.includes('@')) emails.push(text);
             });
+            // Also check chip input
+            const input = document.querySelector('.sch-chip-input');
+            if (input && input.value.trim().includes('@')) {
+                emails.push(input.value.trim());
+            }
+            return emails.join(',');
         }
 
-        // Create Schedule button
-        const createBtn = document.getElementById('createScheduleBtn');
-        if (!createBtn) return;
+        // ==========================================
+        // ADD EMAIL CHIP ON ENTER
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
+            const chipInput = document.querySelector('.sch-chip-input');
+            if (chipInput) {
+                chipInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        const email = this.value.trim().replace(',', '');
+                        if (!email.includes('@')) return;
 
-        createBtn.addEventListener('click', function () {
-            const scheduleName = document.getElementById('scheduleName')?.value?.trim();
-            const reportType   = document.querySelector('#typeDropdown .selected-text')?.textContent?.trim();
-            const frequency    = document.querySelector('#freqDropdown .selected-text')?.textContent?.trim();
-            const startDate    = document.getElementById('startDate')?._flatpickr?.selectedDates[0];
-            const recipients   = collectEmails();
+                        const chip = document.createElement('div');
+                        chip.className = 'sch-email-chip';
+                        chip.innerHTML = `${email} <i class="fa-solid fa-xmark sch-close-chip" onclick="this.parentElement.remove()"></i>`;
+                        this.parentElement.insertBefore(chip, this);
+                        this.value = '';
+                    }
+                });
+            }
 
-            if (!scheduleName) { showCustomAlert("Please enter a schedule name."); return; }
-            if (!reportType || reportType === 'Report Type') { showCustomAlert("Please select a report type."); return; }
-            if (!frequency  || frequency  === 'Frequency')  { showCustomAlert("Please select frequency."); return; }
-            if (!recipients) { showCustomAlert("Please add at least one recipient email."); return; }
+            // Create Schedule button
+            const createBtn = document.getElementById('createScheduleBtn');
+            if (!createBtn) return;
 
-            // Format date
-            const nextRunDate = startDate ? startDate.toISOString().split('T')[0] : null;
+            createBtn.addEventListener('click', function () {
+                const scheduleName = document.getElementById('scheduleName')?.value?.trim();
+                const reportType = document.querySelector('#typeDropdown .selected-text')?.textContent?.trim();
+                const frequency = document.querySelector('#freqDropdown .selected-text')?.textContent?.trim();
+                const startDate = document.getElementById('startDate')?._flatpickr?.selectedDates[0];
+                const recipients = collectEmails();
 
-            const payload = {
-                adminId:      parseInt(adminId),
-                scheduleName: scheduleName,
-                reportType:   reportType,
-                frequency:    frequency,
-                nextRunDate:  nextRunDate,
-                recipients:   recipients,
-                status:       "Active"
+                if (!scheduleName) { showCustomAlert("Please enter a schedule name."); return; }
+                if (!reportType || reportType === 'Report Type') { showCustomAlert("Please select a report type."); return; }
+                if (!frequency || frequency === 'Frequency') { showCustomAlert("Please select frequency."); return; }
+                if (!recipients) { showCustomAlert("Please add at least one recipient email."); return; }
+
+                // Format date
+                const nextRunDate = startDate ? startDate.toISOString().split('T')[0] : null;
+
+                const payload = {
+                    adminId: parseInt(adminId),
+                    scheduleName: scheduleName,
+                    reportType: reportType,
+                    frequency: frequency,
+                    nextRunDate: nextRunDate,
+                    recipients: recipients,
+                    status: "Active"
+                };
+
+                createBtn.disabled = true;
+                createBtn.textContent = "Creating...";
+
+                $.ajax({
+                    url: `${BASE_URL}/api/admin/reports/scheduled/add`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        showCustomAlert("Schedule Created Successfully!");
+                        setTimeout(() => { window.location.href = "AdminScheduledReports.html"; }, 1200);
+                    },
+                    error: function (err) {
+                        const msg = err.responseJSON?.error || "Failed to create schedule.";
+                        showCustomAlert(msg);
+                        createBtn.disabled = false;
+                        createBtn.textContent = "Create Schedule";
+                    }
+                });
+            });
+        });
+
+        function showCustomAlert(message, title = "Alert") {
+            const overlay = document.getElementById('customAlertOverlay');
+            const titleEl = document.getElementById('alertTitle');
+            const messageEl = document.getElementById('alertMessage');
+            const okBtn = overlay.querySelector('.btn-alert-ok');
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            // Icon change logic (Optional: error ke liye red, success ke liye green)
+            const iconBox = document.getElementById('alertIconBox');
+            if (message.toLowerCase().includes("success")) {
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #00ff9d;"></i>';
+            } else {
+                iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: #ff4d4d;"></i>';
+            }
+
+            overlay.classList.add('active');
+
+            // Close button logic
+            okBtn.onclick = function () {
+                overlay.classList.remove('active');
             };
-
-            createBtn.disabled    = true;
-            createBtn.textContent = "Creating...";
-
-            $.ajax({
-                url:         `${BASE_URL}/api/admin/reports/scheduled/add`,
-                type:        'POST',
-                contentType: 'application/json',
-                data:        JSON.stringify(payload),
-                success: function () {
-                    showCustomAlert("Schedule Created Successfully!");
-                    setTimeout(() => { window.location.href = "AdminScheduledReports.html"; }, 1200);
-                },
-                error: function (err) {
-                    const msg = err.responseJSON?.error || "Failed to create schedule.";
-                    showCustomAlert(msg);
-                    createBtn.disabled    = false;
-                    createBtn.textContent = "Create Schedule";
-                }
-            });
-        });
-    });
-</script>
+        }
+    </script>
 
     <script>
         function toggleSchDropdown(dropdownId) {
