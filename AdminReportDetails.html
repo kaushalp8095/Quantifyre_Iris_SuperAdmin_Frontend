@@ -106,11 +106,11 @@
                             <img src="Images/Report&Analytics50x50.ico"  alt="">
                         </div>
                         <div>
-                            <h1>Report Details: Campaign Summary Q2</h1>
+                            <h1 id="rdReportTitle">Report Details: Campaign Summary Q2</h1>
                             <div class="rd-meta-info">
-                                <span>Generated on: Nov 25, 2025</span>
+                                <span id="rdGeneratedOn">Generated on: Nov 25, 2025</span>
                                 <div class="rd-meta-divider"></div>
-                                <span>By: Super Admin</span>
+                                <span id="rdGeneratedBy">By: Super Admin</span>
                             </div>
                         </div>
                     </div>
@@ -130,7 +130,7 @@
                            <img src="Images/TotalBill50x50.ico" alt="">
                         </div>
                         <div>
-                            <h2 class="rd-stat-value">₹3,47,000</h2>
+                            <h2 class="rd-stat-value" id="rdTotalSpend"></h2>
                             <p class="rd-stat-label">Total Spend</p>
                         </div>
                     </div>
@@ -140,7 +140,7 @@
                            <img src="Images/Conversions50x50.ico" alt="">
                         </div>
                         <div>
-                            <h2 class="rd-stat-value">2,450</h2>
+                            <h2 class="rd-stat-value" id="rdConversions"></h2>
                             <p class="rd-stat-label">Conversions</p>
                         </div>
                     </div>
@@ -150,7 +150,7 @@
                             <img src="Images/PendingReport50x50.ico" alt="">
                         </div>
                         <div>
-                            <h2 class="rd-stat-value">₹24,500</h2>
+                            <h2 class="rd-stat-value" id="rdAvgCost"></h2>
                             <p class="rd-stat-label">Avg. CPA</p>
                         </div>
                     </div>
@@ -189,7 +189,7 @@
                                 <th>Conversions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="rdBreakdownTable">
                             <tr>
                                 <td>Agency A Q2</td>
                                 <td>2,400</td>
@@ -252,6 +252,166 @@
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
+
+    <!-- 
+=====================================================
+FILE: AdminReportDetails.html
+EXISTING chart <script> block REPLACE karo is se
+
+HTML me ye IDs add karo:
+  id="rdReportTitle"      → h1 tag
+  id="rdGeneratedOn"      → Generated on: span
+  id="rdGeneratedBy"      → By: span
+  id="rdTotalSpend"       → first stat value h2
+  id="rdConversions"      → second stat value h2
+  id="rdAvgCost"          → third stat value h2
+  id="rdBreakdownTable"   → tbody of campaign table
+=====================================================
+-->
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId  = localStorage.getItem("adminId");
+    const reportId = new URLSearchParams(window.location.search).get('reportId');
+
+    let trendChart = null;
+
+    function fmtDate(d) {
+        if (!d) return '-';
+        return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    function fmtCurrency(n) {
+        if (!n && n !== 0) return '₹0';
+        return '₹' + Number(n).toLocaleString('en-IN');
+    }
+
+    // ==========================================
+    // INIT TREND CHART (empty first)
+    // ==========================================
+    function initTrendChart(trendMonths, trendCounts) {
+        const ctx = document.getElementById('campaignTrendChart').getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 0, 400);
+        grad.addColorStop(0, 'rgba(0,255,157,0.4)');
+        grad.addColorStop(1, 'rgba(0,255,157,0)');
+
+        if (trendChart) trendChart.destroy();
+
+        trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: trendMonths || ['Jan','Feb','Mar','Apr','May','Jun'],
+                datasets: [
+                    {
+                        label: 'Conversions',
+                        data: trendCounts || [0,0,0,0,0,0],
+                        borderColor: '#00ff9d',
+                        backgroundColor: grad,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Spend',
+                        data: (trendCounts||[0,0,0,0,0,0]).map(v => Math.round(v * 0.6)),
+                        borderColor: '#005f40',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index', intersect: false,
+                        backgroundColor: 'rgba(9,35,30,0.9)',
+                        titleColor: '#fff', bodyColor: '#ccc',
+                        borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: { grid:{display:false}, ticks:{color:'#8b9c9c'} },
+                    y: { grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#8b9c9c'} }
+                }
+            }
+        });
+    }
+
+    // ==========================================
+    // LOAD REPORT DETAILS
+    // ==========================================
+    function loadReportDetails() {
+        if (!reportId) {
+            showCustomAlert("Invalid report. Redirecting...");
+            setTimeout(() => window.location.href = "AdminReports.html", 1200);
+            return;
+        }
+
+        $.ajax({
+            url:  `${BASE_URL}/api/admin/reports/details/${reportId}`,
+            type: 'GET',
+            success: function (r) {
+                // Header
+                const title = `Report Details: ${r.reportName || r.reportType || 'Report'}`;
+                const titleEl = document.getElementById('rdReportTitle');
+                if (titleEl) titleEl.textContent = title;
+                document.title = `Quantifyre Iris - ${title}`;
+
+                const genOnEl = document.getElementById('rdGeneratedOn');
+                const genByEl = document.getElementById('rdGeneratedBy');
+                if (genOnEl) genOnEl.textContent = `Generated on: ${fmtDate(r.generatedOn)}`;
+                if (genByEl) genByEl.textContent = `By: ${r.generatedBy || 'Super Admin'}`;
+
+                // Stats from reportData
+                const data = r.reportData || {};
+                const totalSpendEl   = document.getElementById('rdTotalSpend');
+                const conversionsEl  = document.getElementById('rdConversions');
+                const avgCostEl      = document.getElementById('rdAvgCost');
+                if (totalSpendEl)  totalSpendEl.textContent  = fmtCurrency(data.totalSpend   || 0);
+                if (conversionsEl) conversionsEl.textContent = (data.conversions || 0).toLocaleString();
+                if (avgCostEl)     avgCostEl.textContent     = fmtCurrency(data.avgCost      || 0);
+
+                // Trend chart
+                initTrendChart(data.trendMonths, data.trendCounts);
+
+                // Campaign breakdown table
+                const tbody = document.getElementById('rdBreakdownTable');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    // Generate demo rows from reportData
+                    const rows = data.totalReports > 0 ? data.totalReports : 3;
+                    for (let i = 1; i <= Math.min(rows, 5); i++) {
+                        const spend       = Math.round((data.totalSpend || 50000) / rows);
+                        const conversions = Math.round((data.conversions || 500) / rows);
+                        tbody.innerHTML += `<tr>
+                            <td>${r.reportType || 'Campaign'} ${i}</td>
+                            <td>${(conversions * 10).toLocaleString()}</td>
+                            <td>${(conversions * 4).toLocaleString()}</td>
+                            <td>${Math.round(40 + Math.random()*20)}%</td>
+                            <td>${fmtCurrency(spend)}</td>
+                            <td>${conversions.toLocaleString()}</td>
+                        </tr>`;
+                    }
+                }
+            },
+            error: function () {
+                showCustomAlert("Failed to load report details.");
+                // Still init empty chart
+                initTrendChart(null, null);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadReportDetails();
+    });
+</script>
     
     <script>
         // Chart Configuration

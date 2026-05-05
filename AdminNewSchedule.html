@@ -124,7 +124,7 @@
 
                         <div class="sch-form-group sch-full-width">
                             <label>Schedule Name</label>
-                            <input type="text" class="sch-input" placeholder="Enter Schedule name">
+                            <input type="text" class="sch-input" id="scheduleName">
                         </div>
 
                         <div class="form-group">
@@ -185,13 +185,13 @@
                                 <div class="sch-email-chip">
                                     client@acme.com <i class="fa-solid fa-xmark sch-close-chip"></i>
                                 </div>
-                                <input type="text" class="sch-chip-input" placeholder="Add email addresses...">
+                                <input type="text" id="emailChipsContainer" class="sch-chip-input" placeholder="Add email addresses...">
                             </div>
                         </div>
                     </div>
 
                     <div class="sch-actions">
-                        <button type="button" class="btn btn-submit">Create Schedule</button>
+                        <button type="button" id="createScheduleBtn" class="btn btn-submit">Create Schedule</button>
                         <button type="button" class="btn btn-cancel" onclick="history.back()">Cancel</button>
                     </div>
                 </form>
@@ -217,6 +217,113 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/flatpickr.js"></script>
     <script src="Js/all.js"></script>
+
+    <!-- 
+=====================================================
+FILE: AdminNewSchedule.html
+EXISTING <script> ke BAAD paste karo
+
+HTML me ye add karo:
+  Schedule name input: id="scheduleName"  (abhi sirf placeholder hai)
+  Create Schedule button: id="createScheduleBtn"
+  
+  Chips (emails) me id add karo: id="emailChipsContainer"
+=====================================================
+-->
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId  = localStorage.getItem("adminId");
+
+    // ==========================================
+    // EMAIL CHIPS — collect all emails
+    // ==========================================
+    function collectEmails() {
+        const chips = document.querySelectorAll('.sch-email-chip');
+        const emails = [];
+        chips.forEach(chip => {
+            const text = chip.textContent.replace('×','').trim();
+            if (text && text.includes('@')) emails.push(text);
+        });
+        // Also check chip input
+        const input = document.querySelector('.sch-chip-input');
+        if (input && input.value.trim().includes('@')) {
+            emails.push(input.value.trim());
+        }
+        return emails.join(',');
+    }
+
+    // ==========================================
+    // ADD EMAIL CHIP ON ENTER
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function () {
+        const chipInput = document.querySelector('.sch-chip-input');
+        if (chipInput) {
+            chipInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const email = this.value.trim().replace(',','');
+                    if (!email.includes('@')) return;
+
+                    const chip = document.createElement('div');
+                    chip.className = 'sch-email-chip';
+                    chip.innerHTML = `${email} <i class="fa-solid fa-xmark sch-close-chip" onclick="this.parentElement.remove()"></i>`;
+                    this.parentElement.insertBefore(chip, this);
+                    this.value = '';
+                }
+            });
+        }
+
+        // Create Schedule button
+        const createBtn = document.getElementById('createScheduleBtn');
+        if (!createBtn) return;
+
+        createBtn.addEventListener('click', function () {
+            const scheduleName = document.getElementById('scheduleName')?.value?.trim();
+            const reportType   = document.querySelector('#typeDropdown .selected-text')?.textContent?.trim();
+            const frequency    = document.querySelector('#freqDropdown .selected-text')?.textContent?.trim();
+            const startDate    = document.getElementById('startDate')?._flatpickr?.selectedDates[0];
+            const recipients   = collectEmails();
+
+            if (!scheduleName) { showCustomAlert("Please enter a schedule name."); return; }
+            if (!reportType || reportType === 'Report Type') { showCustomAlert("Please select a report type."); return; }
+            if (!frequency  || frequency  === 'Frequency')  { showCustomAlert("Please select frequency."); return; }
+            if (!recipients) { showCustomAlert("Please add at least one recipient email."); return; }
+
+            // Format date
+            const nextRunDate = startDate ? startDate.toISOString().split('T')[0] : null;
+
+            const payload = {
+                adminId:      parseInt(adminId),
+                scheduleName: scheduleName,
+                reportType:   reportType,
+                frequency:    frequency,
+                nextRunDate:  nextRunDate,
+                recipients:   recipients,
+                status:       "Active"
+            };
+
+            createBtn.disabled    = true;
+            createBtn.textContent = "Creating...";
+
+            $.ajax({
+                url:         `${BASE_URL}/api/admin/reports/scheduled/add`,
+                type:        'POST',
+                contentType: 'application/json',
+                data:        JSON.stringify(payload),
+                success: function () {
+                    showCustomAlert("Schedule Created Successfully!");
+                    setTimeout(() => { window.location.href = "AdminScheduledReports.html"; }, 1200);
+                },
+                error: function (err) {
+                    const msg = err.responseJSON?.error || "Failed to create schedule.";
+                    showCustomAlert(msg);
+                    createBtn.disabled    = false;
+                    createBtn.textContent = "Create Schedule";
+                }
+            });
+        });
+    });
+</script>
 
     <script>
         function toggleSchDropdown(dropdownId) {

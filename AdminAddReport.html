@@ -215,7 +215,7 @@
                     </div>
 
                     <div class="ar-form-actions">
-                        <button type="button" class="ar-btn ar-btn-submit">Generate Report</button>
+                        <button type="button" id="generateReportBtn" class="ar-btn ar-btn-submit">Generate Report</button>
                         <button type="button" class="ar-btn ar-btn-cancel" onclick="history.back()">Cancel</button>
                     </div>
 
@@ -240,6 +240,68 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/flatpickr.js"></script>
     <script src="Js/all.js"></script>
+
+    <!-- 
+=====================================================
+FILE: AdminAddReport.html
+EXISTING script block ke BAAD paste karo
+Generate Report button me id add karo: id="generateReportBtn"
+=====================================================
+-->
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId  = localStorage.getItem("adminId");
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const generateBtn = document.getElementById('generateReportBtn');
+        if (!generateBtn) return;
+
+        generateBtn.addEventListener('click', function () {
+            // Dropdown se value lo
+            const reportType = document.querySelector('#reportTypeDD input[type="hidden"]')?.value?.trim();
+            const format     = document.querySelector('#formatDD input[type="hidden"]')?.value?.trim();
+            const startDate  = document.getElementById('startDate')?._flatpickr?.selectedDates[0];
+            const endDate    = document.getElementById('endDate')?._flatpickr?.selectedDates[0];
+
+            if (!reportType || reportType === 'Select Report Type') {
+                showCustomAlert("Please select a Report Type."); return;
+            }
+
+            // Date format YYYY-MM-DD
+            const fmt = (d) => d ? d.toISOString().split('T')[0] : null;
+
+            const payload = {
+                adminId:    parseInt(adminId),
+                reportType: reportType,
+                format:     format || 'PDF',
+                startDate:  fmt(startDate),
+                endDate:    fmt(endDate)
+            };
+
+            generateBtn.disabled    = true;
+            generateBtn.textContent = "Generating...";
+
+            $.ajax({
+                url:         `${BASE_URL}/api/admin/reports/generate`,
+                type:        'POST',
+                contentType: 'application/json',
+                data:        JSON.stringify(payload),
+                success: function (res) {
+                    showCustomAlert("Report Generated Successfully!");
+                    setTimeout(() => {
+                        window.location.href = `AdminReportDetails.html?reportId=${res.reportId}`;
+                    }, 1200);
+                },
+                error: function (err) {
+                    const msg = err.responseJSON?.error || "Failed to generate report.";
+                    showCustomAlert(msg);
+                    generateBtn.disabled    = false;
+                    generateBtn.textContent = "Generate Report";
+                }
+            });
+        });
+    });
+</script>
 
     <script>
         // Custom Dropdown Logic for Reports Page
