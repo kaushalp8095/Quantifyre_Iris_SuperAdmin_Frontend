@@ -134,46 +134,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Monthly Client Perf.</td>
-                                <td>Performance</td>
-                                <td>Monthly(1st)</td>
-                                <td>Nov 01, 2025</td>
-                                <td>Client@acme.com</td>
-                                <td><span class="sr-status sr-status-active">Active</span></td>
-                            </tr>
-                            <tr>
-                                <td>Weekly Financial</td>
-                                <td>Financial</td>
-                                <td>Weekly(Mon)</td>
-                                <td>Oct 05, 2025</td>
-                                <td>finance@internal.com</td>
-                                <td><span class="sr-status sr-status-active">Active</span></td>
-                            </tr>
-                            <tr>
-                                <td>Daily System Check</td>
-                                <td>System</td>
-                                <td>Daily</td>
-                                <td>Oct 10, 2025</td>
-                                <td>admin@iris.com</td>
-                                <td><span class="sr-status sr-status-paused">Paused</span></td>
-                            </tr>
-                            <tr>
-                                <td>Quarterly Review</td>
-                                <td>Performance</td>
-                                <td>Quarterly</td>
-                                <td>Dec 01, 2025</td>
-                                <td>manager@agency.com</td>
-                                <td><span class="sr-status sr-status-active">Active</span></td>
-                            </tr>
-                            <tr>
-                                <td>Quarterly Review</td>
-                                <td>Performance</td>
-                                <td>Quarterly</td>
-                                <td>Dec 01, 2025</td>
-                                <td>manager@agency.com</td>
-                                <td><span class="sr-status sr-status-paused">Paused</span></td>
-                            </tr>
 
                         </tbody>
                     </table>
@@ -243,7 +203,7 @@
         // LOAD SCHEDULES
         // ==========================================
         function loadSchedules() {
-            $('#scheduleTable tbody').html(`<tr><td colspan="6" style="text-align:center;padding:30px;">
+            $('#scheduleTable tbody').html(`<tr><td colspan="7" style="text-align:center;padding:30px;">
             <i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>`);
 
             $.ajax({
@@ -255,7 +215,7 @@
                     tbody.empty();
 
                     if (!schedules || schedules.length === 0) {
-                        tbody.html(`<tr><td colspan="6" style="text-align:center;color:#8b9c9c;padding:30px;">
+                        tbody.html(`<tr><td colspan="7" style="text-align:center;color:#8b9c9c;padding:30px;">
                         No scheduled reports. <a href="AdminNewSchedule.html">Create one</a></td></tr>`);
                         return;
                     }
@@ -281,7 +241,7 @@
                     setupTablePagination('scheduleTable', 'pagination-schedulereports', 8);
                 },
                 error: function () {
-                    $('#scheduleTable tbody').html(`<tr><td colspan="6" style="text-align:center;color:#e74c3c;padding:30px;">Failed to load schedules.</td></tr>`);
+                    $('#scheduleTable tbody').html(`<tr><td colspan="7" style="text-align:center;color:#e74c3c;padding:30px;">Failed to load schedules.</td></tr>`);
                 }
             });
         }
