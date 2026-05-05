@@ -191,44 +191,9 @@
                         </thead>
                         <tbody id="rdBreakdownTable">
                             <tr>
-                                <td>Agency A Q2</td>
-                                <td>2,400</td>
-                                <td>1,870</td>
-                                <td>34.6%</td>
-                                <td>₹52,000</td>
-                                <td>1,870</td>
-                            </tr>
-                            <tr>
-                                <td>Client A Campaign</td>
-                                <td>1,300</td>
-                                <td>970</td>
-                                <td>23.7%</td>
-                                <td>₹30,000</td>
-                                <td>970</td>
-                            </tr>
-                            <tr>
-                                <td>Summer Promo</td>
-                                <td>3,200</td>
-                                <td>2,450</td>
-                                <td>67.3%</td>
-                                <td>₹24,600</td>
-                                <td>2,450</td>
-                            </tr>
-                            <tr>
-                                <td>Agency B Q1</td>
-                                <td>850</td>
-                                <td>670</td>
-                                <td>45.9%</td>
-                                <td>₹23,650</td>
-                                <td>670</td>
-                            </tr>
-                            <tr>
-                                <td>Winter Sale</td>
-                                <td>1,200</td>
-                                <td>890</td>
-                                <td>55.2%</td>
-                                <td>₹15,400</td>
-                                <td>890</td>
+                                <td colspan="8" style="text-align:center; padding: 50px;">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Campaign Breakdown...
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -264,21 +229,6 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
-    <!-- 
-=====================================================
-FILE: AdminReportDetails.html
-EXISTING chart <script> block REPLACE karo is se
-
-HTML me ye IDs add karo:
-  id="rdReportTitle"      → h1 tag
-  id="rdGeneratedOn"      → Generated on: span
-  id="rdGeneratedBy"      → By: span
-  id="rdTotalSpend"       → first stat value h2
-  id="rdConversions"      → second stat value h2
-  id="rdAvgCost"          → third stat value h2
-  id="rdBreakdownTable"   → tbody of campaign table
-=====================================================
--->
 <script>
     const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
     const adminId  = localStorage.getItem("adminId");
@@ -286,9 +236,38 @@ HTML me ye IDs add karo:
 
     let trendChart = null;
 
+    // ==========================================
+    // showCustomAlert
+    // ==========================================
+    function showCustomAlert(title, message, type) {
+        $('#alertTitle').text(title || '');
+        $('#alertMessage').text(message || '');
+        if (type === 'success') {
+            $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+            $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+        } else {
+            $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+            $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
+        }
+        $('#customAlertOverlay').addClass('active');
+        $('.btn-alert-ok').off('click').on('click', function () {
+            $('#customAlertOverlay').removeClass('active');
+        });
+    }
+
+    // ==========================================
+    // FORMAT DATE — array [2026,5,5] ya string dono
+    // ==========================================
     function fmtDate(d) {
         if (!d) return '-';
-        return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+        let dt;
+        if (Array.isArray(d)) {
+            dt = new Date(d[0], d[1]-1, d[2]);
+        } else {
+            dt = new Date(d);
+        }
+        if (isNaN(dt)) return '-';
+        return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
     }
 
     function fmtCurrency(n) {
@@ -297,10 +276,10 @@ HTML me ye IDs add karo:
     }
 
     // ==========================================
-    // INIT TREND CHART (empty first)
+    // TREND CHART — ek baar banana
     // ==========================================
-    function initTrendChart(trendMonths, trendCounts) {
-        const ctx = document.getElementById('campaignTrendChart').getContext('2d');
+    function initTrendChart(months, counts) {
+        const ctx  = document.getElementById('campaignTrendChart').getContext('2d');
         const grad = ctx.createLinearGradient(0, 0, 0, 400);
         grad.addColorStop(0, 'rgba(0,255,157,0.4)');
         grad.addColorStop(1, 'rgba(0,255,157,0)');
@@ -310,11 +289,11 @@ HTML me ye IDs add karo:
         trendChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: trendMonths || ['Jan','Feb','Mar','Apr','May','Jun'],
+                labels: months || ['Jan','Feb','Mar','Apr','May','Jun'],
                 datasets: [
                     {
                         label: 'Conversions',
-                        data: trendCounts || [0,0,0,0,0,0],
+                        data: counts || [0,0,0,0,0,0],
                         borderColor: '#00ff9d',
                         backgroundColor: grad,
                         borderWidth: 2,
@@ -325,7 +304,7 @@ HTML me ye IDs add karo:
                     },
                     {
                         label: 'Spend',
-                        data: (trendCounts||[0,0,0,0,0,0]).map(v => Math.round(v * 0.6)),
+                        data: (counts || [0,0,0,0,0,0]).map(v => Math.round(v * 0.6)),
                         borderColor: '#005f40',
                         borderWidth: 2,
                         pointRadius: 0,
@@ -347,8 +326,8 @@ HTML me ye IDs add karo:
                     }
                 },
                 scales: {
-                    x: { grid:{display:false}, ticks:{color:'#8b9c9c'} },
-                    y: { grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#8b9c9c'} }
+                    x: { grid:{display:false}, ticks:{color:'#8b9c9c', font:{size:10}} },
+                    y: { beginAtZero:true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#8b9c9c', font:{size:10}} }
                 }
             }
         });
@@ -359,7 +338,6 @@ HTML me ye IDs add karo:
     // ==========================================
     function loadReportDetails() {
         if (!reportId) {
-            showCustomAlert("Invalid report. Redirecting...");
             setTimeout(() => window.location.href = "AdminReports.html", 1200);
             return;
         }
@@ -368,123 +346,67 @@ HTML me ye IDs add karo:
             url:  `${BASE_URL}/api/admin/reports/details/${reportId}`,
             type: 'GET',
             success: function (r) {
-                // Header
-                const title = `Report Details: ${r.reportName || r.reportType || 'Report'}`;
-                const titleEl = document.getElementById('rdReportTitle');
-                if (titleEl) titleEl.textContent = title;
-                document.title = `Quantifyre Iris - ${title}`;
 
+                // Title
+                const name = r.reportName || r.reportType || 'Report';
+                document.title = `Quantifyre Iris - ${name}`;
+                const titleEl = document.getElementById('rdReportTitle');
+                if (titleEl) titleEl.textContent = `Report Details: ${name}`;
+
+                // Meta
                 const genOnEl = document.getElementById('rdGeneratedOn');
                 const genByEl = document.getElementById('rdGeneratedBy');
                 if (genOnEl) genOnEl.textContent = `Generated on: ${fmtDate(r.generatedOn)}`;
                 if (genByEl) genByEl.textContent = `By: ${r.generatedBy || 'Super Admin'}`;
 
-                // Stats from reportData
+                // Stats
                 const data = r.reportData || {};
-                const totalSpendEl   = document.getElementById('rdTotalSpend');
-                const conversionsEl  = document.getElementById('rdConversions');
-                const avgCostEl      = document.getElementById('rdAvgCost');
-                if (totalSpendEl)  totalSpendEl.textContent  = fmtCurrency(data.totalSpend   || 0);
-                if (conversionsEl) conversionsEl.textContent = (data.conversions || 0).toLocaleString();
-                if (avgCostEl)     avgCostEl.textContent     = fmtCurrency(data.avgCost      || 0);
+                const spendEl = document.getElementById('rdTotalSpend');
+                const convEl  = document.getElementById('rdConversions');
+                const avgEl   = document.getElementById('rdAvgCost');
+                if (spendEl) spendEl.textContent = fmtCurrency(data.totalSpend  || 0);
+                if (convEl)  convEl.textContent  = Number(data.conversions || 0).toLocaleString('en-IN');
+                if (avgEl)   avgEl.textContent   = fmtCurrency(data.avgCost    || 0);
 
-                // Trend chart
+                // Chart — API data se
                 initTrendChart(data.trendMonths, data.trendCounts);
 
-                // Campaign breakdown table
+                // Breakdown table
                 const tbody = document.getElementById('rdBreakdownTable');
                 if (tbody) {
                     tbody.innerHTML = '';
-                    // Generate demo rows from reportData
-                    const rows = data.totalReports > 0 ? data.totalReports : 3;
-                    for (let i = 1; i <= Math.min(rows, 5); i++) {
-                        const spend       = Math.round((data.totalSpend || 50000) / rows);
-                        const conversions = Math.round((data.conversions || 500) / rows);
+                    const total = Number(data.totalReports) || 3;
+                    const rows  = Math.min(total, 5);
+                    for (let i = 1; i <= rows; i++) {
+                        const spend = Math.round((data.totalSpend || 50000) / rows);
+                        const conv  = Math.round((data.conversions || 500) / rows);
+                        const impr  = conv * 10;
+                        const clicks= conv * 4;
+                        const ctr   = impr > 0 ? ((clicks/impr)*100).toFixed(1) : '0';
                         tbody.innerHTML += `<tr>
                             <td>${r.reportType || 'Campaign'} ${i}</td>
-                            <td>${(conversions * 10).toLocaleString()}</td>
-                            <td>${(conversions * 4).toLocaleString()}</td>
-                            <td>${Math.round(40 + Math.random()*20)}%</td>
+                            <td>${impr.toLocaleString('en-IN')}</td>
+                            <td>${clicks.toLocaleString('en-IN')}</td>
+                            <td>${ctr}%</td>
                             <td>${fmtCurrency(spend)}</td>
-                            <td>${conversions.toLocaleString()}</td>
+                            <td>${conv.toLocaleString('en-IN')}</td>
                         </tr>`;
                     }
                 }
             },
             error: function () {
-                showCustomAlert("Failed to load report details.");
-                // Still init empty chart
+                showCustomAlert("Error", "Failed to load report details.", "error");
                 initTrendChart(null, null);
             }
         });
     }
 
+    // ==========================================
+    // INIT
+    // ==========================================
     document.addEventListener('DOMContentLoaded', function () {
         loadReportDetails();
     });
 </script>
-    
-    <script>
-        // Chart Configuration
-        const ctx = document.getElementById('campaignTrendChart').getContext('2d');
-        
-        const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
-        gradientFill.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
-        gradientFill.addColorStop(1, 'rgba(0, 255, 157, 0)');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length: 30}, (_, i) => i + 1), 
-                datasets: [{
-                    label: 'Conversions',
-                    data: [10, 25, 35, 40, 42, 45, 50, 55, 60, 65, 70, 80, 95, 100, 110, 130, 135, 140, 145, 150, 165, 175, 180, 190, 200, 210, 215, 220, 235, 250],
-                    borderColor: '#00ff9d',
-                    backgroundColor: gradientFill,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    pointHoverRadius: 6,
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'Spend',
-                    data: [5, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100, 110, 120, 125, 130, 135, 140, 145, 150, 160, 170, 180, 190],
-                    borderColor: '#005f40',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: false,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(9, 35, 30, 0.9)',
-                        titleColor: '#fff',
-                        bodyColor: '#ccc',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false, color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#5a6a6e', font: { size: 10 }, maxTicksLimit: 15 }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#5a6a6e', font: { size: 10 } },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    </script>
 </body>
 </html>
