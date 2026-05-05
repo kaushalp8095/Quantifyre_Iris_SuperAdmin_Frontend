@@ -377,212 +377,215 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
-    <script>
-        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
-        const adminId = localStorage.getItem("adminId");
-        let reportToDeleteId = null;
-        let donutChart = null, lineChart = null;
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId  = localStorage.getItem("adminId");
+    let reportToDeleteId = null;
+    let donutChart = null, lineChart = null;
 
-        function rptStatusPill(status) {
-            const map = { 'generated': ['rpt-status-generated', 'Generated'], 'pending': ['rpt-status-pending', 'Pending'], 'failed': ['rpt-status-failed', 'Failed'] };
-            const [cls, lbl] = map[(status || '').toLowerCase()] || ['rpt-status-pending', status || '-'];
-            return `<span class="${cls}">${lbl}</span>`;
+    // ==========================================
+    // showCustomAlert — is page me define karna zaruri hai
+    // ==========================================
+    function showCustomAlert(title, message, type) {
+        $('#alertTitle').text(title || '');
+        $('#alertMessage').text(message || '');
+        if (type === 'success') {
+            $('#alertIconBox').html('<i class="fa-solid fa-check"></i>');
+            $('#alertIconBox').removeClass('alert-icon-error').addClass('alert-icon-success');
+        } else {
+            $('#alertIconBox').html('<i class="fa-solid fa-triangle-exclamation"></i>');
+            $('#alertIconBox').removeClass('alert-icon-success').addClass('alert-icon-error');
         }
-
-        function fmtDate(d) {
-            if (!d) return '-';
-            return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        }
-
-        function initCharts() {
-            // Donut — Report Type
-            const ctxD = document.getElementById('reportTypeChart').getContext('2d');
-            donutChart = new Chart(ctxD, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Performance', 'Financial', 'Client Activity', 'System Logs'],
-                    datasets: [{ data: [0, 0, 0, 0], backgroundColor: ['#00b871', '#ff6b35', '#b85e35', '#107c91'], borderWidth: 0, hoverOffset: 5 }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '60%',
-                    plugins: { legend: { position: 'right', labels: { color: '#ccc', boxWidth: 10, font: { size: 10 } } } }
-                }
-            });
-
-            // Line — Monthly
-            const ctxL = document.getElementById('monthlyReportChart').getContext('2d');
-            const grad = ctxL.createLinearGradient(0, 0, 0, 300);
-            grad.addColorStop(0, 'rgba(0,255,157,0.2)');
-            grad.addColorStop(1, 'rgba(0,255,157,0)');
-
-            lineChart = new Chart(ctxL, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{ label: 'Reports', data: [0, 0, 0, 0, 0, 0], borderColor: '#a3e635', backgroundColor: grad, borderWidth: 2, pointRadius: 2, fill: true, tension: 0.3 }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#8b9c9c', font: { size: 9 } } },
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b9c9c', font: { size: 9 } } }
-                    }
-                }
-            });
-        }
-
-        function updateCharts(charts) {
-            if (charts.typeLabels && donutChart) {
-                const total = (charts.typeCounts || []).reduce((a, b) => a + b, 0);
-                donutChart.data.labels = charts.typeLabels.map((l, i) => `${l} (${total > 0 ? Math.round(charts.typeCounts[i] / total * 100) : 0}%)`);
-                donutChart.data.datasets[0].data = charts.typeCounts;
-                donutChart.update();
-            }
-            if (charts.monthLabels && lineChart) {
-                lineChart.data.labels = charts.monthLabels;
-                lineChart.data.datasets[0].data = charts.monthCounts;
-                lineChart.update();
-            }
-        }
-
-        function loadDashboard() {
-            if (!adminId) return;
-            $.ajax({
-                url: `${BASE_URL}/api/admin/reports/dashboard`,
-                type: 'GET',
-                data: { adminId: adminId },
-                success: function (res) {
-                    $('#totalReportsCount').text(res.totalReports || 0);
-                    $('#generatedTodayCount').text(res.generatedReports || 0);
-                    $('#pendingReportsCount').text(res.pendingReports || 0);
-                    if (res.charts) updateCharts(res.charts);
-
-                    const tbody = $('#recentReportsTable');
-                    tbody.empty();
-                    const reports = res.recentReports || [];
-                    if (reports.length === 0) {
-                        tbody.html(`<tr><td colspan="6" style="text-align:center;color:#8b9c9c;padding:30px;">No reports yet. <a href="AdminAddReport.html">Generate one</a></td></tr>`);
-                        return;
-                    }
-                    reports.forEach(r => {
-                        tbody.append(`<tr>
-                        <td>${r.reportName || '-'}</td>
-                        <td>${r.generatedBy || 'Super Admin'}</td>
-                        <td>${fmtDate(r.generatedOn)}</td>
-                        <td>${r.reportType || '-'}</td>
-                        <td>${rptStatusPill(r.status)}</td>
-                        <td><div class="action-cell">
-                            <a href="AdminReportDetails.html?reportId=${r.id}" class="btn-icon btn-edit" style="text-decoration:none;"><i class="fa-regular fa-eye"></i></a>
-                            <div class="btn-icon btn-delete" onclick="openDeleteModal(${r.id})"><i class="fa-regular fa-trash-can"></i></div>
-                        </div></td>
-                    </tr>`);
-                    });
-                },
-                error: function () {
-                    $('#recentReportsTable').html(`<tr><td colspan="6" style="text-align:center;color:#e74c3c;padding:30px;">Failed to load.</td></tr>`);
-                }
-            });
-        }
-
-        function openDeleteModal(id) { reportToDeleteId = id; document.getElementById('deleteModal').classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); reportToDeleteId = null; }
-        function confirmDeleteReport() {
-            if (!reportToDeleteId) return;
-            $.ajax({
-                url: `${BASE_URL}/api/admin/reports/delete/${reportToDeleteId}`,
-                type: 'DELETE', data: { adminId: adminId },
-                success: function () { closeModal('deleteModal'); showCustomAlert("Report deleted!"); loadDashboard(); },
-                error: function () { closeModal('deleteModal'); showCustomAlert("Failed to delete."); }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            initCharts();
-            loadDashboard();
-            const delBtn = document.getElementById('confirmDeleteReportBtn');
-            if (delBtn) delBtn.addEventListener('click', confirmDeleteReport);
+        $('#customAlertOverlay').addClass('active');
+        $('.btn-alert-ok').off('click').on('click', function () {
+            $('#customAlertOverlay').removeClass('active');
         });
-    </script>
+    }
 
-    <script>
-        // --- 1. Report Type Donut Chart ---
-        const ctxDonut = document.getElementById('reportTypeChart').getContext('2d');
-        new Chart(ctxDonut, {
+    // ==========================================
+    // STATUS PILL
+    // ==========================================
+    function rptStatusPill(status) {
+        const map = {
+            'generated': ['rpt-status-pill rpt-status-completed', 'Generated'],
+            'pending':   ['rpt-status-pill rpt-status-pending',   'Pending'],
+            'failed':    ['rpt-status-pill rpt-status-failed',    'Failed']
+        };
+        const [cls, lbl] = map[(status||'').toLowerCase()] || ['rpt-status-pill rpt-status-pending', status||'-'];
+        return `<span class="${cls}">${lbl}</span>`;
+    }
+
+    // ==========================================
+    // FORMAT DATE — Spring LocalDate array [2026,5,5] ya string dono
+    // ==========================================
+    function fmtDate(d) {
+        if (!d) return '-';
+        let dt;
+        if (Array.isArray(d)) {
+            dt = new Date(d[0], d[1]-1, d[2]);
+        } else {
+            dt = new Date(d);
+        }
+        if (isNaN(dt)) return '-';
+        return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    // ==========================================
+    // INIT CHARTS — ek baar banana
+    // ==========================================
+    function initCharts() {
+        const ctxD = document.getElementById('reportTypeChart').getContext('2d');
+        donutChart = new Chart(ctxD, {
             type: 'doughnut',
             data: {
-                labels: ['Performance (45%)', 'Financial (30%)', 'Client (15%)', 'System (10%)'],
-                datasets: [{
-                    data: [45, 30, 15, 10],
-                    backgroundColor: [
-                        '#00b871',
-                        '#ff6b35',
-                        '#b85e35',
-                        '#107c91'
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 5
-                }]
+                labels: ['Performance','Financial','Client Activity','System Logs'],
+                datasets: [{ data:[0,0,0,0], backgroundColor:['#00b871','#ff6b35','#b85e35','#107c91'], borderWidth:0, hoverOffset:5 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '60%',
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            color: '#ccc',
-                            boxWidth: 10,
-                            font: { size: 10 }
-                        }
-                    }
-                }
+                responsive:true, maintainAspectRatio:false, cutout:'60%',
+                plugins:{ legend:{ position:'right', labels:{ color:'#ccc', boxWidth:10, font:{size:10} } } }
             }
         });
 
-        // --- 2. Monthly Report Generation Line Chart ---
-        const ctxLine = document.getElementById('monthlyReportChart').getContext('2d');
-
-        const lineGradient = ctxLine.createLinearGradient(0, 0, 0, 300);
-        lineGradient.addColorStop(0, 'rgba(0, 255, 157, 0.2)');
-        lineGradient.addColorStop(1, 'rgba(0, 255, 157, 0)');
-
-        new Chart(ctxLine, {
+        const ctxL = document.getElementById('monthlyReportChart').getContext('2d');
+        const grad = ctxL.createLinearGradient(0,0,0,300);
+        grad.addColorStop(0,'rgba(0,255,157,0.2)');
+        grad.addColorStop(1,'rgba(0,255,157,0)');
+        lineChart = new Chart(ctxL, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Reports',
-                    data: [15, 25, 20, 35, 25, 38, 30, 48, 45, 35, 42, 50],
-                    borderColor: '#a3e635',
-                    backgroundColor: lineGradient,
-                    borderWidth: 2,
-                    pointRadius: 2,
-                    pointBackgroundColor: '#a3e635',
-                    fill: true,
-                    tension: 0.3
-                }]
+                labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+                datasets: [{ label:'Reports', data:[0,0,0,0,0,0], borderColor:'#a3e635', backgroundColor:grad, borderWidth:2, pointRadius:2, pointBackgroundColor:'#a3e635', fill:true, tension:0.3 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false, color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#8b9c9c', font: { size: 9 } }
-                    },
-                    y: {
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#8b9c9c', font: { size: 9 } }
-                    }
+                responsive:true, maintainAspectRatio:false,
+                plugins:{ legend:{display:false} },
+                scales:{
+                    x:{ grid:{display:false}, ticks:{color:'#8b9c9c',font:{size:9}} },
+                    y:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#8b9c9c',font:{size:9}} }
                 }
             }
         });
-    </script>
+    }
+
+    // ==========================================
+    // UPDATE CHARTS WITH API DATA
+    // ==========================================
+    function updateCharts(charts) {
+        if (!charts) return;
+
+        if (charts.typeLabels && charts.typeCounts && donutChart) {
+            const total = charts.typeCounts.reduce((a,b) => a+b, 0);
+            donutChart.data.labels = charts.typeLabels.map((l,i) =>
+                `${l} (${total>0 ? Math.round(charts.typeCounts[i]/total*100) : 0}%)`);
+            donutChart.data.datasets[0].data = charts.typeCounts;
+            donutChart.update();
+        }
+
+        if (charts.monthLabels && charts.monthCounts && lineChart) {
+            lineChart.data.labels = charts.monthLabels;
+            lineChart.data.datasets[0].data = charts.monthCounts;
+            lineChart.update();
+        }
+    }
+
+    // ==========================================
+    // LOAD DASHBOARD
+    // ==========================================
+    function loadDashboard() {
+        if (!adminId) return;
+
+        $.ajax({
+            url:  `${BASE_URL}/api/admin/reports/dashboard`,
+            type: 'GET',
+            data: { adminId: adminId },
+            success: function (res) {
+                // Stats
+                $('#totalReportsCount').text(res.totalReports     || 0);
+                $('#generatedTodayCount').text(res.generatedReports || 0);
+                $('#pendingReportsCount').text(res.pendingReports  || 0);
+
+                // Charts
+                updateCharts(res.charts);
+
+                // Table
+                const tbody = $('#recentReportsTable');
+                tbody.empty();
+                const reports = res.recentReports || [];
+
+                if (reports.length === 0) {
+                    tbody.html(`<tr><td colspan="6" style="text-align:center;color:#8b9c9c;padding:30px;">
+                        No reports yet. <a href="AdminAddReport.html">Generate one</a></td></tr>`);
+                    return;
+                }
+
+                reports.forEach(r => {
+                    tbody.append(`<tr>
+                        <td>${r.reportName  || '-'}</td>
+                        <td>${r.generatedBy || 'Super Admin'}</td>
+                        <td>${fmtDate(r.generatedOn)}</td>
+                        <td>${r.reportType  || '-'}</td>
+                        <td>${rptStatusPill(r.status)}</td>
+                        <td>
+                            <div class="action-icons">
+                                <a href="AdminReportDetails.html?reportId=${r.id}" 
+                                   class="action-btn view" style="text-decoration:none;">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                                <div class="action-btn delete" onclick="openDeleteModal(${r.id})">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`);
+                });
+            },
+            error: function () {
+                $('#recentReportsTable').html(`<tr><td colspan="6" style="text-align:center;
+                    color:#e74c3c;padding:30px;">Failed to load reports.</td></tr>`);
+            }
+        });
+    }
+
+    // ==========================================
+    // DELETE
+    // ==========================================
+    function openDeleteModal(id) {
+        reportToDeleteId = id;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+        reportToDeleteId = null;
+    }
+
+    function confirmDeleteReport() {
+        if (!reportToDeleteId) return;
+        $.ajax({
+            url:  `${BASE_URL}/api/admin/reports/delete/${reportToDeleteId}`,
+            type: 'DELETE',
+            data: { adminId: adminId },
+            success: function () {
+                closeModal('deleteModal');
+                showCustomAlert("Success", "Report deleted successfully!", "success");
+                loadDashboard();
+            },
+            error: function () {
+                closeModal('deleteModal');
+                showCustomAlert("Error", "Failed to delete report.", "error");
+            }
+        });
+    }
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function () {
+        initCharts();
+        loadDashboard();
+    });
+</script>
 </body>
 
 </html>
