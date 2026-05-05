@@ -234,6 +234,17 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
@@ -249,32 +260,26 @@ EXISTING last <script> block REPLACE karo is se
     const agencyId = new URLSearchParams(window.location.search).get('agencyId');
 
     // ==========================================
-    // STATUS — sirf class update karo (double border fix)
-    // agencyStatus span me sub-status-badge class already hai HTML me
-    // is liye andar koi nayi span mat bano — sirf class + text update karo
+    // STATUS — class update (double border fix)
     // ==========================================
     function applyStatus(status) {
         const statusEl = document.getElementById('agencyStatus');
         if (!statusEl) return;
-
-        // Pehle sab classes hata do
         statusEl.classList.remove('sub-status-active', 'sub-status-pending', 'sub-status-cancelled');
-
-        const key = (status || '').toLowerCase();
         const map = {
             'active':    ['sub-status-active',    'Active'],
             'pending':   ['sub-status-pending',   'Pending'],
             'cancelled': ['sub-status-cancelled', 'Cancelled'],
         };
-        const [cls, label] = map[key] || ['sub-status-pending', status || 'Unknown'];
+        const [cls, label] = map[(status||'').toLowerCase()] || ['sub-status-pending', status||'Unknown'];
         statusEl.classList.add(cls);
         statusEl.textContent = label;
     }
 
     // ==========================================
-    // SET INPUT VALUE (inputs ke liye .value)
+    // SET FIELD — input ke liye .value, span ke liye .textContent
     // ==========================================
-    function setInput(id, value) {
+    function setField(id, value) {
         const el = document.getElementById(id);
         if (!el) return;
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
@@ -285,11 +290,20 @@ EXISTING last <script> block REPLACE karo is se
     }
 
     // ==========================================
-    // FORMAT DATE
+    // FORMAT DATE — Spring LocalDateTime array ya string dono handle
+    // Spring Boot LocalDateTime → [2026,5,5,14,28,0] format bhi aata hai
     // ==========================================
-    function fmtDate(d) {
-        if (!d) return '-';
-        return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    function fmtDateTime(raw) {
+        if (!raw) return '-';
+        let d;
+        if (Array.isArray(raw)) {
+            // [year, month, day, hour, minute, second]
+            d = new Date(raw[0], raw[1]-1, raw[2], raw[3]||0, raw[4]||0, raw[5]||0);
+        } else {
+            d = new Date(raw);
+        }
+        if (isNaN(d)) return '-';
+        return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
     }
 
     // ==========================================
@@ -306,49 +320,44 @@ EXISTING last <script> block REPLACE karo is se
             url:  `${BASE_URL}/api/admin/subscriptions/details/${agencyId}`,
             type: 'GET',
             success: function (data) {
-
-                // ✅ Title dynamic
+                // Dynamic title
                 const agencyName = data.agencyName || 'Agency';
                 document.title = `Quantifyre Iris - ${agencyName}`;
                 const h1El = document.querySelector('.sub-title-text h1');
                 if (h1El) h1El.textContent = `Company Details: ${agencyName}`;
 
-                // ✅ Input fields (.value use karo)
-                setInput('agencyName',    data.agencyName);
-                setInput('agencyEmail',   data.email);
-                setInput('agencyPhone',   data.phoneNumber);
-                setInput('agencyPlan',    data.plan || 'Basic');
-                setInput('agencyAddress', [data.address, data.city, data.state, data.country]
+                // Input fields
+                setField('agencyName',    data.agencyName);
+                setField('agencyEmail',   data.email);
+                setField('agencyPhone',   data.phoneNumber);
+                setField('agencyPlan',    data.plan || 'Basic');
+                setField('agencyAddress', [data.address, data.city, data.state, data.country]
                                              .filter(Boolean).join(', '));
 
-                // ✅ Logo
+                // Logo
                 const logoEl = document.getElementById('agencyLogo');
                 if (logoEl) {
                     logoEl.src = data.agencyLogo || 'Images/quantifirelogo.png';
                     logoEl.onerror = () => { logoEl.src = 'Images/quantifirelogo.png'; };
                 }
 
-                // ✅ Status — double border fix
+                // Status
                 applyStatus(data.status);
 
-                // Cancel button hide agar already cancelled
+                // Cancel button
                 const cancelBtn = document.getElementById('cancelSubBtn');
                 if (cancelBtn) {
-                    if ((data.status || '').toLowerCase() === 'cancelled') {
+                    if ((data.status||'').toLowerCase() === 'cancelled') {
                         cancelBtn.style.display = 'none';
                     } else {
                         cancelBtn.style.display = '';
+                        cancelBtn.onclick = () => {
+                            window.location.href = `AdminCancelSubscription.html?agencyId=${agencyId}`;
+                        };
                     }
                 }
 
-                // Cancel btn click — redirect to cancel page
-                if (cancelBtn) {
-                    cancelBtn.onclick = function () {
-                        window.location.href = `AdminCancelSubscription.html?agencyId=${agencyId}`;
-                    };
-                }
-
-                // Load recent activity for this agency
+                // Recent activity load
                 loadRecentActivity(agencyName);
             },
             error: function () {
@@ -358,46 +367,66 @@ EXISTING last <script> block REPLACE karo is se
     }
 
     // ==========================================
-    // LOAD RECENT ACTIVITY (Activity Logs se)
+    // LOAD RECENT ACTIVITY — proper columns
     // ==========================================
     function loadRecentActivity(agencyName) {
         $.ajax({
             url:  `${BASE_URL}/api/admin/activity-logs/search`,
             type: 'GET',
-            data: {
-                adminId: adminId,
-                search:  agencyName  // Agency name se relevant logs dhundo
-            },
+            data: { adminId: adminId, search: agencyName },
             success: function (logs) {
                 const tbody = document.querySelector('.sub-table tbody');
                 if (!tbody) return;
                 tbody.innerHTML = '';
 
-                const recent = (logs || []).slice(0, 5); // max 5 rows
+                const recent = (logs || []).slice(0, 5);
 
                 if (recent.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; 
-                        color:#8b9c9c; padding:20px;">No recent activity found.</td></tr>`;
+                    tbody.innerHTML = `<tr>
+                        <td colspan="3" style="text-align:center; color:#8b9c9c; 
+                            padding:20px; white-space:normal;">
+                            No recent activity found.
+                        </td>
+                    </tr>`;
                     return;
                 }
 
                 recent.forEach(log => {
-                    const date = log.logTime
-                        ? new Date(log.logTime).toLocaleDateString('en-GB',
-                              { day:'2-digit', month:'short', year:'numeric' })
-                        : '-';
-                    tbody.innerHTML += `<tr>
-                        <td>${date}</td>
-                        <td>${log.action || '-'}</td>
-                        <td>${log.userName || 'Super Admin'}</td>
-                    </tr>`;
+                    // Each field ALAG <td> me — merge nahi hoga
+                    const tr = document.createElement('tr');
+
+                    const tdDate = document.createElement('td');
+                    tdDate.style.minWidth   = '110px';
+                    tdDate.style.whiteSpace = 'nowrap';
+                    tdDate.textContent = fmtDateTime(log.logTime);
+
+                    const tdAction = document.createElement('td');
+                    tdAction.style.whiteSpace = 'normal';       // wrap karne do
+                    tdAction.style.wordBreak  = 'break-word';
+                    tdAction.style.maxWidth   = '200px';
+                    tdAction.textContent = log.action || '-';
+
+                    const tdUser = document.createElement('td');
+                    tdUser.style.minWidth   = '80px';
+                    tdUser.style.textAlign  = 'right';
+                    tdUser.style.whiteSpace = 'nowrap';
+                    tdUser.textContent = log.userName || 'Super Admin';
+
+                    tr.appendChild(tdDate);
+                    tr.appendChild(tdAction);
+                    tr.appendChild(tdUser);
+                    tbody.appendChild(tr);
                 });
             },
             error: function () {
-                // Fallback — empty state
                 const tbody = document.querySelector('.sub-table tbody');
-                if (tbody) tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;
-                    color:#8b9c9c; padding:20px;">No activity data available.</td></tr>`;
+                if (tbody) {
+                    tbody.innerHTML = `<tr>
+                        <td colspan="3" style="text-align:center; color:#8b9c9c; padding:20px;">
+                            No activity data available.
+                        </td>
+                    </tr>`;
+                }
             }
         });
     }
@@ -417,7 +446,7 @@ EXISTING last <script> block REPLACE karo is se
                 setTimeout(() => loadDetails(), 1000);
             },
             error: function () {
-                showCustomAlert("Failed to reactivate. Please try again.");
+                showCustomAlert("Failed to reactivate.");
             }
         });
     }
