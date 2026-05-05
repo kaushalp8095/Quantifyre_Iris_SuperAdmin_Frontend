@@ -190,24 +190,9 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Oct 01, 2025</td>
-                                        <td>Recent Activity</td>
-                                        <td>Super Admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Oct 01, 2025</td>
-                                        <td>Billing Activity</td>
-                                        <td>Super Admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Nov 01, 2025</td>
-                                        <td>Recent Activity</td>
-                                        <td>Super Admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Oct 01, 2025</td>
-                                        <td>Billing Activity</td>
-                                        <td>Super Admin</td>
+                                        <td colspan="8" style="text-align:center; padding: 50px;">
+                                            <i class="fa-solid fa-spinner fa-spin"></i> Loading Recent Activity...
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -248,218 +233,218 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
-<!-- 
+    <!-- 
 =====================================================
 FILE: AdminSubscriptionDetails.html
 EXISTING last <script> block REPLACE karo is se
 =====================================================
 -->
-<script>
-    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
-    const adminId  = localStorage.getItem("adminId");
-    const agencyId = new URLSearchParams(window.location.search).get('agencyId');
+    <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
+        const agencyId = new URLSearchParams(window.location.search).get('agencyId');
 
-    // ==========================================
-    // STATUS — class update (double border fix)
-    // ==========================================
-    function applyStatus(status) {
-        const statusEl = document.getElementById('agencyStatus');
-        if (!statusEl) return;
-        statusEl.classList.remove('sub-status-active', 'sub-status-pending', 'sub-status-cancelled');
-        const map = {
-            'active':    ['sub-status-active',    'Active'],
-            'pending':   ['sub-status-pending',   'Pending'],
-            'cancelled': ['sub-status-cancelled', 'Cancelled'],
-        };
-        const [cls, label] = map[(status||'').toLowerCase()] || ['sub-status-pending', status||'Unknown'];
-        statusEl.classList.add(cls);
-        statusEl.textContent = label;
-    }
-
-    // ==========================================
-    // SET FIELD — input ke liye .value, span ke liye .textContent
-    // ==========================================
-    function setField(id, value) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-            el.value = value || '';
-        } else {
-            el.textContent = value || '-';
-        }
-    }
-
-    // ==========================================
-    // FORMAT DATE — Spring LocalDateTime array ya string dono handle
-    // Spring Boot LocalDateTime → [2026,5,5,14,28,0] format bhi aata hai
-    // ==========================================
-    function fmtDateTime(raw) {
-        if (!raw) return '-';
-        let d;
-        if (Array.isArray(raw)) {
-            // [year, month, day, hour, minute, second]
-            d = new Date(raw[0], raw[1]-1, raw[2], raw[3]||0, raw[4]||0, raw[5]||0);
-        } else {
-            d = new Date(raw);
-        }
-        if (isNaN(d)) return '-';
-        return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-    }
-
-    // ==========================================
-    // LOAD AGENCY DETAILS
-    // ==========================================
-    function loadDetails() {
-        if (!agencyId) {
-            showCustomAlert("Invalid subscription. Redirecting...");
-            setTimeout(() => window.location.href = "AdminSubscription.html", 1200);
-            return;
+        // ==========================================
+        // STATUS — class update (double border fix)
+        // ==========================================
+        function applyStatus(status) {
+            const statusEl = document.getElementById('agencyStatus');
+            if (!statusEl) return;
+            statusEl.classList.remove('sub-status-active', 'sub-status-pending', 'sub-status-cancelled');
+            const map = {
+                'active': ['sub-status-active', 'Active'],
+                'pending': ['sub-status-pending', 'Pending'],
+                'cancelled': ['sub-status-cancelled', 'Cancelled'],
+            };
+            const [cls, label] = map[(status || '').toLowerCase()] || ['sub-status-pending', status || 'Unknown'];
+            statusEl.classList.add(cls);
+            statusEl.textContent = label;
         }
 
-        $.ajax({
-            url:  `${BASE_URL}/api/admin/subscriptions/details/${agencyId}`,
-            type: 'GET',
-            success: function (data) {
-                // Dynamic title
-                const agencyName = data.agencyName || 'Agency';
-                document.title = `Quantifyre Iris - ${agencyName}`;
-                const h1El = document.querySelector('.sub-title-text h1');
-                if (h1El) h1El.textContent = `Company Details: ${agencyName}`;
-
-                // Input fields
-                setField('agencyName',    data.agencyName);
-                setField('agencyEmail',   data.email);
-                setField('agencyPhone',   data.phoneNumber);
-                setField('agencyPlan',    data.plan || 'Basic');
-                setField('agencyAddress', [data.address, data.city, data.state, data.country]
-                                             .filter(Boolean).join(', '));
-
-                // Logo
-                const logoEl = document.getElementById('agencyLogo');
-                if (logoEl) {
-                    logoEl.src = data.agencyLogo || 'Images/quantifirelogo.png';
-                    logoEl.onerror = () => { logoEl.src = 'Images/quantifirelogo.png'; };
-                }
-
-                // Status
-                applyStatus(data.status);
-
-                // Cancel button
-                const cancelBtn = document.getElementById('cancelSubBtn');
-                if (cancelBtn) {
-                    if ((data.status||'').toLowerCase() === 'cancelled') {
-                        cancelBtn.style.display = 'none';
-                    } else {
-                        cancelBtn.style.display = '';
-                        cancelBtn.onclick = () => {
-                            window.location.href = `AdminCancelSubscription.html?agencyId=${agencyId}`;
-                        };
-                    }
-                }
-
-                // Recent activity load
-                loadRecentActivity(agencyName);
-            },
-            error: function () {
-                showCustomAlert("Failed to load subscription details.");
+        // ==========================================
+        // SET FIELD — input ke liye .value, span ke liye .textContent
+        // ==========================================
+        function setField(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.value = value || '';
+            } else {
+                el.textContent = value || '-';
             }
-        });
-    }
+        }
 
-    // ==========================================
-    // LOAD RECENT ACTIVITY — proper columns
-    // ==========================================
-    function loadRecentActivity(agencyName) {
-        $.ajax({
-            url:  `${BASE_URL}/api/admin/activity-logs/search`,
-            type: 'GET',
-            data: { adminId: adminId, search: agencyName },
-            success: function (logs) {
-                const tbody = document.querySelector('.sub-table tbody');
-                if (!tbody) return;
-                tbody.innerHTML = '';
+        // ==========================================
+        // FORMAT DATE — Spring LocalDateTime array ya string dono handle
+        // Spring Boot LocalDateTime → [2026,5,5,14,28,0] format bhi aata hai
+        // ==========================================
+        function fmtDateTime(raw) {
+            if (!raw) return '-';
+            let d;
+            if (Array.isArray(raw)) {
+                // [year, month, day, hour, minute, second]
+                d = new Date(raw[0], raw[1] - 1, raw[2], raw[3] || 0, raw[4] || 0, raw[5] || 0);
+            } else {
+                d = new Date(raw);
+            }
+            if (isNaN(d)) return '-';
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
 
-                const recent = (logs || []).slice(0, 5);
+        // ==========================================
+        // LOAD AGENCY DETAILS
+        // ==========================================
+        function loadDetails() {
+            if (!agencyId) {
+                showCustomAlert("Invalid subscription. Redirecting...");
+                setTimeout(() => window.location.href = "AdminSubscription.html", 1200);
+                return;
+            }
 
-                if (recent.length === 0) {
-                    tbody.innerHTML = `<tr>
+            $.ajax({
+                url: `${BASE_URL}/api/admin/subscriptions/details/${agencyId}`,
+                type: 'GET',
+                success: function (data) {
+                    // Dynamic title
+                    const agencyName = data.agencyName || 'Agency';
+                    document.title = `Quantifyre Iris - ${agencyName}`;
+                    const h1El = document.querySelector('.sub-title-text h1');
+                    if (h1El) h1El.textContent = `Company Details: ${agencyName}`;
+
+                    // Input fields
+                    setField('agencyName', data.agencyName);
+                    setField('agencyEmail', data.email);
+                    setField('agencyPhone', data.phoneNumber);
+                    setField('agencyPlan', data.plan || 'Basic');
+                    setField('agencyAddress', [data.address, data.city, data.state, data.country]
+                        .filter(Boolean).join(', '));
+
+                    // Logo
+                    const logoEl = document.getElementById('agencyLogo');
+                    if (logoEl) {
+                        logoEl.src = data.agencyLogo || 'Images/quantifirelogo.png';
+                        logoEl.onerror = () => { logoEl.src = 'Images/quantifirelogo.png'; };
+                    }
+
+                    // Status
+                    applyStatus(data.status);
+
+                    // Cancel button
+                    const cancelBtn = document.getElementById('cancelSubBtn');
+                    if (cancelBtn) {
+                        if ((data.status || '').toLowerCase() === 'cancelled') {
+                            cancelBtn.style.display = 'none';
+                        } else {
+                            cancelBtn.style.display = '';
+                            cancelBtn.onclick = () => {
+                                window.location.href = `AdminCancelSubscription.html?agencyId=${agencyId}`;
+                            };
+                        }
+                    }
+
+                    // Recent activity load
+                    loadRecentActivity(agencyName);
+                },
+                error: function () {
+                    showCustomAlert("Failed to load subscription details.");
+                }
+            });
+        }
+
+        // ==========================================
+        // LOAD RECENT ACTIVITY — proper columns
+        // ==========================================
+        function loadRecentActivity(agencyName) {
+            $.ajax({
+                url: `${BASE_URL}/api/admin/activity-logs/search`,
+                type: 'GET',
+                data: { adminId: adminId, search: agencyName },
+                success: function (logs) {
+                    const tbody = document.querySelector('.sub-table tbody');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+
+                    const recent = (logs || []).slice(0, 5);
+
+                    if (recent.length === 0) {
+                        tbody.innerHTML = `<tr>
                         <td colspan="3" style="text-align:center; color:#8b9c9c; 
                             padding:20px; white-space:normal;">
                             No recent activity found.
                         </td>
                     </tr>`;
-                    return;
-                }
+                        return;
+                    }
 
-                recent.forEach(log => {
-                    // Each field ALAG <td> me — merge nahi hoga
-                    const tr = document.createElement('tr');
+                    recent.forEach(log => {
+                        // Each field ALAG <td> me — merge nahi hoga
+                        const tr = document.createElement('tr');
 
-                    const tdDate = document.createElement('td');
-                    tdDate.style.minWidth   = '110px';
-                    tdDate.style.whiteSpace = 'nowrap';
-                    tdDate.textContent = fmtDateTime(log.logTime);
+                        const tdDate = document.createElement('td');
+                        tdDate.style.minWidth = '110px';
+                        tdDate.style.whiteSpace = 'nowrap';
+                        tdDate.textContent = fmtDateTime(log.logTime);
 
-                    const tdAction = document.createElement('td');
-                    tdAction.style.whiteSpace = 'normal';       // wrap karne do
-                    tdAction.style.wordBreak  = 'break-word';
-                    tdAction.style.maxWidth   = '200px';
-                    tdAction.textContent = log.action || '-';
+                        const tdAction = document.createElement('td');
+                        tdAction.style.whiteSpace = 'normal';       // wrap karne do
+                        tdAction.style.wordBreak = 'break-word';
+                        tdAction.style.maxWidth = '200px';
+                        tdAction.textContent = log.action || '-';
 
-                    const tdUser = document.createElement('td');
-                    tdUser.style.minWidth   = '80px';
-                    tdUser.style.textAlign  = 'right';
-                    tdUser.style.whiteSpace = 'nowrap';
-                    tdUser.textContent = log.userName || 'Super Admin';
+                        const tdUser = document.createElement('td');
+                        tdUser.style.minWidth = '80px';
+                        tdUser.style.textAlign = 'right';
+                        tdUser.style.whiteSpace = 'nowrap';
+                        tdUser.textContent = log.userName || 'Super Admin';
 
-                    tr.appendChild(tdDate);
-                    tr.appendChild(tdAction);
-                    tr.appendChild(tdUser);
-                    tbody.appendChild(tr);
-                });
-            },
-            error: function () {
-                const tbody = document.querySelector('.sub-table tbody');
-                if (tbody) {
-                    tbody.innerHTML = `<tr>
+                        tr.appendChild(tdDate);
+                        tr.appendChild(tdAction);
+                        tr.appendChild(tdUser);
+                        tbody.appendChild(tr);
+                    });
+                },
+                error: function () {
+                    const tbody = document.querySelector('.sub-table tbody');
+                    if (tbody) {
+                        tbody.innerHTML = `<tr>
                         <td colspan="3" style="text-align:center; color:#8b9c9c; padding:20px;">
                             No activity data available.
                         </td>
                     </tr>`;
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
 
-    // ==========================================
-    // REACTIVATE
-    // ==========================================
-    function reactivateSubscription() {
-        if (!agencyId) return;
-        $.ajax({
-            url:         `${BASE_URL}/api/admin/subscriptions/reactivate/${agencyId}`,
-            type:        'POST',
-            contentType: 'application/json',
-            data:        JSON.stringify({ adminId: parseInt(adminId) }),
-            success: function () {
-                showCustomAlert("Subscription Reactivated Successfully!");
-                setTimeout(() => loadDetails(), 1000);
-            },
-            error: function () {
-                showCustomAlert("Failed to reactivate.");
-            }
-        });
-    }
+        // ==========================================
+        // REACTIVATE
+        // ==========================================
+        function reactivateSubscription() {
+            if (!agencyId) return;
+            $.ajax({
+                url: `${BASE_URL}/api/admin/subscriptions/reactivate/${agencyId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ adminId: parseInt(adminId) }),
+                success: function () {
+                    showCustomAlert("Subscription Reactivated Successfully!");
+                    setTimeout(() => loadDetails(), 1000);
+                },
+                error: function () {
+                    showCustomAlert("Failed to reactivate.");
+                }
+            });
+        }
 
-    // ==========================================
-    // INIT
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', function () {
-        loadDetails();
-        const reactBtn = document.getElementById('reactivateSubBtn');
-        if (reactBtn) reactBtn.addEventListener('click', reactivateSubscription);
-    });
-</script>
+        // ==========================================
+        // INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDetails();
+            const reactBtn = document.getElementById('reactivateSubBtn');
+            if (reactBtn) reactBtn.addEventListener('click', reactivateSubscription);
+        });
+    </script>
 
 </body>
 
