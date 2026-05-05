@@ -21,25 +21,27 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
-                    <li class="active"><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+                    <li class="active"><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico">
+                            Subscription</a></li>
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -69,7 +71,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -109,13 +112,14 @@
                     </div>
                 </div>
                 <div class="rpt-header-actions">
-                     <a href="AdminSubscription.html" class="btn-back">
-                    <i class="fa-solid fa-arrow-left"></i> Back
-                </a>
+                    <a href="AdminSubscription.html" class="btn-back">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </a>
 
-                     <button id="cancelSubBtn" class="btn btn-submit" style="text-decoration: none;text-align: center;">Cancel Subscription</button>
+                    <button id="cancelSubBtn" class="btn btn-submit"
+                        style="text-decoration: none;text-align: center;">Cancel Subscription</button>
                 </div>
-               
+
             </div>
 
             <div class="sub-main-grid">
@@ -150,17 +154,17 @@
                 </div>
 
                 <div class="sub-right-stack">
-                    
+
                     <div class="sub-glass-card">
                         <div class="sub-card-header">Subscription Overview</div>
-                        
+
                         <div class="sub-detail-row">
                             <span class="sub-key">Plan</span>
                             <span class="sub-val" id="agencyPlan">Premium</span>
                         </div>
                         <div class="sub-detail-row">
                             <span class="sub-key">Status</span>
-                            <span class="sub-status-badge" id="agencyStatus">Active</span>
+                            <span class="sub-status-badge" id="agencyStatus"></span>
                         </div>
                         <div class="sub-detail-row">
                             <span class="sub-key">Start Date</span>
@@ -174,7 +178,7 @@
 
                     <div class="sub-glass-card" style="flex-grow: 1;">
                         <div class="sub-card-header">Recent Activity</div>
-                        
+
                         <div class="sub-table-wrapper">
                             <table class="sub-table">
                                 <thead>
@@ -239,123 +243,123 @@ FILE: AdminSubscriptionDetails.html
 KAHAN LAGAO: </body> se pehle, all.js ke baad
 
 HTML me ye IDs add karo jahan jahan data dikhana ho:
-  id="agencyName"    id="ownerName"     id="agencyEmail"
+  id="agencyName"    id="agencyEmail"
   id="agencyPhone"   id="agencyPlan"    id="agencyStatus"
   id="agencyAddress" id="agencyLogo"
   Cancel button: id="cancelSubBtn"
 =====================================================
 -->
-<script>
-    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
-    const adminId  = localStorage.getItem("adminId");
-    const agencyId = new URLSearchParams(window.location.search).get('agencyId');
+    <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
+        const agencyId = new URLSearchParams(window.location.search).get('agencyId');
 
-    // ==========================================
-    // STATUS PILL
-    // ==========================================
-    function statusPill(status) {
-        const map = {
-            'active':    ['sub-status-active',    'Active'],
-            'pending':   ['sub-status-pending',   'Pending'],
-            'cancelled': ['sub-status-cancelled', 'Cancelled'],
-        };
-        const key = (status || '').toLowerCase();
-        const [cls, label] = map[key] || ['sub-status-pending', status || 'Unknown'];
-        return `<span class="${cls}">${label}</span>`;
-    }
-
-    // ==========================================
-    // LOAD DETAILS
-    // ==========================================
-    function loadDetails() {
-        if (!agencyId) {
-            showCustomAlert("Invalid subscription. Redirecting...");
-            setTimeout(() => window.location.href = "AdminSubscription.html", 1200);
-            return;
+        // ==========================================
+        // STATUS PILL
+        // ==========================================
+        function statusPill(status) {
+            const map = {
+                'active': ['sub-status-active', 'Active'],
+                'pending': ['sub-status-pending', 'Pending'],
+                'cancelled': ['sub-status-cancelled', 'Cancelled'],
+            };
+            const key = (status || '').toLowerCase();
+            const [cls, label] = map[key] || ['sub-status-pending', status || 'Unknown'];
+            return `<span class="${cls}">${label}</span>`;
         }
 
-        $.ajax({
-            url:  `${BASE_URL}/api/admin/subscriptions/details/${agencyId}`,
-            type: 'GET',
-            success: function (data) {
+        // ==========================================
+        // LOAD DETAILS
+        // ==========================================
+        function loadDetails() {
+            if (!agencyId) {
+                showCustomAlert("Invalid subscription. Redirecting...");
+                setTimeout(() => window.location.href = "AdminSubscription.html", 1200);
+                return;
+            }
 
-                // Agency logo
-                const logoEl = document.getElementById('agencyLogo');
-                if (logoEl) {
-                    logoEl.src = data.agencyLogo || 'Images/quantifirelogo.png';
-                    logoEl.onerror = () => logoEl.src = 'Images/quantifirelogo.png';
-                }
+            $.ajax({
+                url: `${BASE_URL}/api/admin/subscriptions/details/${agencyId}`,
+                type: 'GET',
+                success: function (data) {
 
-                // Text fields
-                setText('agencyName',    data.agencyName  || '-');
-                setText('ownerName',     data.ownerName   || '-');
-                setText('agencyEmail',   data.email       || '-');
-                setText('agencyPhone',   data.phoneNumber || '-');
-                setText('agencyPlan',    data.plan        || 'Basic');
-                setText('agencyAddress', [data.address, data.city, data.state, data.country]
-                                            .filter(Boolean).join(', ') || '-');
-
-                // Status pill
-                const statusEl = document.getElementById('agencyStatus');
-                if (statusEl) statusEl.innerHTML = statusPill(data.status);
-
-                // Cancel button — cancelled ho to hide karo
-                const cancelBtn = document.getElementById('cancelSubBtn');
-                if (cancelBtn) {
-                    if ((data.status || '').toLowerCase() === 'cancelled') {
-                        cancelBtn.style.display = 'none';
-                        // Reactivate button show karo
-                        const reactBtn = document.getElementById('reactivateSubBtn');
-                        if (reactBtn) reactBtn.style.display = '';
+                    // Agency logo
+                    const logoEl = document.getElementById('agencyLogo');
+                    if (logoEl) {
+                        logoEl.src = data.agencyLogo || 'Images/quantifirelogo.png';
+                        logoEl.onerror = () => logoEl.src = 'Images/quantifirelogo.png';
                     }
+
+                    // Text fields
+                    setText('agencyName', data.agencyName || '-');
+                    setText('agencyEmail', data.email || '-');
+                    setText('agencyPhone', data.phoneNumber || '-');
+                    setText('agencyPlan', data.plan || 'Basic');
+                    setText('agencyAddress', [data.address, data.city, data.state, data.country]
+                        .filter(Boolean).join(', ') || '-');
+
+                    // Status pill
+                    const statusEl = document.getElementById('agencyStatus');
+                    if (statusEl) statusEl.innerHTML = statusPill(data.status);
+
+                    // Cancel button — cancelled ho to hide karo
+                    const cancelBtn = document.getElementById('cancelSubBtn');
+                    if (cancelBtn) {
+                        if ((data.status || '').toLowerCase() === 'cancelled') {
+                            cancelBtn.style.display = 'none';
+                            // Reactivate button show karo
+                            const reactBtn = document.getElementById('reactivateSubBtn');
+                            if (reactBtn) reactBtn.style.display = '';
+                        }
+                    }
+
+                    // Cancel page link me agencyId daalo
+                    const cancelLink = document.querySelector('a[href*="AdminCancelSubscription"]');
+                    if (cancelLink) {
+                        cancelLink.href = `AdminCancelSubscription.html?agencyId=${agencyId}`;
+                    }
+                },
+                error: function (err) {
+                    console.error("Subscription Details Error:", err);
+                    showCustomAlert("Failed to load subscription details.");
                 }
+            });
+        }
 
-                // Cancel page link me agencyId daalo
-                const cancelLink = document.querySelector('a[href*="AdminCancelSubscription"]');
-                if (cancelLink) {
-                    cancelLink.href = `AdminCancelSubscription.html?agencyId=${agencyId}`;
+        // Helper
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        // ==========================================
+        // REACTIVATE (agar cancelled ho)
+        // ==========================================
+        function reactivateSubscription() {
+            if (!agencyId) return;
+            $.ajax({
+                url: `${BASE_URL}/api/admin/subscriptions/reactivate/${agencyId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ adminId: parseInt(adminId) }),
+                success: function () {
+                    showCustomAlert("Subscription Reactivated Successfully!");
+                    setTimeout(() => loadDetails(), 1000);
+                },
+                error: function () {
+                    showCustomAlert("Failed to reactivate. Please try again.");
                 }
-            },
-            error: function (err) {
-                console.error("Subscription Details Error:", err);
-                showCustomAlert("Failed to load subscription details.");
-            }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDetails();
+
+            const reactBtn = document.getElementById('reactivateSubBtn');
+            if (reactBtn) reactBtn.addEventListener('click', reactivateSubscription);
         });
-    }
+    </script>
 
-    // Helper
-    function setText(id, value) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value;
-    }
-
-    // ==========================================
-    // REACTIVATE (agar cancelled ho)
-    // ==========================================
-    function reactivateSubscription() {
-        if (!agencyId) return;
-        $.ajax({
-            url:         `${BASE_URL}/api/admin/subscriptions/reactivate/${agencyId}`,
-            type:        'POST',
-            contentType: 'application/json',
-            data:        JSON.stringify({ adminId: parseInt(adminId) }),
-            success: function () {
-                showCustomAlert("Subscription Reactivated Successfully!");
-                setTimeout(() => loadDetails(), 1000);
-            },
-            error: function () {
-                showCustomAlert("Failed to reactivate. Please try again.");
-            }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        loadDetails();
-
-        const reactBtn = document.getElementById('reactivateSubBtn');
-        if (reactBtn) reactBtn.addEventListener('click', reactivateSubscription);
-    });
-</script>
-    
 </body>
+
 </html>
