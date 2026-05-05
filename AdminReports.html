@@ -363,21 +363,20 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
-    <!-- 
-=====================================================
-FILE: AdminReports.html
-EXISTING chart <script> block REPLACE karo is se
-
-HTML me IDs add karo:
-  id="totalReportsCount"   id="generatedTodayCount"   id="pendingReportsCount"
-  Table tbody: id="recentReportsTable"
-  Delete confirm button: id="confirmDeleteReportBtn"
-  Delete modal confirm button: onclick="confirmDeleteReport()"
-=====================================================
--->
     <script>
         const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
         const adminId = localStorage.getItem("adminId");

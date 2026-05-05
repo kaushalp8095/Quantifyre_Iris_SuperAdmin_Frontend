@@ -237,6 +237,17 @@
         </div>
     </div>
 
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon-box" id="alertIconBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="alertTitle">Alert Title</h3>
+            <p id="alertMessage">Alert Message goes here.</p>
+            <button class="btn-alert-ok">OK</button>
+        </div>
+    </div>
+
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/flatpickr.js"></script>
     <script src="Js/all.js"></script>
@@ -322,6 +333,31 @@ Generate Report button me id add karo: id="generateReportBtn"
                 $('.ar-dropdown').removeClass('active');
             }
         });
+
+        function showCustomAlert(message, title = "Alert") {
+    const overlay = document.getElementById('customAlertOverlay');
+    const titleEl = document.getElementById('alertTitle');
+    const messageEl = document.getElementById('alertMessage');
+    const okBtn = overlay.querySelector('.btn-alert-ok');
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+
+    // Icon change logic (Optional: error ke liye red, success ke liye green)
+    const iconBox = document.getElementById('alertIconBox');
+    if (message.toLowerCase().includes("success")) {
+        iconBox.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #00ff9d;"></i>';
+    } else {
+        iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: #ff4d4d;"></i>';
+    }
+
+    overlay.classList.add('active');
+
+    // Close button logic
+    okBtn.onclick = function() {
+        overlay.classList.remove('active');
+    };
+}
     </script>
 
     <script>
