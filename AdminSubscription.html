@@ -21,25 +21,27 @@
                 <div class="logo-icon"><img src="Images/quantifirelogo.png"></div>
             </div>
             <div class="user-mini-profile">
-                <div class="avatar-circle"><img src="#" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                <div class="avatar-circle"><img src="#"
+                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
                 <p></p>
             </div>
             <nav>
                 <ul>
-                    <li ><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
+                    <li><a href="AdminDashboard.html"><img src="Images/Dashboard30x30.ico"> Dashboard</a></li>
                     <li><a href="AdminAgencies.html"><img src="Images/Agency30x30.ico"> Agencies</a></li>
                     <li><a href="AdminCampaigns.html"><img src="Images/Campaign30x30.ico"> Campaigns</a></li>
                     <li><a href="AdminBilling.html"><img src="Images/Billing30x30.ico"> Billing</a></li>
-                    
+
                     <li><a href="AdminRoles.html"><img src="Images/Roles30x30.ico"> Roles</a></li>
                     <li><a href="AdminReports.html"><img src="Images/Report&Analytics.ico"> Reports</a></li>
                     <li><a href="AdminActivityLogs.html"><img src="Images/ActivityLog30x30.ico"> Activity Logs</a></li>
                     <li><a href="AdminSupport.html"><img src="Images/Support30x30.ico"> Support</a></li>
-                    <li class="active"><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico"> Subscription</a></li>
-                    
+                    <li class="active"><a href="AdminSubscription.html"><img src="Images/Subcription30x30.ico">
+                            Subscription</a></li>
+
                     <div class="mobile-only-menu">
-                        <li ><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
-                            Setting</a></li>
+                        <li><a href="AdminSystemSetting.html"><img src="Images/Setting30x30.ico"> System
+                                Setting</a></li>
                         <div class="dropdown-divider"
                             style="margin: 10px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);"></div>
                         <li><a href="javascript:void(0)" onclick="openLogoutModal()"><i
@@ -69,7 +71,8 @@
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
                                 </div>
                             </ul>
-                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a></div>
+                            <div class="notif-footer"><a href="AdminAllNotifications.html">View All Notifications</a>
+                            </div>
                         </div>
                     </div>
                     <div class="profile-info" onclick="toggleProfileDropdown(event)"
@@ -111,9 +114,9 @@
             <section class="sub-overview-box">
                 <div class="sub-stats-grid">
                     <div class="sub-stat-card">
-                       <img src="Images/TotalSub50x50.ico" alt="">
+                        <img src="Images/TotalSub50x50.ico" alt="">
                         <div class="sub-stat-content">
-                            <h2>51</h2>
+                            <h2 id="totalSubCount"></h2>
                             <p>Total Subscriptions</p>
                         </div>
                     </div>
@@ -122,7 +125,7 @@
                             <img src="Images/ActiveSub50x50.ico" alt="">
                         </div>
                         <div class="sub-stat-content">
-                            <h2>35</h2>
+                            <h2 id="activeSubCount"></h2>
                             <p>Active Subscriptions</p>
                         </div>
                     </div>
@@ -131,7 +134,7 @@
                             <img src="Images/PendingSub50x50.ico" alt="">
                         </div>
                         <div class="sub-stat-content">
-                            <h2>15</h2>
+                            <h2 id="pendingSubCount"></h2>
                             <p>Pending Subscriptions</p>
                         </div>
                     </div>
@@ -154,7 +157,7 @@
                                 <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="subscriptionTable">
                             <tr>
                                 <td>Acme Corp</td>
                                 <td>john@acmecorp.com</td>
@@ -163,7 +166,8 @@
                                     <span class="sub-status-active">Active</span>
                                 </td>
                                 <td>
-                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i
+                                            class="fa-regular fa-eye"></i></a>
                                 </td>
                             </tr>
                             <tr>
@@ -174,7 +178,8 @@
                                     <span class="sub-status-active">Active</span>
                                 </td>
                                 <td>
-                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i
+                                            class="fa-regular fa-eye"></i></a>
                                 </td>
                             </tr>
                             <tr>
@@ -185,7 +190,8 @@
                                     <span class="sub-status-pending">Pending</span>
                                 </td>
                                 <td>
-                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i
+                                            class="fa-regular fa-eye"></i></a>
                                 </td>
                             </tr>
                             <tr>
@@ -196,7 +202,8 @@
                                     <span class="sub-status-active">Active</span>
                                 </td>
                                 <td>
-                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i
+                                            class="fa-regular fa-eye"></i></a>
                                 </td>
                             </tr>
                             <tr>
@@ -207,7 +214,8 @@
                                     <span class="sub-status-pending">Pending</span>
                                 </td>
                                 <td>
-                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i
+                                            class="fa-regular fa-eye"></i></a>
                                 </td>
                             </tr>
                             <tr>
@@ -218,17 +226,18 @@
                                     <span class="sub-status-active">Active</span>
                                 </td>
                                 <td>
-                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="AdminSubscriptionDetails.html" class="sub-action-btn"><i
+                                            class="fa-regular fa-eye"></i></a>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-               
+
             </section>
-            
-           <div class="pagination-wrapper" id="pagination-subscription">
+
+            <div class="pagination-wrapper" id="pagination-subscription">
                 <div class="pagination-info">
                     Showing <span class="start-row">1</span> to <span class="end-row">4</span> of <span
                         class="total-rows">1250</span> entries
@@ -243,11 +252,11 @@
                     <button class="page-btn next-btn"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
             </div>
-            
+
         </main>
     </div>
 
-     <!-- Logut Model Logic -->
+    <!-- Logut Model Logic -->
     <div class="modal-overlay" id="logoutModal">
         <div class="modal-content">
             <div class="modal-icon-box2">
@@ -265,7 +274,98 @@
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
 
-        <script>
+    <script>
+        const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+        const adminId = localStorage.getItem("adminId");
+
+        // ==========================================
+        // STATUS PILL
+        // ==========================================
+        function statusPill(status) {
+            const map = {
+                'active': ['sub-status-active', 'Active'],
+                'pending': ['sub-status-pending', 'Pending'],
+                'cancelled': ['sub-status-cancelled', 'Cancelled'],
+            };
+            const key = (status || '').toLowerCase();
+            const [cls, label] = map[key] || ['sub-status-pending', status || 'Unknown'];
+            return `<span class="${cls}">${label}</span>`;
+        }
+
+        // ==========================================
+        // LOAD SUBSCRIPTIONS
+        // ==========================================
+        function loadSubscriptions() {
+            if (!adminId) return;
+
+            $('#subscriptionTable tbody').html(`
+            <tr><td colspan="5" style="text-align:center; padding:40px;">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+            </td></tr>`);
+
+            $.ajax({
+                url: `${BASE_URL}/api/admin/subscriptions/list`,
+                type: 'GET',
+                data: { adminId: adminId },
+                success: function (res) {
+
+                    // Stats update
+                    $('#totalSubCount').text(res.totalSubscriptions || 0);
+                    $('#activeSubCount').text(res.activeSubscriptions || 0);
+                    $('#pendingSubCount').text(res.pendingSubscriptions || 0);
+
+                    const tbody = $('#subscriptionTable tbody');
+                    tbody.empty();
+
+                    const subs = res.subscriptions || [];
+                    if (subs.length === 0) {
+                        tbody.html(`<tr><td colspan="5" style="text-align:center; 
+                        color:#8b9c9c; padding:30px;">No subscriptions found.</td></tr>`);
+                        return;
+                    }
+
+                    subs.forEach(sub => {
+                        tbody.append(`
+                        <tr>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <img src="${sub.agencyLogo || 'Images/quantifirelogo.png'}" 
+                                         style="width:32px;height:32px;border-radius:50%;object-fit:cover;" 
+                                         onerror="this.src='Images/quantifirelogo.png'">
+                                    <span>${sub.agencyName || '-'}</span>
+                                </div>
+                            </td>
+                            <td>${sub.email || '-'}</td>
+                            <td>${sub.plan || 'Basic'}</td>
+                            <td>${statusPill(sub.status)}</td>
+                            <td>
+                                <a href="AdminSubscriptionDetails.html?agencyId=${sub.id}" 
+                                   class="sub-action-btn">
+                                    <i class="fa-regular fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                    });
+
+                    setupTablePagination('subscriptionTable', 'pagination-subscription', 8);
+                },
+                error: function (err) {
+                    console.error("Subscription Load Error:", err);
+                    $('#subscriptionTable tbody').html(`<tr><td colspan="5" 
+                    style="text-align:center; color:#e74c3c; padding:30px;">
+                    Failed to load subscriptions.</td></tr>`);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSubscriptions();
+        });
+    </script>
+
+
+    <script>
         // ---- Pagination Logic ---- //
         function setupTablePagination(tableId, paginationWrapperId, rowsPerPage = 4) {
             const table = document.getElementById(tableId);
@@ -343,4 +443,5 @@
     </script>
 
 </body>
+
 </html>

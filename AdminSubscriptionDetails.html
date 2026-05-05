@@ -113,7 +113,7 @@
                     <i class="fa-solid fa-arrow-left"></i> Back
                 </a>
 
-                     <a href="AdminCancelSubscription.html" class="btn btn-submit" style="text-decoration: none;text-align: center;">Cancel Subscription</a>
+                     <button id="cancelSubBtn" class="btn btn-submit" style="text-decoration: none;text-align: center;">Cancel Subscription</button>
                 </div>
                
             </div>
@@ -123,28 +123,28 @@
                 <div class="sub-glass-card">
                     <div class="sub-form-group">
                         <label class="sub-label">Agency Name</label>
-                        <input type="text" class="sub-input" value="Acme Corp" readonly>
+                        <input type="text" class="sub-input" id="agencyName" readonly>
                     </div>
 
                     <div class="sub-form-group">
                         <label class="sub-label">Email Address</label>
-                        <input type="email" class="sub-input" value="john@acmecorp.com" readonly>
+                        <input type="email" class="sub-input" id="agencyEmail" readonly>
                     </div>
 
                     <div class="sub-form-group">
                         <label class="sub-label">Phone Number</label>
-                        <input type="text" class="sub-input" value="9825434768" readonly>
+                        <input type="text" class="sub-input" id="agencyPhone" readonly>
                     </div>
 
                     <div class="sub-form-group">
                         <label class="sub-label">Address</label>
-                        <input type="text" class="sub-input" value="Someshvar mall, Modhera Cross Road, Mehsana-2" readonly>
+                        <input type="text" class="sub-input" id="agencyAddress" readonly>
                     </div>
 
                     <div class="sub-form-group">
                         <label class="sub-label">Agency Logo</label>
                         <div class="sub-logo-box">
-                            <img src="Images/quantifirelogo.png" alt="Agency Logo">
+                            <img src="Images/quantifirelogo.png" id="agencyLogo" alt="Agency Logo">
                         </div>
                     </div>
                 </div>
@@ -156,11 +156,11 @@
                         
                         <div class="sub-detail-row">
                             <span class="sub-key">Plan</span>
-                            <span class="sub-val">Premium</span>
+                            <span class="sub-val" id="agencyPlan">Premium</span>
                         </div>
                         <div class="sub-detail-row">
                             <span class="sub-key">Status</span>
-                            <span class="sub-status-badge">Active</span>
+                            <span class="sub-status-badge" id="agencyStatus">Active</span>
                         </div>
                         <div class="sub-detail-row">
                             <span class="sub-key">Start Date</span>
@@ -232,6 +232,130 @@
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
+
+    <!-- 
+=====================================================
+FILE: AdminSubscriptionDetails.html
+KAHAN LAGAO: </body> se pehle, all.js ke baad
+
+HTML me ye IDs add karo jahan jahan data dikhana ho:
+  id="agencyName"    id="ownerName"     id="agencyEmail"
+  id="agencyPhone"   id="agencyPlan"    id="agencyStatus"
+  id="agencyAddress" id="agencyLogo"
+  Cancel button: id="cancelSubBtn"
+=====================================================
+-->
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId  = localStorage.getItem("adminId");
+    const agencyId = new URLSearchParams(window.location.search).get('agencyId');
+
+    // ==========================================
+    // STATUS PILL
+    // ==========================================
+    function statusPill(status) {
+        const map = {
+            'active':    ['sub-status-active',    'Active'],
+            'pending':   ['sub-status-pending',   'Pending'],
+            'cancelled': ['sub-status-cancelled', 'Cancelled'],
+        };
+        const key = (status || '').toLowerCase();
+        const [cls, label] = map[key] || ['sub-status-pending', status || 'Unknown'];
+        return `<span class="${cls}">${label}</span>`;
+    }
+
+    // ==========================================
+    // LOAD DETAILS
+    // ==========================================
+    function loadDetails() {
+        if (!agencyId) {
+            showCustomAlert("Invalid subscription. Redirecting...");
+            setTimeout(() => window.location.href = "AdminSubscription.html", 1200);
+            return;
+        }
+
+        $.ajax({
+            url:  `${BASE_URL}/api/admin/subscriptions/details/${agencyId}`,
+            type: 'GET',
+            success: function (data) {
+
+                // Agency logo
+                const logoEl = document.getElementById('agencyLogo');
+                if (logoEl) {
+                    logoEl.src = data.agencyLogo || 'Images/quantifirelogo.png';
+                    logoEl.onerror = () => logoEl.src = 'Images/quantifirelogo.png';
+                }
+
+                // Text fields
+                setText('agencyName',    data.agencyName  || '-');
+                setText('ownerName',     data.ownerName   || '-');
+                setText('agencyEmail',   data.email       || '-');
+                setText('agencyPhone',   data.phoneNumber || '-');
+                setText('agencyPlan',    data.plan        || 'Basic');
+                setText('agencyAddress', [data.address, data.city, data.state, data.country]
+                                            .filter(Boolean).join(', ') || '-');
+
+                // Status pill
+                const statusEl = document.getElementById('agencyStatus');
+                if (statusEl) statusEl.innerHTML = statusPill(data.status);
+
+                // Cancel button — cancelled ho to hide karo
+                const cancelBtn = document.getElementById('cancelSubBtn');
+                if (cancelBtn) {
+                    if ((data.status || '').toLowerCase() === 'cancelled') {
+                        cancelBtn.style.display = 'none';
+                        // Reactivate button show karo
+                        const reactBtn = document.getElementById('reactivateSubBtn');
+                        if (reactBtn) reactBtn.style.display = '';
+                    }
+                }
+
+                // Cancel page link me agencyId daalo
+                const cancelLink = document.querySelector('a[href*="AdminCancelSubscription"]');
+                if (cancelLink) {
+                    cancelLink.href = `AdminCancelSubscription.html?agencyId=${agencyId}`;
+                }
+            },
+            error: function (err) {
+                console.error("Subscription Details Error:", err);
+                showCustomAlert("Failed to load subscription details.");
+            }
+        });
+    }
+
+    // Helper
+    function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    }
+
+    // ==========================================
+    // REACTIVATE (agar cancelled ho)
+    // ==========================================
+    function reactivateSubscription() {
+        if (!agencyId) return;
+        $.ajax({
+            url:         `${BASE_URL}/api/admin/subscriptions/reactivate/${agencyId}`,
+            type:        'POST',
+            contentType: 'application/json',
+            data:        JSON.stringify({ adminId: parseInt(adminId) }),
+            success: function () {
+                showCustomAlert("Subscription Reactivated Successfully!");
+                setTimeout(() => loadDetails(), 1000);
+            },
+            error: function () {
+                showCustomAlert("Failed to reactivate. Please try again.");
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadDetails();
+
+        const reactBtn = document.getElementById('reactivateSubBtn');
+        if (reactBtn) reactBtn.addEventListener('click', reactivateSubscription);
+    });
+</script>
     
 </body>
 </html>

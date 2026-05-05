@@ -119,7 +119,7 @@
                     </div>
 
                     <h3 class="cs-warning-title">
-                        Are you sure you want to cancel the subscription for Acme Corp?<br>
+                        Are you sure you want to cancel the subscription for <span id="cancelAgencyName"></span>?<br>
                         This action cannot be undone
                     </h3>
 
@@ -158,8 +158,8 @@
                         </label>
 
                         <div class="cs-btn-row">
-                            <a href="AdminSubscription.html" class="cs-btn cs-btn-confirm"
-                                style="text-decoration: none;text-align: center;">Confirm Cancellation</a>
+                            <button id="confirmCancelBtn" class="cs-btn cs-btn-confirm"
+                                style="text-decoration: none;text-align: center;">Confirm Cancellation</button>
                             <a href="AdminSubscription.html" class="cs-btn cs-btn-back" onclick="history.back()"
                                 style="text-decoration: none;text-align: center;">Go Back</a>
                         </div>
@@ -186,6 +186,112 @@
 
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
+
+    <!-- 
+=====================================================
+FILE: AdminCancelSubscription.html
+KAHAN LAGAO: </body> se pehle, EXISTING script ke baad
+
+"Confirm Cancellation" button me id add karo:
+  id="confirmCancelBtn"
+
+Agency naam dikhane ke liye:
+  id="cancelAgencyName"  (h3 ya span me)
+=====================================================
+-->
+<script>
+    const BASE_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space";
+    const adminId  = localStorage.getItem("adminId");
+    const agencyId = new URLSearchParams(window.location.search).get('agencyId');
+
+    // ==========================================
+    // LOAD AGENCY NAME (page heading me)
+    // ==========================================
+    function loadAgencyName() {
+        if (!agencyId) return;
+        $.ajax({
+            url:  `${BASE_URL}/api/admin/subscriptions/details/${agencyId}`,
+            type: 'GET',
+            success: function (data) {
+                // Heading me agency naam daalo
+                const nameEl = document.getElementById('cancelAgencyName');
+                if (nameEl) nameEl.textContent = data.agencyName || 'this Agency';
+
+                // h3 me bhi update karo jo static text hai
+                const warningTitle = document.querySelector('.cs-warning-title');
+                if (warningTitle) {
+                    warningTitle.innerHTML = `Are you sure you want to cancel the subscription for 
+                        <strong>${data.agencyName || 'this Agency'}</strong>?<br>
+                        This action cannot be undone`;
+                }
+            },
+            error: function () {
+                console.error("Could not load agency name.");
+            }
+        });
+    }
+
+    // ==========================================
+    // CONFIRM CANCEL — API CALL
+    // ==========================================
+    function confirmCancellation() {
+        if (!agencyId) {
+            showCustomAlert("Invalid subscription.");
+            return;
+        }
+
+        // Reason dropdown se value lo
+        const reasonInput = document.querySelector('input[name="cancellation_reason"]');
+        const reason = reasonInput ? reasonInput.value : 'Not specified';
+
+        // Comments (agar koi textarea hai)
+        const commentsEl = document.getElementById('cancellationComments');
+        const comments = commentsEl ? commentsEl.value.trim() : '';
+
+        const confirmBtn = document.getElementById('confirmCancelBtn');
+        if (confirmBtn) {
+            confirmBtn.disabled     = true;
+            confirmBtn.textContent  = "Cancelling...";
+        }
+
+        $.ajax({
+            url:         `${BASE_URL}/api/admin/subscriptions/cancel/${agencyId}`,
+            type:        'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                adminId:  parseInt(adminId),
+                reason:   reason,
+                comments: comments
+            }),
+            success: function () {
+                showCustomAlert("Subscription Cancelled Successfully!");
+                setTimeout(() => {
+                    window.location.href = "AdminSubscription.html";
+                }, 1200);
+            },
+            error: function (err) {
+                const msg = err.responseJSON?.error || "Failed to cancel. Please try again.";
+                showCustomAlert(msg);
+                if (confirmBtn) {
+                    confirmBtn.disabled    = false;
+                    confirmBtn.textContent = "Confirm Cancellation";
+                }
+            }
+        });
+    }
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function () {
+        loadAgencyName();
+
+        const confirmBtn = document.getElementById('confirmCancelBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', confirmCancellation);
+        }
+    });
+</script>
 
     <script>
 
