@@ -107,7 +107,7 @@
                         <img src="Images/Subcribe50x50.ico" alt="">
                     </div>
                     <div class="sub-title-text">
-                        <h1>Company Details: Acme Corp</h1>
+                        <h1></h1>
                         <p>View and manage the company's active subscription details</p>
                     </div>
                 </div>
@@ -160,7 +160,7 @@
 
                         <div class="sub-detail-row">
                             <span class="sub-key">Plan</span>
-                            <span class="sub-val" id="agencyPlan">Premium</span>
+                            <span class="sub-val" id="agencyPlan"></span>
                         </div>
                         <div class="sub-detail-row">
                             <span class="sub-key">Status</span>
@@ -168,11 +168,11 @@
                         </div>
                         <div class="sub-detail-row">
                             <span class="sub-key">Start Date</span>
-                            <span class="sub-val">Oct 01, 2025</span>
+                            <span class="sub-val"></span>
                         </div>
                         <div class="sub-detail-row">
                             <span class="sub-key">Next Billing</span>
-                            <span class="sub-val">Nov 01, 2025</span>
+                            <span class="sub-val"></span>
                         </div>
                     </div>
 
@@ -309,7 +309,7 @@ EXISTING last <script> block REPLACE karo is se
                     const agencyName = data.agencyName || 'Agency';
                     document.title = `Quantifyre Iris - ${agencyName}`;
                     const h1El = document.querySelector('.sub-title-text h1');
-                    if (h1El) h1El.textContent = `Company Details: ${agencyName}`;
+                    if (h1El) h1El.textContent = `Agency Details: ${agencyName}`;
 
                     // Input fields
                     setField('agencyName', data.agencyName);
