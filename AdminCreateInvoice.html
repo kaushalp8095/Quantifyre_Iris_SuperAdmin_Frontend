@@ -280,14 +280,17 @@
         $(document).ready(function () {
 
             function fetchNextInvoiceNumber() {
+                // localhost hatakar apni Hugging Face URL use karein
+                const API_URL = "https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/invoices/next-no";
+
                 $.ajax({
-                    url: 'http://localhost:8080/api/admin/invoices/next-no', // Tumhara naya endpoint
+                    url: API_URL,
                     type: 'GET',
                     success: function (nextNo) {
-                        $('#invoiceNo').val(nextNo); // Backend se aaya hua sahi number set kar diya
+                        $('#invoiceNo').val(nextNo);
                     },
-                    error: function () {
-                        console.error("Invoice number fetch failed");
+                    error: function (xhr) {
+                        console.error("Invoice number fetch failed", xhr);
                     }
                 });
             }
