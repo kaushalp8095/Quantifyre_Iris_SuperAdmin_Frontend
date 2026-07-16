@@ -86,34 +86,25 @@
                 $btn.text("Verifying...").prop("disabled", true);
 
                 $.ajax({
-                    url: 'https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/login',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    
-                    data: JSON.stringify({ email: email, password: password }),
+                    url: "https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/login",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
                     success: function (response) {
-                        if (response.status === "success" || response.adminId) {
-                            localStorage.setItem('isAdminLoggedIn', 'true');
-                            localStorage.setItem('adminId', response.adminId); // 👈 Most Important
-                            localStorage.setItem('loginTime', new Date().getTime());
-                            localStorage.setItem('adminName', response.name);
-                            localStorage.setItem('adminEmail', response.email);
 
-                            document.cookie = "isAdminLoggedIn=true; path=/; max-age=86400; SameSite=Lax";
+                        localStorage.setItem("isAdminLoggedIn", "true");
+                        localStorage.setItem("adminId", response.adminId);
+                        localStorage.setItem("adminName", response.name);
 
-                            $btn.text("Success! Redirecting...");
-                            setTimeout(function () {
-                                window.location.href = "AdminDashboard.html";
-                            }, 500);
-                        } else {
-                            errorBox.text("Login failed. Please try again.").show();
-                            $btn.text("Login").prop("disabled", false);
-                        }
+                        window.location.href = "AdminDashboard.html";
                     },
                     error: function (xhr) {
-                        var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : "Invalid Credentials!";
-                        errorBox.text(msg).show();
-                        $btn.text("Login").prop("disabled", false);
+                        $("#loginError").text(
+                            xhr.responseJSON?.message || "Invalid Credentials!"
+                        ).show();
                     }
                 });
             });
