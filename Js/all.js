@@ -12,9 +12,7 @@ $.ajaxPrefilter(function (options) {
 
     // CORS ke liye credentials enable karna zaroori hai
     options.crossDomain = true;
-    options.xhrFields = {
-        withCredentials: true
-    };
+    
 });
 
 
@@ -156,9 +154,6 @@ function confirmLogout() {
     $.ajax({
         url: "https://kaushalpatel-quantifyre-admin-backend.hf.space/api/admin/logout",
         type: "POST",
-        xhrFields: {
-            withCredentials: true // 🔴 Ye line sabse zaroori hai cookie delete karne ke liye
-        },
         success: function () {
             // Backend se cookie delete hone ke baad, Frontend ka kachra saaf karo
             localStorage.clear();
