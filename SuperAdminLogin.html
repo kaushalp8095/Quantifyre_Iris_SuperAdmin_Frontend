@@ -95,15 +95,12 @@
                     }),
                     success: function (response) {
 
-                        console.log("SUCCESS RESPONSE:", response);
+
 
                         localStorage.setItem("isAdminLoggedIn", "true");
                         localStorage.setItem("adminId", response.adminId);
+                        localStorage.setItem("adminName", response.name);
                         localStorage.setItem("loginTime", Date.now());
-
-                        console.log("After Save:");
-                        console.log(localStorage.getItem("isAdminLoggedIn"));
-                        console.log(localStorage.getItem("adminId"));
 
                         window.location.href = "AdminDashboard.html";
                     },
@@ -120,7 +117,7 @@
     </script>
     <script src="Js/jquery-3.7.1.min.js"></script>
     <script src="Js/all.js"></script>
-    <script src="Js/admin-auth-guard.js"></script>
+    <!-- <script src="Js/admin-auth-guard.js"></script> -->
 </body>
 
 </html>

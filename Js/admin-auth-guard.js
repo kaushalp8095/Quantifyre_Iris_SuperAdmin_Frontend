@@ -1,11 +1,11 @@
 (function () {
     // ✅ JS cookie reader
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-    }
+    // function getCookie(name) {
+    //     const value = `; ${document.cookie}`;
+    //     const parts = value.split(`; ${name}=`);
+    //     if (parts.length === 2) return parts.pop().split(';').shift();
+    //     return null;
+    // }
 
     const path = window.location.pathname;
     const isLoginPage = path.toLowerCase().includes("superadminlogin.html");
@@ -14,14 +14,14 @@
     const adminId = localStorage.getItem("adminId");
     const loginTime = localStorage.getItem("loginTime"); // Backend se aayi hui timestamp
 
-    // ✅ KEY FIX: Cookie delete hui? → Force logout
-    const cookiePresent = getCookie("isAdminLoggedIn");
-    if (isLoggedIn === "true" && !cookiePresent) {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.replace("SuperAdminLogin.html");
-        return;
-    }
+    // // ✅ KEY FIX: Cookie delete hui? → Force logout
+    // const cookiePresent = getCookie("isAdminLoggedIn");
+    // if (isLoggedIn === "true" && !cookiePresent) {
+    //     localStorage.clear();
+    //     sessionStorage.clear();
+    //     window.location.replace("SuperAdminLogin.html");
+    //     return;
+    // }
 
     // 1. ⏰ FRONTEND SESSION EXPIRY (24 Hours Check)
     const ONE_DAY = 24 * 60 * 60 * 1000;
